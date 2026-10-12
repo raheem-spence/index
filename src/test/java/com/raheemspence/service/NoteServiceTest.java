@@ -504,6 +504,160 @@ class NoteServiceTest {
         assertEquals(noteList.get(1).getOwner().getLastName(), recentNotesResponse.get(1).getOwnerLastName());
         assertEquals(noteList.get(1).getCreatedAt(), recentNotesResponse.get(1).getCreatedAt());
         assertEquals(noteList.get(1).getUpdatedAt(), recentNotesResponse.get(1).getUpdatedAt());
+    }
 
+    // notes list empty
+    @Test
+    void getRecentNotesValidRequestReturnsEmptyList() {
+        // 1. Arrange
+        Long userId = 1L;
+
+        when(noteRepository.findAccessibleNotesByUserId(eq(userId), any(Pageable.class))).thenReturn(List.of());
+
+        // 2. Act
+        List<NoteResponse> emptyList = noteService.getRecentNotes(userId);
+
+        // 3. Assert
+        assertNotNull(emptyList);
+        assertTrue(emptyList.isEmpty());
+    }
+
+    // ==================== getNotesByCourseId ====================
+    // happy path
+    @Test
+    void getNotesByCourseIdReturnsNotesList() {
+        // 1. Arrange
+        Long userId = 1L;
+        Long courseId = 1L;
+
+        Course course = new Course();
+        course.setName("Jamaican History");
+        course.setId(courseId);
+
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setFirstName("Ra");
+        user1.setLastName("Ra");
+
+        User user2 = new User();
+        user2.setId(2L);
+        user2.setFirstName("Heem");
+        user2.setLastName("Boy");
+
+        Note note1 = new Note();
+        note1.setId(1L);
+        note1.setCourse(course);
+        note1.setTitle("Jamaica");
+        note1.setContent("Coconut Milk");
+        note1.setOwner(user1);
+        note1.setCreatedAt(Instant.parse("2026-10-10T10:00:00Z"));
+        note1.setUpdatedAt(Instant.parse("2026-10-12T10:00:00Z"));
+
+        Note note2 = new Note();
+        note2.setId(2L);
+        note2.setCourse(course);
+        note2.setTitle("Ackee and Saltfish");
+        note2.setContent("Food");
+        note2.setOwner(user2);
+        note2.setCreatedAt(Instant.parse("2017-09-05T10:00:00Z"));
+        note2.setUpdatedAt(Instant.parse("2026-10-12T10:43:00Z"));
+
+        List<Note> noteList = List.of(note2, note1);
+
+        when(courseMembershipRepository.existsByUserIdAndCourseId(userId, courseId)).thenReturn(true);
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
+        when(noteRepository.findByCourseIdOrderByUpdatedAtDesc(courseId)).thenReturn(noteList);
+
+        // 2. Act
+        List<NoteResponse> noteResponse = noteService.getNotesByCourseId(userId, courseId);
+
+        // 3. Assert
+        assertNotNull(noteResponse);
+        assertEquals(noteList.size(), noteResponse.size());
+        assertEquals(noteList.get(0).getOwner().getId(), noteResponse.get(0).getOwnerId());
+        assertEquals(noteList.get(0).getOwner().getFirstName(), noteResponse.get(0).getOwnerFirstName());
+        assertEquals(noteList.get(0).getOwner().getLastName(), noteResponse.get(0).getOwnerLastName());
+        assertEquals(noteList.get(0).getId(), noteResponse.get(0).getId());
+        assertEquals(noteList.get(0).getTitle(), noteResponse.get(0).getTitle());
+        assertEquals(noteList.get(0).getContent(), noteResponse.get(0).getContent());
+        assertEquals(noteList.get(0).getCourse().getName(), noteResponse.get(0).getCourseName());
+        assertEquals(noteList.get(0).getCourse().getId(), noteResponse.get(0).getCourseId());
+        assertEquals(noteList.get(0).getCreatedAt(), noteResponse.get(0).getCreatedAt());
+        assertEquals(noteList.get(0).getUpdatedAt(), noteResponse.get(0).getUpdatedAt());
+
+        assertEquals(noteList.get(1).getOwner().getId(), noteResponse.get(1).getOwnerId());
+        assertEquals(noteList.get(1).getOwner().getFirstName(), noteResponse.get(1).getOwnerFirstName());
+        assertEquals(noteList.get(1).getOwner().getLastName(), noteResponse.get(1).getOwnerLastName());
+        assertEquals(noteList.get(1).getId(), noteResponse.get(1).getId());
+        assertEquals(noteList.get(1).getTitle(), noteResponse.get(1).getTitle());
+        assertEquals(noteList.get(1).getContent(), noteResponse.get(1).getContent());
+        assertEquals(noteList.get(1).getCourse().getName(), noteResponse.get(1).getCourseName());
+        assertEquals(noteList.get(1).getCourse().getId(), noteResponse.get(1).getCourseId());
+        assertEquals(noteList.get(1).getCreatedAt(), noteResponse.get(1).getCreatedAt());
+        assertEquals(noteList.get(1).getUpdatedAt(), noteResponse.get(1).getUpdatedAt());
+
+    }
+
+    // notes list empty
+    @Test
+    void getNotesByCourseIdReturnsEmptyList() {
+        // 1. Arrange
+        Long userId = 1L;
+        Long courseId = 1L;
+
+        Course course = new Course();
+        course.setId(courseId);
+
+        List<Note> emptyList = List.of();
+
+        when(courseMembershipRepository.existsByUserIdAndCourseId(userId, courseId)).thenReturn(true);
+        when(courseRepository.findById(courseId)).thenReturn(Optional.of(course));
+        when(noteRepository.findByCourseIdOrderByUpdatedAtDesc(courseId)).thenReturn(emptyList);
+
+        // 2. Act
+        List<NoteResponse> emptyNoteResponse = noteService.getNotesByCourseId(userId, courseId);
+
+        // 3. Assert
+        assertNotNull(emptyNoteResponse);
+        assertTrue(emptyNoteResponse.isEmpty());
+    }
+
+    // user not member 403 -- FORBIDDEN
+    @Test
+    void getNotesByCourseIdUserNotCourseMemberThrowsForbidden() {
+        // 1. Arrange
+        Long userId = 1L;
+        Long courseId = 1L;
+
+        when(courseMembershipRepository.existsByUserIdAndCourseId(userId, courseId)).thenReturn(false);
+
+        // 2. Act
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> {
+                    noteService.getNotesByCourseId(userId, courseId);
+                });
+
+        // 3. Assert
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
+    }
+
+    // course note found 404 -- NOT FOUND
+    @Test
+    void getNotesByCourseIdCourseDoesNotExistThrowsNotFound() {
+        // 1. Arrange
+        Long userId = 1L;
+        Long courseId = 1L;
+
+        when(courseMembershipRepository.existsByUserIdAndCourseId(userId, courseId)).thenReturn(true);
+        when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
+
+        // 2. Act
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> {
+                    noteService.getNotesByCourseId(userId, courseId);
+                });
+
+        // 3. Assert
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
     }
 }

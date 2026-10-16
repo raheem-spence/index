@@ -11,7 +11,5 @@ public class CreateCourseRequest {
     @NotBlank(message = "Class name cannot be empty")
     private String courseName;
 
-    @NotBlank(message = "School cannot be empty")
     private String school;
-
 }

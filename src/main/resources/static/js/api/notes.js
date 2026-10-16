@@ -3,7 +3,7 @@ import { handleAuth } from "./auth.js";
 export async function loadDashboardNotes() {
     try {
         // 1. send the network request
-        const response = await fetch(`http://127.0.0.1:8080/courses/notes`, {
+        const response = await fetch(`/courses/notes`, {
             method: 'GET',
             credentials: 'include'
         });
@@ -31,7 +31,7 @@ export async function loadDashboardNotes() {
 export async function loadNotes(courseId) {
     try {
         // 1. send the network request
-        const response = await fetch(`http://127.0.0.1:8080/courses/${courseId}/notes`, {
+        const response = await fetch(`/courses/${courseId}/notes`, {
             method: 'GET',
             credentials: 'include'
         });
@@ -59,7 +59,7 @@ export async function loadNotes(courseId) {
 
 export async function createNote(courseId, noteData) {
     try {
-        const response = await fetch(`http://127.0.0.1:8080/courses/${courseId}/notes`, {
+        const response = await fetch(`/courses/${courseId}/notes`, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -90,7 +90,7 @@ export async function createNote(courseId, noteData) {
 
 export async function updateNote(courseId, noteData, noteId) {
     try {
-        const response = await fetch(`http://127.0.0.1:8080/courses/${courseId}/notes/${noteId}`, {
+        const response = await fetch(`/courses/${courseId}/notes/${noteId}`, {
             method: 'PUT',
             credentials: 'include',
             headers: {
@@ -123,7 +123,7 @@ export async function updateNote(courseId, noteData, noteId) {
 
 export async function deleteNote(courseId, noteId) {
     try {
-        const response = await fetch(`http://127.0.0.1:8080/courses/${courseId}/notes/${noteId}`, {
+        const response = await fetch(`/courses/${courseId}/notes/${noteId}`, {
             method: 'DELETE',
             credentials: 'include'
         });

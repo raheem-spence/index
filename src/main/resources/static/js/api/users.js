@@ -2,7 +2,7 @@ import { handleAuth } from "./auth.js";
 
 export async function fetchCurrentUser() {
     try {
-        const response = await fetch('http://127.0.0.1:8080/users/me', {
+        const response = await fetch('/users/me', {
             method: 'GET',
             credentials: 'include'
         });

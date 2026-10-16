@@ -3,7 +3,7 @@ import { handleAuth } from "./auth.js";
 export async function fetchCourses() {
     try {
         // 1. send the network request
-        const response = await fetch('http://127.0.0.1:8080/course/my-courses', {
+        const response = await fetch('/course/my-courses', {
             method: 'GET',
             credentials: 'include'
         });
@@ -30,7 +30,7 @@ export async function fetchCourses() {
 
 export async function fetchCourseDetails(courseId) {
     try {
-        const response = await fetch(`http://127.0.0.1:8080/course/${courseId}`, {
+        const response = await fetch(`/course/${courseId}`, {
             method: 'GET',
             credentials: 'include'
         });
@@ -55,7 +55,7 @@ export async function fetchCourseDetails(courseId) {
 
 export async function fetchCourseMembers(courseId) {
     try {
-        const response = await fetch(`http://127.0.0.1:8080/course/${courseId}/members`, {
+        const response = await fetch(`/course/${courseId}/members`, {
             method: 'GET',
             credentials: 'include'
         });
@@ -80,7 +80,7 @@ export async function fetchCourseMembers(courseId) {
 
 export async function createCourse(courseName) {
     try {
-        const response = await fetch(`http://127.0.0.1:8080/course/create`, {
+        const response = await fetch(`/course/create`, {
             method: 'POST',
             credentials: 'include',
             headers: {

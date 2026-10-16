@@ -1,7 +1,7 @@
 // imports
 import { fetchCourses, fetchCourseDetails, fetchCourseMembers } from "../api/courses.js";
 import { fetchCurrentUser } from "../api/users.js";
-import { loadNotes, createNote, deleteNote } from "../api/notes.js"
+import { loadNotes, createNote, deleteNote, updateNote } from "../api/notes.js"
 import { formatRelativeTime, delay, formatDate } from "../utilities.js";
 
 // constanst / URL params / DOM elements
@@ -56,7 +56,6 @@ async function renderCourseView(courseId) {
 
     // get course notes
     const courseNotes = await loadNotes(courseId);
-    console.log(courseNotes);
 
     // get current user
     const currentUser = await fetchCurrentUser();
@@ -455,9 +454,10 @@ function renderCreateNoteModal(courseDetails, insertNewNote) {
                 modalNoteTitleInput.classList.remove('input-error');
             }
         } else {
-            if (modalNoteTitleInput.value.trim() != "") {
+            if (modalNoteTitleInput.value.trim() !== "") {
                 titleError.classList.add('hidden');
                 modalNoteTitleInput.classList.remove('input-error');
+                titleHasError = false;
             } else {
                 titleError.classList.remove('hidden');
                 modalNoteTitleInput.classList.add('input-error');
@@ -473,9 +473,10 @@ function renderCreateNoteModal(courseDetails, insertNewNote) {
                 modalNoteContent.classList.remove('content-error');
             }
         } else {
-            if (modalNoteContent.value.trim() != "") {
+            if (modalNoteContent.value.trim() !== "") {
                 contentError.classList.add('hidden');
                 modalNoteContent.classList.remove('content-error');
+                contentHasError = false;
             } else {
                 contentError.classList.remove('hidden');
                 modalNoteContent.classList.add('content-error');
@@ -489,17 +490,21 @@ function renderCreateNoteModal(courseDetails, insertNewNote) {
             content: modalNoteContent.value
         }
 
-        if (noteData.title.trim() === "") {
+        const validated = validateNoteData(noteData.title, noteData.content);
+
+        if (validated.titleHasError) {
             titleError.classList.remove('hidden');
             modalNoteTitleInput.classList.add('input-error');
             titleHasError = true;
-            return;
         }
 
-        if (noteData.content.trim() === "") {
+        if (validated.contentHasError) {
             contentError.classList.remove('hidden');
             modalNoteContent.classList.add('content-error');
             contentHasError = true;
+        }
+
+        if (validated.titleHasError || validated.contentHasError) {
             return;
         }
         
@@ -719,12 +724,14 @@ function addNote(newNoteData) {
     return noteLi;
 }
 
-function renderNoteDetailView(noteData) {
+async function renderNoteDetailView(noteData) {
     courseContainer.replaceChildren();
 
     const noteDetailContainer = document.createElement('div');
 
     const allBtnsDiv = document.createElement('div');
+    
+    const currUser = await fetchCurrentUser();
 
     const backBtn = document.createElement('button');
     const backArrowSvgContainer = document.createElement('div');
@@ -744,8 +751,26 @@ function renderNoteDetailView(noteData) {
         renderRoute(courseId);
     })
 
+    const noteCourseDiv = document.createElement('div');
+    const noteCourseATag = document.createElement('a');
+
+    
+    noteCourseATag.textContent = noteData.courseName;
+    noteCourseATag.href = `course.html?courseId=${noteData.courseId}`;
+
+    noteCourseATag.classList.add('note-course-a-tag');
+    noteCourseDiv.classList.add('note-course-div');
+
+    noteCourseDiv.append(noteCourseATag);
+
     const noteTitle = document.createElement('h1');
     const noteContent = document.createElement('p');
+
+    const metadataSeparator = document.createElement('p');
+    metadataSeparator.textContent = "·";
+
+    const metadataSeparatorTwo = document.createElement('p');
+    metadataSeparatorTwo.textContent = "·";
 
     const noteMetaDataDiv = document.createElement('div');
     const date = document.createElement('p');
@@ -755,124 +780,6 @@ function renderNoteDetailView(noteData) {
     const noteOwnerDateDiv = document.createElement('div');
     const noteOwner = document.createElement('p');
 
-    const actionButtonsDiv = document.createElement('div');
-    const editSvgContainer = document.createElement('div');
-    const editBtn = document.createElement('button');
-    const editIconString = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" 
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" 
-                            stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil" 
-                            style="color: var(--muted-foreground);"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z">
-                            </path><path d="m15 5 4 4"></path></svg>`;
-    editSvgContainer.innerHTML = editIconString;
-
-    const delSvgContainer = document.createElement('div');
-    const delIconString = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" 
-                            fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" 
-                            class="lucide lucide-trash2 lucide-trash-2"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6">
-                            </path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" x2="10" y1="11" y2="17"></line><line x1="14" x2="14" y1="11" y2="17"></line>
-                            </svg>`;
-    delSvgContainer.innerHTML = delIconString;
-    const deleteDiv = document.createElement('div');
-    const deleteLabel = document.createElement('p');
-    const deleteConfirmLabel = document.createElement('p');
-    deleteLabel.textContent = "Delete";
-    deleteConfirmLabel.textContent = "Delete?";
-    
-    const yesBtn = document.createElement('button');
-    const noBtn = document.createElement('button');
-
-    yesBtn.textContent = "Yes";
-    noBtn.textContent = "No";
-
-    yesBtn.classList.add('yes-btn');
-    noBtn.classList.add('no-btn');
-
-    yesBtn.style.display = 'none';
-    noBtn.style.display = 'none';
-    deleteConfirmLabel.style.display = 'none';
-
-
-    editBtn.addEventListener('click', () => {
-        noteDetailContainer.replaceChildren();
-
-        const topLvlDiv = document.createElement('div');
-
-        const editingNoteDiv = document.createElement('div');
-        const editIconSvgContainer = document.createElement('div');
-        const editTxtSpan = document.createElement('span');
-
-        editTxtSpan.textContent = "Editing note";
-        editIconSvgContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" 
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
-                                        stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil" 
-                                        style="color: var(--primary);"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z">
-                                        </path><path d="m15 5 4 4"></path></svg>`;
-
-        const btnOptionsDiv = document.createElement('div');
-        const cancelBtn = document.createElement('button');
-        const saveChangesBtn = document.createElement('button');
-
-        cancelBtn.textContent = "Cancel";
-        saveChangesBtn.textContent = "Save Changes";
-
-        editingNoteDiv.append(editIconSvgContainer, editTxtSpan);
-        btnOptionsDiv.append(cancelBtn, saveChangesBtn);
-
-        topLvlDiv.append(editingNoteDiv, btnOptionsDiv);
-
-        noteDetailContainer.append(topLvlDiv);
-    })
-
-    deleteDiv.addEventListener('click', (event) => {
-       
-        deleteDiv.classList.add('clicked');
-
-        delSvgContainer.style.display = 'none';
-        yesBtn.style.display = '';
-        noBtn.style.display = '';
-        deleteLabel.style.display = 'none';
-        deleteConfirmLabel.style.display = '';
-
-    })
-
-    yesBtn.addEventListener('click', async (event) => {
-        // stop the event from bubbling up to the parent
-        event.stopPropagation();
-
-        // delete note
-        const deleted = await deleteNote(courseId, noteData.id);
-        if (deleted) {
-            resetDeleteBtn(deleteDiv, deleteLabel, deleteConfirmLabel, delSvgContainer, yesBtn, noBtn);
-            
-            const currUrlParams = new URLSearchParams(window.location.search);
-            currUrlParams.delete('noteId');
-
-            const currUrl = baseCourseUrl + '?' + currUrlParams.toString();
-            history.replaceState(null, '', currUrl);
-
-            renderRoute(courseId);
-            showToast("Note deleted");
-        }
-
-    })
-
-    noBtn.addEventListener('click', (event) => {
-        // stop the event from bubbling up to the parent
-        event.stopPropagation();
-        resetDeleteBtn(deleteDiv, deleteLabel, deleteConfirmLabel, delSvgContainer, yesBtn, noBtn);
-    })
-
-    document.addEventListener('click', (event) => {
-        const isClickInside = deleteDiv.contains(event.target);
-
-        if (!isClickInside) {
-           resetDeleteBtn(deleteDiv, deleteLabel, deleteConfirmLabel, delSvgContainer, yesBtn, noBtn);
-        }
-    })
-
-
-    editBtn.textContent = "Edit";
-
     backBtn.textContent = "All notes";
 
     initalsSpan.textContent = noteData.ownerFirstName[0].toUpperCase() + noteData.ownerLastName[0].toUpperCase();
@@ -880,16 +787,6 @@ function renderNoteDetailView(noteData) {
     noteContent.textContent = noteData.content;
     noteOwner.textContent = noteData.ownerFirstName + " " + noteData.ownerLastName;
 
-    if (noteData.updatedAt != noteData.createdAt) {
-        date.textContent = `Updated ${formatDate(noteData.updatedAt)}`;
-    } else {
-        date.textContent = `Created ${formatDate(noteData.createdAt)}`;
-    }
-
-    actionButtonsDiv.classList.add('action-buttons-div');
-    allBtnsDiv.classList.add('all-btns-div');
-    editBtn.classList.add('note-view-edit-btn');
-    deleteDiv.classList.add('note-view-del-btn');
     noteDetailContainer.classList.add('note-detail-container');
     backBtn.classList.add('back-btn');
     noteTitle.classList.add('note-view-title');
@@ -900,18 +797,296 @@ function renderNoteDetailView(noteData) {
     initalsSpan.classList.add('initials-span');
     date.classList.add('note-view-date');
     noteOwnerDateDiv.classList.add('note-owner-date-div');
+    allBtnsDiv.classList.add('all-btns-div');
 
-    editBtn.prepend(editSvgContainer);
-    deleteDiv.append(delSvgContainer, deleteLabel, deleteConfirmLabel, yesBtn, noBtn);
 
-    actionButtonsDiv.append(editBtn, deleteDiv);
-    allBtnsDiv.append(backBtn, actionButtonsDiv);
-    noteOwnerDateDiv.append(noteOwner, date);
-    initialsDiv.append(initalsSpan);
-    noteMetaDataDiv.append(initialsDiv, noteOwnerDateDiv);
-    backBtn.prepend(backArrowSvgContainer);
-    noteDetailContainer.append(allBtnsDiv, noteTitle, noteMetaDataDiv, noteContent);
-    courseContainer.append(noteDetailContainer);
+
+    if (noteData.updatedAt != noteData.createdAt) {
+        date.textContent = `Updated ${formatDate(noteData.updatedAt)}`;
+    } else {
+        date.textContent = `Created ${formatDate(noteData.createdAt)}`;
+    }
+
+
+    if (currUser.id === noteData.ownerId) {
+
+        const actionButtonsDiv = document.createElement('div');
+        const editSvgContainer = document.createElement('div');
+        const editBtn = document.createElement('button');
+        const editIconString = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" 
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" 
+                                stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil" 
+                                style="color: var(--muted-foreground);"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z">
+                                </path><path d="m15 5 4 4"></path></svg>`;
+        editSvgContainer.innerHTML = editIconString;
+    
+        const delSvgContainer = document.createElement('div');
+        const delIconString = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" 
+                                fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" 
+                                class="lucide lucide-trash2 lucide-trash-2"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6">
+                                </path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" x2="10" y1="11" y2="17"></line><line x1="14" x2="14" y1="11" y2="17"></line>
+                                </svg>`;
+        delSvgContainer.innerHTML = delIconString;
+        const deleteDiv = document.createElement('div');
+        const deleteLabel = document.createElement('p');
+        const deleteConfirmLabel = document.createElement('p');
+        deleteLabel.textContent = "Delete";
+        deleteConfirmLabel.textContent = "Delete?";
+        
+        const yesBtn = document.createElement('button');
+        const noBtn = document.createElement('button');
+    
+        yesBtn.textContent = "Yes";
+        noBtn.textContent = "No";
+    
+        yesBtn.classList.add('yes-btn');
+        noBtn.classList.add('no-btn');
+    
+        yesBtn.style.display = 'none';
+        noBtn.style.display = 'none';
+        deleteConfirmLabel.style.display = 'none';
+    
+    
+        editBtn.addEventListener('click', () => {
+           renderNoteEditView(noteData, noteDetailContainer);
+        })
+    
+        deleteDiv.addEventListener('click', (event) => {
+           
+            deleteDiv.classList.add('clicked');
+    
+            delSvgContainer.style.display = 'none';
+            yesBtn.style.display = '';
+            noBtn.style.display = '';
+            deleteLabel.style.display = 'none';
+            deleteConfirmLabel.style.display = '';
+    
+        })
+    
+        yesBtn.addEventListener('click', async (event) => {
+            // stop the event from bubbling up to the parent
+            event.stopPropagation();
+    
+            // delete note
+            const deleted = await deleteNote(courseId, noteData.id);
+            if (deleted) {
+                resetDeleteBtn(deleteDiv, deleteLabel, deleteConfirmLabel, delSvgContainer, yesBtn, noBtn);
+                
+                const currUrlParams = new URLSearchParams(window.location.search);
+                currUrlParams.delete('noteId');
+    
+                const currUrl = baseCourseUrl + '?' + currUrlParams.toString();
+                history.replaceState(null, '', currUrl);
+    
+                renderRoute(courseId);
+                showToast("Note deleted");
+            }
+    
+        })
+    
+        noBtn.addEventListener('click', (event) => {
+            // stop the event from bubbling up to the parent
+            event.stopPropagation();
+            resetDeleteBtn(deleteDiv, deleteLabel, deleteConfirmLabel, delSvgContainer, yesBtn, noBtn);
+        })
+    
+        document.addEventListener('click', (event) => {
+            const isClickInside = deleteDiv.contains(event.target);
+    
+            if (!isClickInside) {
+               resetDeleteBtn(deleteDiv, deleteLabel, deleteConfirmLabel, delSvgContainer, yesBtn, noBtn);
+            }
+        })
+    
+    
+        editBtn.textContent = "Edit";
+
+        actionButtonsDiv.classList.add('action-buttons-div');
+        allBtnsDiv.classList.add('all-btns-div');
+        editBtn.classList.add('note-view-edit-btn');
+        deleteDiv.classList.add('note-view-del-btn');
+
+        editBtn.prepend(editSvgContainer);
+        deleteDiv.append(delSvgContainer, deleteLabel, deleteConfirmLabel, yesBtn, noBtn);
+    
+        actionButtonsDiv.append(editBtn, deleteDiv);
+        allBtnsDiv.append(backBtn, actionButtonsDiv);
+        noteOwnerDateDiv.append(noteOwner, metadataSeparator, date);
+        initialsDiv.append(initalsSpan);
+        noteMetaDataDiv.append(initialsDiv, noteOwnerDateDiv, metadataSeparatorTwo, noteCourseDiv);
+        backBtn.prepend(backArrowSvgContainer);
+        noteDetailContainer.append(allBtnsDiv, noteTitle, noteMetaDataDiv, noteContent);
+        courseContainer.append(noteDetailContainer);
+    } else {
+        const viewOnlyDiv = document.createElement('div');
+        const eyeIconSvgContainer = document.createElement('div');
+        eyeIconSvgContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+                                        class="lucide lucide-eye preview-icon">
+                                        <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                        </svg>`;
+        const viewOnlyTxt = document.createElement('span');
+        viewOnlyTxt.textContent = "View only";
+
+        viewOnlyDiv.classList.add('view-only-div');
+        viewOnlyTxt.classList.add('view-only-span');
+
+        viewOnlyDiv.append(eyeIconSvgContainer, viewOnlyTxt);
+        allBtnsDiv.append(backBtn, viewOnlyDiv);
+        noteOwnerDateDiv.append(noteOwner, metadataSeparator, date);
+        initialsDiv.append(initalsSpan);
+        noteMetaDataDiv.append(initialsDiv, noteOwnerDateDiv, metadataSeparatorTwo, noteCourseDiv);
+        backBtn.prepend(backArrowSvgContainer);
+        noteDetailContainer.append(allBtnsDiv, noteTitle, noteMetaDataDiv, noteContent);
+        courseContainer.append(noteDetailContainer);
+    }
+}
+
+function renderNoteEditView(noteData, noteDetailContainer) {
+    let hasAttemptedSave = false;
+
+    noteDetailContainer.replaceChildren();
+
+    const topLvlDiv = document.createElement('div');
+
+    const editingNoteDiv = document.createElement('div');
+    const editIconSvgContainer = document.createElement('div');
+    const editTxtSpan = document.createElement('span');
+
+    editTxtSpan.textContent = "Editing note";
+    editIconSvgContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" 
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+                                    stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil" 
+                                    style="color: var(--primary);"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z">
+                                    </path><path d="m15 5 4 4"></path></svg>`;
+
+    const btnOptionsDiv = document.createElement('div');
+    const cancelBtn = document.createElement('button');
+    const saveChangesBtn = document.createElement('button');
+
+    cancelBtn.textContent = "Cancel";
+    saveChangesBtn.textContent = "Save Changes";
+
+    const editTitleDiv = document.createElement('div');
+    const editTitleInput = document.createElement('input');
+    const editTitleLabel = document.createElement('label');
+    editTitleLabel.textContent = "Title";
+    editTitleInput.value = noteData.title;
+    editTitleInput.placeholder = "Note title...";
+
+    const editTitleError = document.createElement('p');
+    editTitleError.textContent = "Title needed";
+    editTitleError.classList.add('edit-input-error', 'field-error', 'hidden');
+
+    const editContentError = document.createElement('p');
+    editContentError.textContent = "Content needed";
+    editContentError.classList.add('field-error', 'hidden');
+
+
+    const editContentDiv = document.createElement('div');
+    const editContentLabel = document.createElement('label');
+    const editContentTxtArea = document.createElement('textarea');
+    editContentLabel.textContent = "Content";
+    editContentTxtArea.value = noteData.content;
+    editContentTxtArea.placeholder = "Start editing your note...";
+
+    editingNoteDiv.classList.add('editing-note-div');
+    btnOptionsDiv.classList.add('btn-options-div');
+    topLvlDiv.classList.add('top-lvl-div');
+    editIconSvgContainer.classList.add('edit-icon-svg');
+    cancelBtn.classList.add('cancel-btn');
+    saveChangesBtn.classList.add('save-btn');
+    editTitleInput.classList.add('edit-input-bar');
+    editContentDiv.classList.add('edit-content-div');
+    editContentLabel.classList.add('edit-label');
+    editTitleLabel.classList.add('edit-label');
+    editContentTxtArea.classList.add('edit-txt-area');
+    editTitleDiv.classList.add('edit-title-div');
+
+    cancelBtn.addEventListener('click', () => {
+        renderNoteDetailView(noteData);
+    })
+
+    editTitleInput.addEventListener('input', () => {
+        const validated = validateNoteData(editTitleInput.value, editContentTxtArea.value);
+
+        if (hasAttemptedSave) {
+            if (!validated.titleHasError) {
+                editTitleError.classList.add('hidden');
+                editTitleInput.classList.remove('has-error', 'input-error');
+            } else {
+                editTitleError.classList.remove('hidden');
+                editTitleInput.classList.add('has-error', 'input-error');
+            }
+        }
+    })
+
+
+    editContentTxtArea.addEventListener('input', () => {
+        const validated = validateNoteData(editTitleInput.value, editContentTxtArea.value);
+
+        if(hasAttemptedSave) {
+            if (validated.contentHasError) {
+                editContentError.classList.remove('hidden');
+                editContentTxtArea.classList.add('has-error', 'content-error');
+            } else {
+                editContentError.classList.add('hidden');
+                editContentTxtArea.classList.remove('has-error', 'content-error');
+            }
+        }
+    })
+
+    saveChangesBtn.addEventListener('click', async () => {
+        hasAttemptedSave = true;
+
+        const validated = validateNoteData(editTitleInput.value, editContentTxtArea.value);
+
+        if (validated.titleHasError) {
+            editTitleError.classList.remove('hidden');
+            editTitleInput.classList.add('has-error', 'input-error');
+        }
+
+        if (validated.contentHasError) {
+            editContentError.classList.remove('hidden');
+            editContentTxtArea.classList.add('has-error', 'content-error');
+        }
+
+        if (validated.titleHasError || validated.contentHasError) {
+            return;
+        }
+
+        const editNoteData = {
+            title: editTitleInput.value,
+            content: editContentTxtArea.value
+        }
+
+        const result = await updateNote(courseId, editNoteData, noteData.id);
+
+        if (result) {
+            const currUrlParams = new URLSearchParams(window.location.search);
+            currUrlParams.delete('noteId');
+
+            const currUrl = baseCourseUrl + '?' + currUrlParams.toString();
+            history.replaceState(null, '', currUrl);
+
+            renderRoute(courseId);
+            showToast("Note saved successfully");
+        }
+
+        })
+
+        editTitleDiv.append(editTitleLabel, editTitleInput);
+        editingNoteDiv.append(editIconSvgContainer, editTxtSpan);
+        btnOptionsDiv.append(cancelBtn, saveChangesBtn);
+
+        topLvlDiv.append(editingNoteDiv, btnOptionsDiv);
+        editContentDiv.append(editContentLabel, editContentTxtArea, editContentError);
+        editTitleDiv.append(editTitleLabel, editTitleInput, editTitleError);
+
+        noteDetailContainer.append(topLvlDiv, editTitleDiv, editContentDiv);
+
+        editTitleInput.focus();
 }
 
 
@@ -1049,7 +1224,6 @@ function createNotesEmptyState(mainMessage, secondaryMessage) {
 async function renderUser() {
 
     const user = await fetchCurrentUser();
-    console.log(user);
 
     const usernamePara = document.createElement('p');
     const userEmailPara = document.createElement('p');
@@ -1085,6 +1259,26 @@ async function renderRoute(courseId) {
         courseContainer.replaceChildren();
         renderCourseView(courseId)
     }
+}
+
+function validateNoteData(title, content) {
+    let titleHasError = false;
+    let contentHasError = false;
+
+    if (title.trim() === "") {
+        // do something
+        titleHasError = true;
+    }
+
+    if (content.trim() === "") {
+        // do something
+        contentHasError = true;
+    }
+
+    return {
+        titleHasError, 
+        contentHasError
+    };
 }
 
 

@@ -15,7 +15,7 @@ if (loginBtn) {
         const password = document.getElementById("password").value;
 
         try {
-        const response = await fetch("http://127.0.0.1:8080/auth/login", {
+        const response = await fetch("/auth/login", {
             method: "POST",
             credentials: "include",
             headers: {
@@ -29,7 +29,7 @@ if (loginBtn) {
         });
 
         if (response.ok) {
-            window.location.href = "dashboard.html";
+            window.location.href = "/dashboard.html";
     
         } else {
             errorDiv.classList.remove('hidden');
@@ -50,7 +50,7 @@ if (loginBtn) {
         const confirmPassword = document.getElementById("confirm-pw").value;
 
         try {
-            const response = await fetch("http://127.0.0.1:8080/auth/signup", {
+            const response = await fetch("/auth/signup", {
                 method: "POST",
                 credentials: "include",
                 headers: {
@@ -68,7 +68,7 @@ if (loginBtn) {
 
         
             if (response.ok) {
-                window.location.href = "dashboard.html";
+                window.location.href = "/dashboard.html";
             } else {
                 data = await response.json()
                 errorDiv.textContent = data.message;

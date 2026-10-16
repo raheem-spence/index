@@ -3,7 +3,7 @@ import { handleAuth } from "./auth.js";
 export async function fetchCourses() {
     try {
         // 1. send the network request
-        const response = await fetch('http://127.0.0.1:8080/course/my-courses', {
+        const response = await fetch('/course/my-courses', {
             method: 'GET',
             credentials: 'include'
         });
@@ -30,7 +30,7 @@ export async function fetchCourses() {
 
 export async function fetchCourseDetails(courseId) {
     try {
-        const response = await fetch(`http://127.0.0.1:8080/course/${courseId}`, {
+        const response = await fetch(`/course/${courseId}`, {
             method: 'GET',
             credentials: 'include'
         });
@@ -55,7 +55,7 @@ export async function fetchCourseDetails(courseId) {
 
 export async function fetchCourseMembers(courseId) {
     try {
-        const response = await fetch(`http://127.0.0.1:8080/course/${courseId}/members`, {
+        const response = await fetch(`/course/${courseId}/members`, {
             method: 'GET',
             credentials: 'include'
         });
@@ -75,5 +75,35 @@ export async function fetchCourseMembers(courseId) {
 
     } catch(error) {
         console.error('Fetch failed:', error)
+    }
+}
+
+export async function createCourse(courseName) {
+    try {
+        const response = await fetch(`/course/create`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(courseName)
+        });
+
+        const result = handleAuth(response);
+
+        if (!result) {
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`HTTP Error! Status: ${response.status}`);
+        }
+
+        const newCourse = await response.json();
+        return newCourse;
+
+    } catch(error) {
+        console.error('Error:', error);
+        return false;
     }
 }

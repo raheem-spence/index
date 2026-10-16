@@ -46,8 +46,7 @@ public class Course {
     // Class description (optional)
     private String description;
 
-    // School
-    @Column(nullable = false)
+    // School (optional)
     private String school;
 
     // Professor (optional)

@@ -113,7 +113,8 @@ export async function updateNote(courseId, noteData, noteId) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        return true;
+        const newEditNoteData = await response.json();
+        return newEditNoteData;
 
     } catch (error) {
         console.log('Error:', error)

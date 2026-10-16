@@ -77,3 +77,33 @@ export async function fetchCourseMembers(courseId) {
         console.error('Fetch failed:', error)
     }
 }
+
+export async function createCourse(courseName) {
+    try {
+        const response = await fetch(`http://127.0.0.1:8080/course/create`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(courseName)
+        });
+
+        const result = handleAuth(response);
+
+        if (!result) {
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`HTTP Error! Status: ${response.status}`);
+        }
+
+        const newCourse = await response.json();
+        return newCourse;
+
+    } catch(error) {
+        console.error('Error:', error);
+        return false;
+    }
+}

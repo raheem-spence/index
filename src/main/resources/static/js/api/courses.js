@@ -107,3 +107,33 @@ export async function createCourse(courseName) {
         return false;
     }
 }
+
+export async function joinCourse(joinCode) {
+    try {
+        const response = await fetch('/course/join', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify(joinCode)
+        });
+
+        const result = handleAuth(response);
+
+        if (!result) {
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`Http Error! Status: ${response.status}`);
+        }
+
+        const joinCourse = await response.json();
+        return joinCourse;
+
+    } catch(error) {
+        console.error('Error:', error);
+        return false;
+    }
+}

@@ -168,7 +168,6 @@ renderSideBarCourses(courses);
 renderDashboard();
 
 
-
 // Show user info
 await renderUser();
 
@@ -312,8 +311,6 @@ function renderCreateCourseModal() {
     createCourseSchoolDiv.classList.add('create-course-school-div');
     optional.classList.add('optional');
     schoolLabel.classList.add('school-label');
-
-
 
 
     // cancel and create buttons

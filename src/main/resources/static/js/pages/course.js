@@ -5,7 +5,7 @@ import { loadNotes, createNote, deleteNote, updateNote } from "../api/notes.js"
 import { formatRelativeTime, delay, formatDate } from "../utilities.js";
 
 // constanst / URL params / DOM elements
-const baseCourseUrl = 'http://127.0.0.1:5500/html/course.html'
+const baseCourseUrl = '/course.html'
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const courseId = Number(urlParams.get('courseId'));
@@ -1129,7 +1129,7 @@ function renderSideBarCourses(courses) {
         const fieldName = "courseId";
 
         for (const course of courses) {
-            const url = new URL(baseCourseUrl);
+            const url = new URL(baseCourseUrl, window.location.origin);
             const courseLi = document.createElement('li');
             courseLi.classList.add('course');
 

@@ -13,7 +13,15 @@ const courseId = urlParams.get('courseId');
 
 
 // ---------- DOM Elements ---------- 
+const courseTitle = document.getElementById('course-title');
+
+const noteContainer = document.getElementById("notes-container");
+
 const ulContainer = document.getElementById('course-list');
+
+const createNoteBtn = document.getElementById("create-note-btn");
+
+const newTitleInput = document.getElementById("note-title-input");
 
 const userDiv = document.getElementById("user-info");
 

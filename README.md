@@ -1,8 +1,8 @@
-# Margin
+# Index
 
-Margin is a course-based collaboration platform designed to help students organize classes, share learning resources, and collaborate with classmates.
+Index is a course-based collaboration platform designed to help students organize classes, share learning resources, and collaborate with classmates.
 
-Margin allows students to create or join courses, manage course-specific resources, and collaborate through shared notes. Access to resources is controlled through course membership, ensuring that only students within a course can view or contribute to that course's content.
+Index allows students to create or join courses, manage course-specific resources, and collaborate through shared notes. Access to resources is controlled through course membership, ensuring that only students within a course can view or contribute to that course's content.
 
 Built with Java Spring Boot, PostgreSQL, and Vanilla JS.
 

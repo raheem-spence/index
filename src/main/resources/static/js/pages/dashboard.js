@@ -1,4 +1,4 @@
-import { fetchCourses, createCourse } from "../api/courses.js";
+import { fetchCourses, createCourse, joinCourse } from "../api/courses.js";
 import { fetchCurrentUser } from "../api/users.js";
 import { loadDashboardNotes, deleteNote } from "../api/notes.js";
 import { formatRelativeTime, formatDate} from "../utilities.js";
@@ -18,10 +18,6 @@ const courseTitle = document.getElementById('course-title');
 const noteContainer = document.getElementById("notes-container");
 
 const ulContainer = document.getElementById('course-list');
-
-const createNoteBtn = document.getElementById("create-note-btn");
-
-const newTitleInput = document.getElementById("note-title-input");
 
 const userDiv = document.getElementById("user-info");
 
@@ -143,6 +139,7 @@ function renderDashboard() {
     dashboardHeader.append(dashboardTitleContainer, btnContainer);
 
     const createCourseModal = renderCreateCourseModal();
+    const joinCourseModal = renderJoinCourseModal();
 
     createClsBtn.addEventListener('click', () => {
         createCourseModal.showModal();
@@ -153,7 +150,16 @@ function renderDashboard() {
         document.body.style.overflow = "";
     })
 
-    dashboardDiv.append(dashboardHeader, coursesSection, notesSection, createCourseModal);
+    joinClsBtn.addEventListener('click', () => {
+        joinCourseModal.showModal();
+        document.body.style.overflow = 'hidden';
+    })
+
+    joinCourseModal.addEventListener('close', () => {
+        document.body.style.overflow = "";
+    })
+
+    dashboardDiv.append(dashboardHeader, coursesSection, notesSection, createCourseModal, joinCourseModal);
     renderDashboardCourses(coursesGrid, coursesSection, courses);
     renderDashboardNotes(notesSection);
 }
@@ -163,17 +169,15 @@ function renderDashboard() {
 // ---------- Initialization ---------- 
 
 // Show user courses
-const courses = await fetchCourses();
+let courses = await fetchCourses();
 renderSideBarCourses(courses);
 renderDashboard();
-
 
 // Show user info
 await renderUser();
 
-
 // ---------- Dashboard ----------
-async function renderDashboardCourses(coursesGrid, coursesSection, courses) {
+function renderDashboardCourses(coursesGrid, coursesSection, courses) {
 
     coursesGrid.replaceChildren();
 
@@ -237,6 +241,141 @@ async function renderDashboardCourses(coursesGrid, coursesSection, courses) {
             coursesGrid.appendChild(courseATag);
         }
     }
+}
+
+function renderJoinCourseModal() {
+
+// join course modal
+    const joinCourseModal = document.createElement('dialog');
+
+    const joinCourseModalContainer = document.createElement('div');
+
+    // close btn
+    const joinCourseCloseBtn = document.createElement('button');
+    const closeBtnString = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" 
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+                            stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
+                            <path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>`;   
+    
+    joinCourseCloseBtn.innerHTML = closeBtnString;
+    joinCourseCloseBtn.setAttribute('aria-label', 'Close');
+
+    
+    // header div
+    const peopleSvgContainer = document.createElement('div');
+    peopleSvgContainer.innerHTML =`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" 
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" 
+                                    stroke-linejoin="round" class="lucide lucide-users preview-icon">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/>
+                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>`;
+
+    const joinCourseModalHeader = document.createElement('div');
+
+    const joinCourseTitleMsgDiv = document.createElement('div');
+    const joinCourseTitle = document.createElement('h1');
+    const joinCourseMsg = document.createElement('p');
+
+    joinCourseTitle.textContent = "Join a course";
+    joinCourseMsg.textContent = "Enter the course code to join an existing course";
+
+
+    // course code input bar
+    const joinCourseCodeDiv = document.createElement('div');
+    const joinCourseLabel = document.createElement('label');
+    const asterisk = document.createElement('span');
+    const joinCourseInput = document.createElement('input');
+    const joinCourseCodeError = document.createElement('p');
+    const joinCourseSecondMsgDiv = document.createElement('div');
+    const joinCourseSecondMsg = document.createElement('p');
+    const iIconSvgContainer = document.createElement('div');
+    iIconSvgContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" 
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+                                    class="lucide lucide-circle-alert preview-icon"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" 
+                                    y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`;
+    
+    joinCourseSecondMsgDiv.classList.add('join-course-scd-msg-div');
+    iIconSvgContainer.classList.add('i-icon-svg');
+
+    joinCourseCodeError.textContent = "Please enter a course code";
+    joinCourseCodeError.classList.add('field-error', 'hidden');
+
+    joinCourseCodeDiv.classList.add('create-course-name-div');
+
+    // cancel and create buttons
+    const joinCourseBtnsContainer = document.createElement('div');
+    const joinCourseCancelBtn = document.createElement('button');
+    const joinCourseJoinBtn = document.createElement('button');
+
+    joinCourseCancelBtn.textContent = "Cancel";
+    joinCourseJoinBtn.textContent = "Join course";
+
+    joinCourseLabel.textContent = "Course code";
+    asterisk.textContent = "*";
+    joinCourseInput.placeholder = "e.g. ABC123";
+    joinCourseSecondMsg.textContent = "Ask a course member to share the course code with you";
+
+    joinCourseModal.classList.add('create-course-modal');
+    joinCourseModalHeader.classList.add('create-course-modal-header');
+    joinCourseModalContainer.classList.add('create-course-modal-container');
+    joinCourseCloseBtn.classList.add('create-course-close-btn');
+    joinCourseTitle.classList.add('create-course-title');
+    joinCourseMsg.classList.add('create-course-msg');
+    joinCourseSecondMsg.classList.add('join-course-scd-msg');
+    asterisk.classList.add('asterisk');
+    peopleSvgContainer.classList.add('layers-svg');
+    joinCourseInput.classList.add('create-course-input');
+    joinCourseLabel.classList.add('create-course-label');
+
+    joinCourseBtnsContainer.classList.add('create-course-btns-container');
+    joinCourseCancelBtn.classList.add('create-course-cancel-btn');
+    joinCourseJoinBtn.classList.add('create-course-create-btn');
+
+    joinCourseCancelBtn.addEventListener('click', () => {
+        joinCourseModal.close();
+    })
+
+    joinCourseCloseBtn.addEventListener('click', () => {
+        joinCourseModal.close();
+    })
+
+    joinCourseModal.addEventListener('close', () => {
+        resetJoinCourseModal(joinCourseInput, joinCourseCodeError, joinCourseSecondMsg, joinCourseSecondMsgDiv, iIconSvgContainer);
+        document.body.style.overflow = "";
+    })
+
+    joinCourseJoinBtn.addEventListener('click', async () => {
+        const joinCourseRequest = {
+            joinCode: joinCourseInput.value.toUpperCase(),
+        }
+
+        const courseCodeHasError = hasJoinCourseError(joinCourseRequest);
+
+        if (courseCodeHasError) {
+            joinCourseCodeError.classList.remove('hidden');
+            joinCourseSecondMsg.classList.add('hidden');
+            joinCourseSecondMsgDiv.classList.add('error');
+            iIconSvgContainer.classList.add('error-icon');
+        } else {
+            await joinCourse(joinCourseRequest);
+            courses = await fetchCourses();
+            renderDashboard();
+            renderSideBarCourses(courses);
+            joinCourseModal.close();
+        }
+    })
+
+
+    joinCourseBtnsContainer.append(joinCourseCancelBtn, joinCourseJoinBtn);
+    joinCourseLabel.append(asterisk);
+    joinCourseTitleMsgDiv.append(joinCourseTitle, joinCourseMsg);
+    joinCourseModalHeader.append(peopleSvgContainer, joinCourseTitleMsgDiv);
+    joinCourseSecondMsgDiv.append(iIconSvgContainer, joinCourseSecondMsg, joinCourseCodeError);
+    joinCourseCodeDiv.append(joinCourseLabel, joinCourseInput, joinCourseSecondMsgDiv);
+    joinCourseModalContainer.append(joinCourseCloseBtn, joinCourseModalHeader, joinCourseCodeDiv, joinCourseBtnsContainer);
+    joinCourseModal.append(joinCourseModalContainer);
+
+    return joinCourseModal;
+    
 }
 
 function renderCreateCourseModal() {
@@ -374,7 +513,10 @@ function renderCreateCourseModal() {
             createCourseNameError.classList.remove('hidden');
             createCourseSecondMsg.classList.add('hidden');
         } else {
-            const newCourse = await createCourse(courseRequest);
+            await createCourse(courseRequest);
+            courses = await fetchCourses();
+            renderDashboard();
+            renderSideBarCourses(courses);
             createCourseModal.close();
         }
     })
@@ -401,6 +543,15 @@ function resetCreateCourseModal(createCourseInput, schoolInput, createCourseName
     // restore classes
     createCourseNameError.classList.add('hidden');
     createCourseSecondMsg.classList.remove('hidden');
+}
+
+function resetJoinCourseModal(joinCourseInput, joinCourseCodeError, joinCourseSecondMsg, joinCourseSecondMsgDiv, iIconSvgContainer) {
+    joinCourseInput.value = "";
+
+    joinCourseCodeError.classList.add('hidden');
+    joinCourseSecondMsg.classList.remove('hidden');
+    joinCourseSecondMsgDiv.classList.remove('error');
+    iIconSvgContainer.classList.remove('error-icon');
 }
 
 function renderDashboardNotes(notesSection) {
@@ -700,6 +851,10 @@ async function renderRecentNoteDetailView(noteData) {
 
 function hasCreateCourseError(courseRequest) {
     return !courseRequest.courseName?.trim();
+}
+
+function hasJoinCourseError(joinCourseRequest) {
+    return !joinCourseRequest.joinCode?.trim();
 }
 
 // ---------- Sidebar ---------- 

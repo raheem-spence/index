@@ -1007,7 +1007,7 @@ aside{
 .current-user-span {
     font-family: Figtree, sans-serif;
     font-size: 11px;
-    background-color: #f3edff;
+    background-color:var(--soft-accent);
     color: var(--primary);
     border-radius: 999px;
     padding: 1px 7px;
@@ -1707,6 +1707,7 @@ aside{
     height: 42px;
     width: 42px;
     background-color: var(--soft-accent);
+    color: var(--primary);
 }
 
 .create-course-modal-header {
@@ -1781,7 +1782,7 @@ aside{
     font-family: Figtree, sans-serif;
     border: 1px solid var(--border);
     padding: 8px 12px;
-    margin-bottom: 4px;
+    margin-bottom: 8px;
     width: 100%;
 }
 
@@ -1810,7 +1811,7 @@ aside{
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    margin-top: 24px;
+    margin-top: 16px;
     border-top: 1px solid var(--border);
     padding-top: 16px;
 }
@@ -1842,4 +1843,38 @@ aside{
 
 .create-course-cancel-btn:hover {
     background-color: #ebebea;
+}
+
+.join-course-scd-msg-div {
+    display: flex;
+    gap: 8px;
+    background-color: var(--soft-accent);
+    border-radius: 6px;
+    align-items: center;
+    padding: 10px;
+}
+
+.join-course-scd-msg {
+    font-family: Figtree, sans-serif;
+    font-size: 13px;
+    color: var(--primary);
+}
+.i-icon-svg {
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 16px;
+    width: 16px;
+    background-color: var(--soft-accent);
+    color: var(--primary);
+}
+
+.error {
+    background-color: #FEF2F2;
+}
+
+.error-icon {
+    color: #B91C1C;
+    background-color: #FEF2F2;
 }

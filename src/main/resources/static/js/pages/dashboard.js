@@ -1,10 +1,11 @@
-import { fetchCourses } from "../api/courses.js";
+import { fetchCourses, createCourse } from "../api/courses.js";
 import { fetchCurrentUser } from "../api/users.js";
-import { loadDashboardNotes, loadNotes, createNote, updateNote } from "../api/notes.js";
-import { formatRelativeTime } from "../utilities.js";
+import { loadDashboardNotes, deleteNote } from "../api/notes.js";
+import { formatRelativeTime, formatDate} from "../utilities.js";
 
 // ---------- Configuration ---------- 
-const baseCourseUrl = 'http://127.0.0.1:5500/html/course.html';
+const baseCourseUrl = '/course.html';
+const baseDashboardUrl = '/dashboard.html';
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const courseId = urlParams.get('courseId');
@@ -30,7 +31,7 @@ const dashboardTitleContainer = document.createElement('div');
 const dashboardTitle = document.createElement('h1');
 const dashboardMessage = document.createElement('p');
 
-const currSiteLocation = document.getElementById('current-site-location');
+
 
 const dropdownMenu = document.getElementById('dropdown-menu');
 const sidebarDropdownBtn = document.getElementById('sidebar-label');
@@ -43,6 +44,8 @@ const profileArrow = document.getElementById('profile-arrow');
 
 const userIconName = document.getElementById('user-icon-name');
 const userInitials = document.getElementById('initials');
+
+const recentNotes = await loadDashboardNotes();
 
 
 userBtn.addEventListener('click', e => {
@@ -80,6 +83,8 @@ sidebarDropdownBtn.addEventListener('click', e => {
 
 
 function renderDashboard() {
+
+    dashboardDiv.replaceChildren();
 
     const btnContainer = document.createElement('div');
 
@@ -133,31 +138,36 @@ function renderDashboard() {
 
     dashboardTitleContainer.append(dashboardTitle, dashboardMessage);
 
+    dashboardHeader.replaceChildren();
+
     dashboardHeader.append(dashboardTitleContainer, btnContainer);
 
-    dashboardDiv.append(dashboardHeader, coursesSection, notesSection);
+    const createCourseModal = renderCreateCourseModal();
+
+    createClsBtn.addEventListener('click', () => {
+        createCourseModal.showModal();
+        document.body.style.overflow = 'hidden';
+    })
+
+    createCourseModal.addEventListener('close', () => {
+        document.body.style.overflow = "";
+    })
+
+    dashboardDiv.append(dashboardHeader, coursesSection, notesSection, createCourseModal);
     renderDashboardCourses(coursesGrid, coursesSection, courses);
     renderDashboardNotes(notesSection);
 }
  
-
-// ---------- App State ---------- 
-
-let currentlyEditingNoteId = null;
-
 
 
 // ---------- Initialization ---------- 
 
 // Show user courses
 const courses = await fetchCourses();
-console.log(courses);
 renderSideBarCourses(courses);
 renderDashboard();
 
 
-// // Show user notes
-// await refreshNotes(courseId);
 
 // Show user info
 await renderUser();
@@ -200,7 +210,7 @@ async function renderDashboardCourses(coursesGrid, coursesSection, courses) {
 
             memberSvgContainer.innerHTML = memberSvgString;
             notesSvgContainer.innerHTML = notesSvgString;
-            courseATag.href = `course.html?courseId=${course.id}`;
+            courseATag.href = `${baseCourseUrl}?courseId=${course.id}`;
 
             courseCard.dataset.id = course.id;
 
@@ -230,13 +240,177 @@ async function renderDashboardCourses(coursesGrid, coursesSection, courses) {
     }
 }
 
-async function renderDashboardNotes(notesSection) {
-    const recentNotes = await loadDashboardNotes();
+function renderCreateCourseModal() {
+
+    // create course modal
+    const createCourseModal = document.createElement('dialog');
+
+    const createCourseModalContainer = document.createElement('div');
+
+    // close btn
+    const createCourseCloseBtn = document.createElement('button');
+    const closeBtnString = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" 
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
+                            stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
+                            <path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>`;   
+    
+    createCourseCloseBtn.innerHTML = closeBtnString;
+    createCourseCloseBtn.setAttribute('aria-label', 'Close');
+
+    
+    // header div
+    const layerSvgContainer = document.createElement('div');
+    layerSvgContainer.innerHTML =`<svg width="1em" height="1em" viewBox="0 0 24 24" 
+                                fill="currentColor" data-d-component="icon" style="color: 
+                                rgb(40, 107, 99); font-size: 20px;">
+                                <path d="M4.94845 4.68299C5.32822 4.24896 5.87687 4 6.4536 
+                                4H17.5461C18.1228 4 18.6714 4.24896 19.0512 4.68299L22.5512 
+                                8.68299C23.6827 9.97616 22.7644 12 21.0461 12H2.9536C1.23528 
+                                12 0.316926 9.97616 1.44845 8.68299L4.94845 4.68299ZM17.5461 
+                                6L6.4536 6L2.9536 10H21.0461L17.5461 6ZM1.99983 15C1.99983
+                                 14.4477 2.44755 14 2.99983 14H20.9998C21.5521 14 21.9998 
+                                 14.4477 21.9998 15C21.9998 15.5523 21.5521 16 20.9998 
+                                 16H2.99983C2.44755 16 1.99983 15.5523 1.99983 15ZM2.99983 
+                                 19C2.99983 18.4477 3.44755 18 3.99983 18H19.9998C20.5521 
+                                 18 20.9998 18.4477 20.9998 19C20.9998 19.5523 20.5521 20 
+                                 19.9998 20H3.99983C3.44755 20 2.99983 19.5523 2.99983 19Z" 
+                                 fill="currentColor"></path></svg>`;
+
+    const createCourseModalHeader = document.createElement('div');
+
+    const createCourseTitleMsgDiv = document.createElement('div');
+    const createCourseTitle = document.createElement('h1');
+    const createCourseMsg = document.createElement('p');
+
+    createCourseTitle.textContent = "Create a course";
+    createCourseMsg.textContent = "Bring your classmates' notes together in one place";
+
+
+    // course name input bar
+    const createCourseNameDiv = document.createElement('div');
+    const createCourseLabel = document.createElement('label');
+    const asterisk = document.createElement('span');
+    const createCourseInput = document.createElement('input');
+    const createCourseNameError = document.createElement('p');
+    const createCourseSecondMsg = document.createElement('p');
+
+    const createCourseSchoolDiv = document.createElement('div');
+    const schoolLabel = document.createElement('label');
+    const optional = document.createElement('span');
+    const schoolInput = document.createElement('input');
+    const schoolMsg = document.createElement('p');
+
+    createCourseNameError.textContent = "Please enter a course name";
+    createCourseNameError.classList.add('field-error', 'hidden');
+
+    schoolLabel.textContent = "School";
+    optional.textContent = "(Optional)";
+    schoolInput.placeholder = "e.g. Bates College";
+    schoolMsg.textContent = "Help classmates find the right course";
+
+    createCourseNameDiv.classList.add('create-course-name-div');
+    createCourseSchoolDiv.classList.add('create-course-school-div');
+    optional.classList.add('optional');
+    schoolLabel.classList.add('school-label');
+
+
+
+
+    // cancel and create buttons
+    const createCourseBtnsContainer = document.createElement('div');
+    const createCourseCancelBtn = document.createElement('button');
+    const createCourseCreateBtn = document.createElement('button');
+
+    createCourseCancelBtn.textContent = "Cancel";
+    createCourseCreateBtn.textContent = "Create course";
+
+    createCourseLabel.textContent = "Course name";
+    asterisk.textContent = "*";
+    createCourseInput.placeholder = "e.g. Microbiology";
+    createCourseSecondMsg.textContent = "Choose a name your classmates will recognize";
+
+    createCourseModal.classList.add('create-course-modal');
+    createCourseModalHeader.classList.add('create-course-modal-header');
+    createCourseModalContainer.classList.add('create-course-modal-container');
+    createCourseCloseBtn.classList.add('create-course-close-btn');
+    createCourseTitle.classList.add('create-course-title');
+    createCourseMsg.classList.add('create-course-msg');
+    createCourseSecondMsg.classList.add('create-course-scd-msg');
+    schoolMsg.classList.add('create-course-scd-msg');
+    layerSvgContainer.classList.add('layers-svg');
+    asterisk.classList.add('asterisk');
+    createCourseInput.classList.add('create-course-input');
+    createCourseLabel.classList.add('create-course-label');
+
+    schoolInput.classList.add('create-course-input');
+    schoolLabel.classList.add('create-course-label');
+
+    createCourseBtnsContainer.classList.add('create-course-btns-container');
+    createCourseCancelBtn.classList.add('create-course-cancel-btn');
+    createCourseCreateBtn.classList.add('create-course-create-btn');
+    
+
+    createCourseCancelBtn.addEventListener('click', () => {
+        createCourseModal.close();
+    })
+
+    createCourseCloseBtn.addEventListener('click', () => {
+        createCourseModal.close();
+    })
+
+    createCourseModal.addEventListener('close', () => {
+        resetCreateCourseModal(createCourseInput, schoolInput, createCourseNameError, createCourseSecondMsg);
+        document.body.style.overflow = "";
+    })
+
+    createCourseCreateBtn.addEventListener('click', async () => {
+        const courseRequest = {
+            courseName: createCourseInput.value,
+            school: schoolInput.value
+        }
+
+        const courseNameHasError = hasCreateCourseError(courseRequest);
+
+        if (courseNameHasError) {
+            createCourseNameError.classList.remove('hidden');
+            createCourseSecondMsg.classList.add('hidden');
+        } else {
+            const newCourse = await createCourse(courseRequest);
+            createCourseModal.close();
+        }
+    })
+
+
+    createCourseBtnsContainer.append(createCourseCancelBtn, createCourseCreateBtn);
+    createCourseLabel.append(asterisk);
+    createCourseTitleMsgDiv.append(createCourseTitle, createCourseMsg);
+    createCourseModalHeader.append(layerSvgContainer, createCourseTitleMsgDiv);
+    createCourseNameDiv.append(createCourseLabel, createCourseInput, createCourseSecondMsg, createCourseNameError);
+    schoolLabel.append(optional);
+    createCourseSchoolDiv.append(schoolLabel, schoolInput, schoolMsg);
+    createCourseModalContainer.append(createCourseCloseBtn, createCourseModalHeader, createCourseNameDiv, createCourseSchoolDiv, createCourseBtnsContainer);
+    createCourseModal.append(createCourseModalContainer);
+
+    return createCourseModal;
+}
+
+function resetCreateCourseModal(createCourseInput, schoolInput, createCourseNameError, createCourseSecondMsg) {
+    // empty input fields
+    createCourseInput.value = "";
+    schoolInput.value = "";
+
+    // restore classes
+    createCourseNameError.classList.add('hidden');
+    createCourseSecondMsg.classList.remove('hidden');
+}
+
+function renderDashboardNotes(notesSection) {
 
     const noteList = document.createElement('ul');
 
     for (const note of recentNotes) {
         const noteItem = document.createElement('li');
+        noteItem.dataset.id = note.id;
         const noteDiv = document.createElement('div');
         const noteOwnerClsDiv = document.createElement('div');
         const noteOwnerDiv = document.createElement('div');
@@ -290,8 +464,243 @@ async function renderDashboardNotes(notesSection) {
         noteItem.append(noteDiv);
         noteList.append(noteItem);
     }
+
+    noteList.addEventListener('click', (event) => {
+        
+        const noteLi = event.target.closest('li');
+        
+        const clickedNoteId = parseInt(noteLi.dataset.id);
+        const note = recentNotes.find(note => note.id === clickedNoteId);
+
+        if (note) {
+            urlParams.set('noteId', note.id);
+            const newQueryString = urlParams.toString();
+            const newUrl = baseDashboardUrl + '?' + newQueryString;
+            history.pushState(null, '', newUrl);
+            renderRecentNoteDetailView(note);
+        }
+
+    })
     
     notesSection.append(noteList);
+}
+
+async function renderRecentNoteDetailView(noteData) {
+    dashboardDiv.replaceChildren();
+
+    const noteDetailContainer = document.createElement('div');
+
+    const allBtnsDiv = document.createElement('div');
+    
+    const currUser = await fetchCurrentUser();
+
+    const backBtn = document.createElement('button');
+    const backArrowSvgContainer = document.createElement('div');
+    const backArrowString = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 12H5M12 5l-7 7 7 7" data-fg-eeut183="10.10:270.389:/src/app/components/CoursePage.tsx:525:11:28779:35:e:path">
+                            </path></svg>`;
+    
+    backArrowSvgContainer.innerHTML = backArrowString;
+
+    backBtn.addEventListener('click', () => {
+        urlParams.delete('noteId');
+        const newUrl = baseDashboardUrl;
+        history.pushState(null, '', newUrl);
+
+        renderDashboard();
+    })
+
+    const noteCourseDiv = document.createElement('div');
+    const noteCourseATag = document.createElement('a');
+
+    const metadataSeparator = document.createElement('p');
+    metadataSeparator.textContent = "·";
+
+    const metadataSeparatorTwo = document.createElement('p');
+    metadataSeparatorTwo.textContent = "·";
+
+    noteCourseATag.textContent = noteData.courseName;
+    noteCourseATag.href = `${baseCourseUrl}?courseId=${noteData.courseId}`;
+
+    noteCourseATag.classList.add('note-course-a-tag');
+    noteCourseDiv.classList.add('note-course-div');
+
+    noteCourseDiv.append(noteCourseATag);
+
+    const noteTitle = document.createElement('h1');
+    const noteContent = document.createElement('p');
+
+    const noteMetaDataDiv = document.createElement('div');
+    const date = document.createElement('p');
+    const initialsDiv = document.createElement('div');
+    const initalsSpan = document.createElement('span');
+
+    const noteOwnerDateDiv = document.createElement('div');
+    const noteOwner = document.createElement('p');
+
+    backBtn.textContent = "Back to Dashboard";
+
+    initalsSpan.textContent = noteData.ownerFirstName[0].toUpperCase() + noteData.ownerLastName[0].toUpperCase();
+    noteTitle.textContent = noteData.title;
+    noteContent.textContent = noteData.content;
+    noteOwner.textContent = noteData.ownerFirstName + " " + noteData.ownerLastName;
+
+    backBtn.classList.add('back-btn');
+    noteTitle.classList.add('note-view-title');
+    noteContent.classList.add('note-view-content');
+    noteMetaDataDiv.classList.add('note-meta-data-div');
+    noteOwner.classList.add('note-view-owner');
+    initialsDiv.classList.add('initials-div');
+    initalsSpan.classList.add('initials-span');
+    date.classList.add('note-view-date');
+    noteOwnerDateDiv.classList.add('note-owner-date-div');
+
+    if (noteData.updatedAt != noteData.createdAt) {
+        date.textContent = `Updated ${formatDate(noteData.updatedAt)}`;
+    } else {
+        date.textContent = `Created ${formatDate(noteData.createdAt)}`;
+    }
+
+
+    if (currUser.id === noteData.ownerId) {
+
+        const actionButtonsDiv = document.createElement('div');
+        const editSvgContainer = document.createElement('div');
+        const editBtn = document.createElement('button');
+        const editIconString = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" 
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" 
+                                stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil" 
+                                style="color: var(--muted-foreground);"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z">
+                                </path><path d="m15 5 4 4"></path></svg>`;
+        editSvgContainer.innerHTML = editIconString;
+    
+        const delSvgContainer = document.createElement('div');
+        const delIconString = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" 
+                                fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" 
+                                class="lucide lucide-trash2 lucide-trash-2"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6">
+                                </path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" x2="10" y1="11" y2="17"></line><line x1="14" x2="14" y1="11" y2="17"></line>
+                                </svg>`;
+        delSvgContainer.innerHTML = delIconString;
+        const deleteDiv = document.createElement('div');
+        const deleteLabel = document.createElement('p');
+        const deleteConfirmLabel = document.createElement('p');
+        deleteLabel.textContent = "Delete";
+        deleteConfirmLabel.textContent = "Delete?";
+        
+        const yesBtn = document.createElement('button');
+        const noBtn = document.createElement('button');
+    
+        yesBtn.textContent = "Yes";
+        noBtn.textContent = "No";
+    
+        yesBtn.classList.add('yes-btn');
+        noBtn.classList.add('no-btn');
+    
+        yesBtn.style.display = 'none';
+        noBtn.style.display = 'none';
+        deleteConfirmLabel.style.display = 'none';
+    
+    
+        editBtn.addEventListener('click', () => {
+           
+        })
+    
+        deleteDiv.addEventListener('click', (event) => {
+           
+            deleteDiv.classList.add('clicked');
+    
+            delSvgContainer.style.display = 'none';
+            yesBtn.style.display = '';
+            noBtn.style.display = '';
+            deleteLabel.style.display = 'none';
+            deleteConfirmLabel.style.display = '';
+    
+        })
+    
+        yesBtn.addEventListener('click', async (event) => {
+            // stop the event from bubbling up to the parent
+            event.stopPropagation();
+    
+            // delete note
+            const deleted = await deleteNote(courseId, noteData.id);
+            if (deleted) {
+                resetDeleteBtn(deleteDiv, deleteLabel, deleteConfirmLabel, delSvgContainer, yesBtn, noBtn);
+                
+                const currUrlParams = new URLSearchParams(window.location.search);
+                currUrlParams.delete('noteId');
+    
+                const currUrl = baseCourseUrl + '?' + currUrlParams.toString();
+                history.replaceState(null, '', currUrl);
+    
+                // renderRoute(courseId);
+                showToast("Note deleted");
+            }
+    
+        })
+    
+        noBtn.addEventListener('click', (event) => {
+            // stop the event from bubbling up to the parent
+            event.stopPropagation();
+            resetDeleteBtn(deleteDiv, deleteLabel, deleteConfirmLabel, delSvgContainer, yesBtn, noBtn);
+        })
+    
+        document.addEventListener('click', (event) => {
+            const isClickInside = deleteDiv.contains(event.target);
+    
+            if (!isClickInside) {
+               resetDeleteBtn(deleteDiv, deleteLabel, deleteConfirmLabel, delSvgContainer, yesBtn, noBtn);
+            }
+        })
+    
+    
+        editBtn.textContent = "Edit";
+
+        actionButtonsDiv.classList.add('action-buttons-div');
+        allBtnsDiv.classList.add('all-btns-div');
+        editBtn.classList.add('note-view-edit-btn');
+        deleteDiv.classList.add('note-view-del-btn');
+
+        editBtn.prepend(editSvgContainer);
+        deleteDiv.append(delSvgContainer, deleteLabel, deleteConfirmLabel, yesBtn, noBtn);
+    
+        actionButtonsDiv.append(editBtn, deleteDiv);
+        allBtnsDiv.append(backBtn, actionButtonsDiv);
+        noteOwnerDateDiv.append(noteOwner, metadataSeparator, date);
+        initialsDiv.append(initalsSpan);
+        noteMetaDataDiv.append(initialsDiv, noteOwnerDateDiv, metadataSeparatorTwo, noteCourseDiv);
+        backBtn.prepend(backArrowSvgContainer);
+        noteDetailContainer.append(allBtnsDiv, noteTitle, noteMetaDataDiv, noteContent);
+        dashboardDiv.append(noteDetailContainer);
+    } else {
+        const viewOnlyDiv = document.createElement('div');
+        const eyeIconSvgContainer = document.createElement('div');
+        eyeIconSvgContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+                                        class="lucide lucide-eye preview-icon">
+                                        <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                        </svg>`;
+        const viewOnlyTxt = document.createElement('span');
+        viewOnlyTxt.textContent = "View only";
+
+        viewOnlyDiv.classList.add('view-only-div');
+        viewOnlyTxt.classList.add('view-only-span');
+        allBtnsDiv.classList.add('all-btns-div');
+
+        viewOnlyDiv.append(eyeIconSvgContainer, viewOnlyTxt);
+        allBtnsDiv.append(backBtn, viewOnlyDiv);
+        noteOwnerDateDiv.append(noteOwner, metadataSeparator, date);
+        initialsDiv.append(initalsSpan);
+        noteMetaDataDiv.append(initialsDiv, noteOwnerDateDiv, metadataSeparatorTwo, noteCourseDiv);
+        backBtn.prepend(backArrowSvgContainer);
+        noteDetailContainer.append(allBtnsDiv, noteTitle, noteMetaDataDiv, noteContent);
+        dashboardDiv.append(noteDetailContainer);
+    }
+}
+
+function hasCreateCourseError(courseRequest) {
+    return !courseRequest.courseName?.trim();
 }
 
 // ---------- Sidebar ---------- 
@@ -310,7 +719,7 @@ function renderSideBarCourses(courses) {
         const fieldName = "courseId";
 
         for (const course of courses) {
-            const url = new URL(baseCourseUrl);
+            const url = new URL(baseCourseUrl, window.location.origin);
             const courseLi = document.createElement('li');
             courseLi.classList.add('course');
 
@@ -335,13 +744,6 @@ function renderSideBarCourses(courses) {
 
         const sideBarCourses = document.querySelectorAll('li.course');
         highlightActiveCourse(sideBarCourses);
-
-
-
-
-
-        // const currentCourseName = document.querySelector('.course.active');
-        // updateHeading(currentCourseName);
     }
 }
 
@@ -349,7 +751,6 @@ function renderSideBarCourses(courses) {
 async function renderUser() {
 
     const user = await fetchCurrentUser();
-    console.log(user);
 
     const usernamePara = document.createElement('p');
     const userEmailPara = document.createElement('p');
@@ -370,197 +771,6 @@ async function renderUser() {
  
 }
 
-
-// ---------- Notes CRUD ---------- 
-
-// // CREATE NOTE
-// // get create note button id
-// const newTextAreaInput = document.getElementById("note-content-input");
-
-// createNoteBtn.addEventListener('click', async () => {
-//     // read the value property of title input
-//     const noteTitle = newTitleInput.value.trim();
-
-//     // read the value property of textarea
-//     const noteContent = newTextAreaInput.value.trim();
-  
-//     const isValid = validateInputs(noteTitle, noteContent);
-
-//     if (!isValid) {
-//         alert("Invalid input");
-//         return
-//     }
-  
-//     if (currentlyEditingNoteId === null) {
-//         await handleCreate(noteTitle, noteContent, courseId);
-//     } else {
-//         await handleUpdate(noteTitle, noteContent, courseId, currentlyEditingNoteId);
-//     }
-
-// })
-
-// // READ NOTES
-// function renderNotes(notes){
-    
-//     // clear notes container
-//     noteContainer.replaceChildren();
-
-//     if (notes.length === 0){
-//         const emptyNotesMessage = document.createElement('h4');
-//         emptyNotesMessage.textContent = "Notes you add appear here"
-//         emptyNotesMessage.classList.add('empty-note-msg');
-
-//         noteContainer.appendChild(emptyNotesMessage);
-
-//         return
-//     } else {
-
-//         for (const noteData of notes) {
-
-//             const noteCard = document.createElement('article');
-
-//             const noteId = noteData.id;
-//             noteCard.dataset.id = noteId;
-
-//             const newTitle = document.createElement('h4');
-//             newTitle.textContent = noteData.title;
-
-          
-//             const newElapsedTime = document.createElement('p');
-//             newElapsedTime.textContent = noteData.createdAt;
-//             newElapsedTime.classList.add("time-elapsed");
-
-        
-//             const newContent= document.createElement('p');
-//             newContent.textContent = noteData.content;
-//             newContent.classList.add("note-content");
-
-//             // create div for edit/delete buttons
-//             const btnsDiv = document.createElement('div');
-
-//             // edit and delete buttons
-//             const editBtn = document.createElement('button');
-//             editBtn.classList.add("edit-btn");
-        
-
-//             const delBtn = document.createElement('button');
-//             delBtn.classList.add("del-btn");
-
-//             const svgNS = "http://www.w3.org/2000/svg"
-
-//             // edit svg 
-//             const svgEditBtnContainer = document.createElementNS(svgNS, 'svg');
-
-//             const editPathElement = document.createElementNS(svgNS, 'path');
-
-//             svgEditBtnContainer.setAttribute("viewBox", "0 0 24 24");
-//             svgEditBtnContainer.setAttribute("fill", "none");
-//             svgEditBtnContainer.setAttribute("stroke-width", "1.5")
-//             svgEditBtnContainer.setAttribute("stroke", "currentColor");
-//             svgEditBtnContainer.setAttribute("class", "size-6");
-
-//             editPathElement.setAttribute("stroke-linecap", "round");
-//             editPathElement.setAttribute("stroke-linejoin", "round");
-//             editPathElement.setAttribute("d", "m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10");
-
-//             const editSpan = document.createElement('span');
-//             editSpan.textContent = "Edit";
-
-//             svgEditBtnContainer.appendChild(editPathElement);
-
-//             editBtn.append(svgEditBtnContainer, editSpan);
-
-
-
-//             // delete svg
-//             const svgDelBtnContainer = document.createElementNS(svgNS, 'svg');
-
-//             const delPathElement = document.createElementNS(svgNS, 'path');
-
-//             svgDelBtnContainer.setAttribute("viewBox", "0 0 24 24");
-//             svgDelBtnContainer.setAttribute("fill", "none");
-//             svgDelBtnContainer.setAttribute("stroke-width", "1.5")
-//             svgDelBtnContainer.setAttribute("stroke", "currentColor");
-//             svgDelBtnContainer.setAttribute("class", "size-6");
-
-//             delPathElement.setAttribute("stroke-linecap", "round");
-//             delPathElement.setAttribute("stroke-linejoin", "round");
-//             delPathElement.setAttribute("d", "m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0");
-
-//             const delSpan = document.createElement('span');
-//             delSpan.textContent = "Delete";
-
-//             svgDelBtnContainer.appendChild(delPathElement);
-
-//             delBtn.append(svgDelBtnContainer, delSpan);
-
-//             btnsDiv.classList.add("edit-delete");
-
-//             btnsDiv.append(editBtn, delBtn);
-
-//             noteCard.classList.add("note-card")
-
-//             // append inner elements to article element
-//             noteCard.append(newTitle, newElapsedTime, newContent, btnsDiv);
-
-//             noteContainer.append(noteCard);
-//         }
-//     }
-// }
-
-
-// // DELETE & EDIT NOTE
-// noteContainer.addEventListener('click', async (event) => {
-
-//     // find the closet button from target
-//     const btnItem = event.target.closest('button');
-
-//     if(!btnItem) {
-//         return
-//     }
-     
-//     // find the closest note card from button
-//     const closestNoteCard = btnItem.closest('.note-card');
-//     const noteCardId = closestNoteCard.dataset.id;
-
-//     // if edit button clicked
-//     if(btnItem.classList.contains('edit-btn')) {
-
-//         currentlyEditingNoteId = noteCardId;
-        
-//         // fill form with old title/content
-//         const origTitle = closestNoteCard.querySelector('h4');
-//         const origContentPara = closestNoteCard.querySelector('p.note-content');
-
-//         newTitleInput.value = origTitle.textContent;
-//         newTextAreaInput.value = origContentPara.textContent;
-
-//         // change btn text to 'Update Note'
-//         createNoteBtn.textContent = "Update Note";
-
-//         // if delete button clicked
-//         } else if (btnItem.classList.contains('del-btn')) {
-
-//             try {
-//                 const response = await fetch(`http://127.0.0.1:8080/courses/${courseId}/notes/${noteCardId}`, {
-//                     method: 'DELETE',
-//                     credentials: 'include'
-//                 });
-
-//                 if (response.status === 403) {
-//                     console.log('You do not have permission to delete this note.')
-//                 } else if (!response.ok) {
-//                     throw new Error(`HTTP Error! Status: ${response.status}`)
-//                 } else {
-//                 await refreshNotes(courseId);
-//                 }
-
-//             } catch (error) {
-//                 console.log(error);
-//             }
-//         }
-// })
-
 // ---------- Rendering ---------- 
 
 function highlightActiveCourse(sideBarCourses) {
@@ -573,58 +783,4 @@ function highlightActiveCourse(sideBarCourses) {
                 course.classList.add("active");
         }
     });
-}
-
-// function updateHeading(currentCourse) {
-//     courseTitle.textContent = currentCourse.textContent + " Notes";
-// }
-
-async function refreshNotes(courseId) {
-    const notes = await loadNotes(courseId);
-    renderNotes(notes);
-}
-
-function clearInputs() {
-    newTitleInput.value = "";
-    newTextAreaInput.value = "";
-}
-
-
-function validateInputs(title, content) {
-    // Validate title and content
-    if (title.length == 0) {
-        return false;
-    } else if (content.length == 0) {
-        return false;
-    }
-
-    return true;
-}
-
-
-async function handleCreate(title, content, courseId) {
-    const noteData = {title: title, content: content}
-
-    await createNote(courseId, noteData);
-    await refreshNotes(courseId);
-
-    clearInputs();
-}
-
-async function handleUpdate(title, content, courseId, noteId) {
-    const noteData = {title: title, content: content}
-
-    const canUpdate = await updateNote(courseId, noteData, noteId);
-
-    if (!canUpdate) {
-        console.log("You do not have permission to edit this note.");
-        clearInputs();
-        createNoteBtn.textContent = "Create Note";
-        currentlyEditingNoteId = null;
-    } else {
-        await refreshNotes(courseId);
-        clearInputs();
-        createNoteBtn.textContent = "Create Note";
-        currentlyEditingNoteId = null;
-    }
 }

@@ -313,6 +313,8 @@ function renderCreateCourseModal() {
     schoolLabel.classList.add('school-label');
 
 
+
+
     // cancel and create buttons
     const createCourseBtnsContainer = document.createElement('div');
     const createCourseCancelBtn = document.createElement('button');

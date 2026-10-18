@@ -11,20 +11,33 @@ export async function fetchCourses() {
         const result = handleAuth(response);
 
         if (!result) {
-            return;
+            return {
+                success: false,
+                status: 401
+            }
         }
 
         // 2. check if response status is ok
         if (!response.ok) {
-            throw new Error(`HTTP Error! Status: ${response.status}`);
+            return {
+                success: false,
+                status: response.status
+            }
         }
 
         // 3. parse the stream data into a json object
         const courses = await response.json();
-        return courses;
+        return {
+            success: true,
+            data: courses
+        }
 
     } catch (error) {
         console.error('Fetch failed:', error);
+        return {
+            success: false,
+            status: null
+        }
     }
 }
 
@@ -39,18 +52,31 @@ export async function fetchDashboardCourses() {
         const result = handleAuth(response);
 
         if (!result) {
-            return;
+            return {
+                success: false,
+                status: 401
+            }
         }
 
         if (!response.ok) {
-            throw new Error(`Http error! Status: ${response.status}`);
+            return {
+                success: false,
+                status: response.status
+            }
         }
 
         const dashboardCourses = await response.json();
-        return dashboardCourses;
+        return {
+            success: true,
+            data: dashboardCourses
+        }
 
     } catch (error) {
         console.error('Fetch failed: ', error);
+        return {
+            success: false,
+            status: null
+        }
     }
 }
 
@@ -148,18 +174,30 @@ export async function joinCourse(joinCode) {
         const result = handleAuth(response);
 
         if (!result) {
-            return;
+            return {
+                success: false,
+                status: 401
+            }
         }
 
         if (!response.ok) {
-            throw new Error(`Http Error! Status: ${response.status}`);
+            return {
+                success: false,
+                status: response.status
+            }
         }
 
         const joinCourse = await response.json();
-        return joinCourse;
+        return {
+            success: true,
+            data: joinCourse
+        };
 
     } catch(error) {
         console.error('Error:', error);
-        return false;
+        return {
+            success: false,
+            status: null
+        }
     }
 }

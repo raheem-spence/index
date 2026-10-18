@@ -27,6 +27,31 @@ export async function loadDashboardNotes() {
     }
 }
 
+export async function loadDashboardCourses() {
+    try {
+        const response = await fetch('/course/dashboard', {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        const result = handleAuth(response);
+
+        if (!result) {
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`Http error! Status: ${response.status}`);
+        }
+
+        const dashboardCourses = await response.json();
+        return dashboardCourses;
+
+    } catch (error) {
+        console.error('Fetch failed: ', error);
+    }
+}
+
 
 export async function loadNotes(courseId) {
     try {

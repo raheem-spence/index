@@ -1,4 +1,4 @@
-import { fetchCourses, createCourse, joinCourse } from "../api/courses.js";
+import { fetchCourses, createCourse, joinCourse, fetchDashboardCourses } from "../api/courses.js";
 import { fetchCurrentUser } from "../api/users.js";
 import { loadDashboardNotes, deleteNote } from "../api/notes.js";
 import { formatRelativeTime, formatDate} from "../utilities.js";
@@ -11,12 +11,9 @@ const urlParams = new URLSearchParams(queryString);
 const courseId = urlParams.get('courseId');
 
 
-
+const dashboardCourses = await fetchDashboardCourses();
+console.log(dashboardCourses);
 // ---------- DOM Elements ---------- 
-const courseTitle = document.getElementById('course-title');
-
-const noteContainer = document.getElementById("notes-container");
-
 const ulContainer = document.getElementById('course-list');
 
 const userDiv = document.getElementById("user-info");
@@ -26,8 +23,6 @@ const dashboardHeader = document.createElement('div');
 const dashboardTitleContainer = document.createElement('div');
 const dashboardTitle = document.createElement('h1');
 const dashboardMessage = document.createElement('p');
-
-
 
 const dropdownMenu = document.getElementById('dropdown-menu');
 const sidebarDropdownBtn = document.getElementById('sidebar-label');
@@ -160,7 +155,7 @@ function renderDashboard() {
     })
 
     dashboardDiv.append(dashboardHeader, coursesSection, notesSection, createCourseModal, joinCourseModal);
-    renderDashboardCourses(coursesGrid, coursesSection, courses);
+    renderDashboardCourses(coursesGrid, courses);
     renderDashboardNotes(notesSection);
 }
  
@@ -177,7 +172,7 @@ renderDashboard();
 await renderUser();
 
 // ---------- Dashboard ----------
-function renderDashboardCourses(coursesGrid, coursesSection, courses) {
+function renderDashboardCourses(coursesGrid, courses) {
 
     coursesGrid.replaceChildren();
 

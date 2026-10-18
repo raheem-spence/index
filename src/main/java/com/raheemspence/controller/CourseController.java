@@ -34,6 +34,17 @@ public class CourseController {
         return courseService.getCoursesByUserId(userId);
     }
 
+    @GetMapping("/dashboard")
+    public List<CourseResponse> getDashboardCourses(HttpSession httpSession) {
+        Long userId = (Long) httpSession.getAttribute("userId");
+
+        if (userId == null) {
+            return List.of();
+        }
+
+        return courseService.getDashboardCourses(userId);
+    }
+
     @GetMapping("/{courseId}")
     public CourseDetailsResponse getCourseDetails(@PathVariable Long courseId, HttpSession httpSession) {
         Long userId = (Long) httpSession.getAttribute("userId");
@@ -66,5 +77,6 @@ public class CourseController {
 
         return courseService.joinCourse(userId, joinCourseRequest);
     }
+
 
 }

@@ -10,11 +10,12 @@ import com.raheemspence.repository.CourseMembershipRepository;
 import com.raheemspence.repository.CourseRepository;
 import com.raheemspence.repository.NoteRepository;
 import com.raheemspence.repository.UserRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.swing.text.html.Option;
+import org.springframework.data.domain.Pageable;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
@@ -229,5 +230,27 @@ public class CourseService {
 
         return joinCourseResponse;
 
+    }
+
+    public List<CourseResponse> getDashboardCourses(Long userId) {
+
+        Pageable pageable = PageRequest.of(0, 4);
+
+        List<Course> dashboardCourses = courseRepository.findAccessibleCoursesByUserId(userId, pageable);
+
+        List<CourseResponse> dashboardCoursesResponse = new ArrayList<>();
+
+        for (Course course : dashboardCourses) {
+            CourseResponse courseResponse = new CourseResponse();
+
+            courseResponse.setId(course.getId());
+            courseResponse.setName(course.getName());
+            courseResponse.setNoteCount(noteRepository.countByCourseId(course.getId()));
+            courseResponse.setMemberCount(courseMembershipRepository.countByCourseId(course.getId()));
+
+            dashboardCoursesResponse.add(courseResponse);
+        }
+
+        return dashboardCoursesResponse;
     }
 }

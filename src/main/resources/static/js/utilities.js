@@ -74,4 +74,12 @@ export function delay(milliseconds) {
     });
 }
 
+export async function showToast(textContent, toastTxt, toast) {
+    toastTxt.textContent = textContent;
+    await delay(300);
+    toast.classList.remove('hidden');
+    await delay(3000);
+    toast.classList.add('hidden');
+}
+
 

@@ -1,7 +1,7 @@
 import { fetchCourses, createCourse, joinCourse, fetchDashboardCourses } from "../api/courses.js";
 import { fetchCurrentUser } from "../api/users.js";
 import { loadDashboardNotes, deleteNote } from "../api/notes.js";
-import { formatRelativeTime, formatDate} from "../utilities.js";
+import { formatRelativeTime, formatDate, showToast } from "../utilities.js";
 
 // ---------- Configuration ---------- 
 const baseCourseUrl = '/course.html';
@@ -37,6 +37,21 @@ const userInitials = document.getElementById('initials');
 const recentNotes = await loadDashboardNotes();
 const dashboardCoursesResult = await fetchDashboardCourses();
 let dashboardCourses = dashboardCoursesResult.data;
+
+
+const toast = document.createElement('div');
+const toastTxt = document.createElement('span');
+const iIconSvgContainer = document.createElement('div');
+iIconSvgContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" 
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+                                    class="lucide lucide-circle-alert preview-icon"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" 
+                                    y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`;
+
+toast.classList.add('toast', 'hidden');
+iIconSvgContainer.classList.add('toast-i-icon');
+toast.append(iIconSvgContainer, toastTxt);
+document.body.appendChild(toast);
+
 
 userBtn.addEventListener('click', e => {
     e.stopPropagation();
@@ -340,6 +355,7 @@ function renderJoinCourseModal() {
     })
 
     joinCourseJoinBtn.addEventListener('click', async () => {
+
         const joinCourseRequest = {
             joinCode: joinCourseInput.value.trim().toUpperCase(),
         }
@@ -361,16 +377,19 @@ function renderJoinCourseModal() {
                 if (dashboardCoursesResult.success) {
                     dashboardCourses = dashboardCoursesResult.data;
                     renderDashboard();
-
-                    if (coursesResult.success) {
-                        renderSideBarCourses(coursesResult.data);
-                        joinCourseModal.close();
-                    } else {
-                        console.error("Join course succeeded, but sidebard refresh failed");
-                    }
                 } else {
-                    console.error("Join succeeded, but dashboard refresh failed");
+                    showToast("Course joined! Refresh to see it.", toastTxt, toast)
+                    console.error("Join course succeeded, but dashboard refresh failed");
+                } 
+
+                if (coursesResult.success) {
+                    renderSideBarCourses(coursesResult.data);
+                } else {
+                    showToast("Course joined! Refresh to update sidebar.", toastTxt, toast);
+                    console.error("Join course succeeded, but sidebar refresh failed");
                 }
+
+                joinCourseModal.close();
             } else {
                 if (joinResult.status === 400) {
                     // show the message for existing course member
@@ -379,11 +398,15 @@ function renderJoinCourseModal() {
                     // show message for course not found
                     joinCourseRequestError.textContent = "Course not found. Please check the course code."
 
+                } else if (joinResult.status === 500) {
+                    // show generic failure message
+                    joinCourseRequestError.textContent = "Something went wrong on our end. Please try again later.";
                 } else {
                     // show generic failure message
-                    joinCourseRequestError.textContent = "Unable to join course. Please check course code and try again.";
+                    joinCourseRequestError.textContent = "Unable to join course.";
                 }
                 
+                joinCourseCodeError.classList.add('hidden');
                 joinCourseSecondMsg.classList.add('hidden');
                 joinCourseRequestError.classList.remove('hidden');
                 joinCourseSecondMsgDiv.classList.add('error');

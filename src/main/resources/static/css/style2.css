@@ -1295,6 +1295,10 @@ aside{
     color: #16a34a;
 }
 
+.toast-i-icon {
+    color: #2563EB;
+}
+
 .field-error {
     font-size: 13px;
     color: #dc2626;

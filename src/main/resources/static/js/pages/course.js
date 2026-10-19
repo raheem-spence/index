@@ -2,7 +2,7 @@
 import { fetchCourses, fetchCourseDetails, fetchCourseMembers } from "../api/courses.js";
 import { fetchCurrentUser } from "../api/users.js";
 import { loadNotes, createNote, deleteNote, updateNote } from "../api/notes.js"
-import { formatRelativeTime, delay, formatDate } from "../utilities.js";
+import { formatRelativeTime, delay, formatDate, showToast } from "../utilities.js";
 
 // constanst / URL params / DOM elements
 const baseCourseUrl = '/course.html'
@@ -665,14 +665,6 @@ function searchNotes(courseNotes, searchBar, noteList, notesTotal, noteSectionTi
         renderFilteredNotes(searchString, courseNotes, noteList, notesTotal, noteSectionTitle);
 
     })
-}
-
-async function showToast(textContent) {
-    toastTxt.textContent = textContent;
-    await delay(300);
-    toast.classList.remove('hidden');
-    await delay(3000);
-    toast.classList.add('hidden');
 }
 
 function addNote(newNoteData) {

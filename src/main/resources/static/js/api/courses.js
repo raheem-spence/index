@@ -90,18 +90,31 @@ export async function fetchCourseDetails(courseId) {
         const result = handleAuth(response);
 
         if (!result) {
-            return;
+            return {
+                success: false,
+                status: 401
+            }
         }
 
         if (!response.ok) {
-            throw new Error(`HTTP Error! Status: ${response.status}`);
+            return {
+                success: false,
+                status: response.status
+            }
         }
 
         const courseDetails = await response.json();
-        return courseDetails;
+        return {
+            success: true,
+            data: courseDetails
+        }
 
     } catch (error) {
         console.error('Fetch failed:', error);
+        return {
+            success: false,
+            status: null
+        }
     }
 }
 
@@ -115,18 +128,31 @@ export async function fetchCourseMembers(courseId) {
         const result = handleAuth(response);
 
         if (!result) {
-            return;
+            return {
+                success: false,
+                status: 401
+            }
         }
         
         if (!response.ok) {
-            throw new Error(`HTTP Error! Status: ${response.status}`);
+            return {
+                success: false,
+                status: response.status
+            }
         }
 
         const courseMembers = await response.json()
-        return courseMembers;
+        return {
+            success: true,
+            data: courseMembers
+        }
 
     } catch(error) {
         console.error('Fetch failed:', error)
+        return {
+            success: false,
+            status: null
+        }
     }
 }
 
@@ -144,19 +170,31 @@ export async function createCourse(courseName) {
         const result = handleAuth(response);
 
         if (!result) {
-            return;
+            return {
+                success: false,
+                status: 401
+            }
         }
 
         if (!response.ok) {
-            throw new Error(`HTTP Error! Status: ${response.status}`);
+            return {
+                success: false,
+                status: response.status
+            }
         }
 
         const newCourse = await response.json();
-        return newCourse;
+        return {
+            success: true,
+            data: newCourse
+        }
 
     } catch(error) {
         console.error('Error:', error);
-        return false;
+        return {
+            success: false,
+            status: null
+        }
     }
 }
 

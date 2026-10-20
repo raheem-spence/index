@@ -34,9 +34,32 @@ const profileArrow = document.getElementById('profile-arrow');
 const userIconName = document.getElementById('user-icon-name');
 const userInitials = document.getElementById('initials');
 
-const recentNotes = await loadDashboardNotes();
-const dashboardCoursesResult = await fetchDashboardCourses();
-let dashboardCourses = dashboardCoursesResult.data;
+let recentNotes = null;
+let dashboardCourses = null;
+
+async function initializeDashboard() {
+
+    const recentNotesResult = await loadDashboardNotes();
+    if (!recentNotesResult.success) {
+        return;
+    }
+    recentNotes = recentNotesResult.data;
+
+    const coursesResult = await fetchCourses();
+    if (!coursesResult.success) {
+        return;
+    }
+    let courses = coursesResult.data;
+
+    const dashboardCoursesResult = await fetchDashboardCourses();
+    if (!dashboardCoursesResult.success) {
+        return;
+    }
+    dashboardCourses = dashboardCoursesResult.data;
+    renderSideBarCourses(courses);
+    renderDashboard();
+}
+
 
 
 const toast = document.createElement('div');
@@ -175,12 +198,6 @@ function renderDashboard() {
 
 
 // ---------- Initialization ---------- 
-
-// Show user courses
-const coursesResult = await fetchCourses();
-let courses = coursesResult.data;
-renderSideBarCourses(courses);
-renderDashboard();
 
 // Show user info
 await renderUser();
@@ -481,6 +498,7 @@ function renderCreateCourseModal() {
     const asterisk = document.createElement('span');
     const createCourseInput = document.createElement('input');
     const createCourseNameError = document.createElement('p');
+    const createCourseGenError = document.createElement('p');
     const createCourseSecondMsg = document.createElement('p');
 
     const createCourseSchoolDiv = document.createElement('div');
@@ -491,6 +509,9 @@ function renderCreateCourseModal() {
 
     createCourseNameError.textContent = "Please enter a course name";
     createCourseNameError.classList.add('field-error', 'hidden');
+
+    createCourseGenError.textContent = "Something went wrong on our end. Please try again later.";
+    createCourseGenError.classList.add('field-error', 'hidden');
 
     schoolLabel.textContent = "School";
     optional.textContent = "(Optional)";
@@ -548,7 +569,7 @@ function renderCreateCourseModal() {
     })
 
     createCourseModal.addEventListener('close', () => {
-        resetCreateCourseModal(createCourseInput, schoolInput, createCourseNameError, createCourseSecondMsg);
+        resetCreateCourseModal(createCourseInput, schoolInput, createCourseNameError, createCourseGenError, createCourseSecondMsg);
         document.body.style.overflow = "";
     })
 
@@ -564,11 +585,33 @@ function renderCreateCourseModal() {
             createCourseNameError.classList.remove('hidden');
             createCourseSecondMsg.classList.add('hidden');
         } else {
-            await createCourse(courseRequest);
-            courses = await fetchCourses();
-            renderDashboard();
-            renderSideBarCourses(courses);
-            createCourseModal.close();
+            const createResult = await createCourse(courseRequest);
+
+            if (createResult.success) {
+                const dashboardCoursesResult = await fetchDashboardCourses();
+                const coursesResult = await fetchCourses();
+
+                if (dashboardCoursesResult.success) {
+                    dashboardCourses = dashboardCoursesResult.data;
+                    renderDashboard();
+                } else {
+                    showToast("Course created! Refresh to see it.", toastTxt, toast);
+                    console.error("Coures creation succeeded, but dashboard refresh failed");
+                }
+
+                if (coursesResult.success) {
+                    renderSideBarCourses(coursesResult.data);
+                } else {
+                    showToast("Course created! Refresh to update sidebar.", toastTxt, toast);
+                    console.error("Course creation succeeded, but sidebar refresh failed");
+                }
+               
+                createCourseModal.close();
+            } else {
+                createCourseGenError.classList.remove('hidden');
+                console.error("Something went wrong on our end. Please try again later.");
+            }
+
         }
     })
 
@@ -577,7 +620,7 @@ function renderCreateCourseModal() {
     createCourseLabel.append(asterisk);
     createCourseTitleMsgDiv.append(createCourseTitle, createCourseMsg);
     createCourseModalHeader.append(layerSvgContainer, createCourseTitleMsgDiv);
-    createCourseNameDiv.append(createCourseLabel, createCourseInput, createCourseSecondMsg, createCourseNameError);
+    createCourseNameDiv.append(createCourseLabel, createCourseInput, createCourseSecondMsg, createCourseNameError, createCourseGenError);
     schoolLabel.append(optional);
     createCourseSchoolDiv.append(schoolLabel, schoolInput, schoolMsg);
     createCourseModalContainer.append(createCourseCloseBtn, createCourseModalHeader, createCourseNameDiv, createCourseSchoolDiv, createCourseBtnsContainer);
@@ -586,13 +629,14 @@ function renderCreateCourseModal() {
     return createCourseModal;
 }
 
-function resetCreateCourseModal(createCourseInput, schoolInput, createCourseNameError, createCourseSecondMsg) {
+function resetCreateCourseModal(createCourseInput, schoolInput, createCourseNameError, createCourseGenError, createCourseSecondMsg) {
     // empty input fields
     createCourseInput.value = "";
     schoolInput.value = "";
 
     // restore classes
     createCourseNameError.classList.add('hidden');
+    createCourseGenError.classList.add('hidden');
     createCourseSecondMsg.classList.remove('hidden');
 }
 
@@ -695,7 +739,11 @@ async function renderRecentNoteDetailView(noteData) {
 
     const allBtnsDiv = document.createElement('div');
     
-    const currUser = await fetchCurrentUser();
+    const currUserResult = await fetchCurrentUser();
+    if (!currUserResult.success) {
+        return;
+    }
+    const currUser = currUserResult.data;
 
     const backBtn = document.createElement('button');
     const backArrowSvgContainer = document.createElement('div');
@@ -957,7 +1005,11 @@ function renderSideBarCourses(courses) {
 // Render username and email 
 async function renderUser() {
 
-    const user = await fetchCurrentUser();
+    const userResult = await fetchCurrentUser();
+    if(!userResult.success) {
+        return;
+    }
+    const user = userResult.data;
 
     const usernamePara = document.createElement('p');
     const userEmailPara = document.createElement('p');
@@ -991,3 +1043,5 @@ function highlightActiveCourse(sideBarCourses) {
         }
     });
 }
+
+initializeDashboard();

@@ -11,19 +11,69 @@ export async function loadDashboardNotes() {
         const result = handleAuth(response);
 
         if (!result) {
-            return;
+            return {
+                success: false,
+                status: 401
+            }
         }
 
         // 2. check if response is ok
         if (!response.ok) {
-            throw new Error(`Http error! Status: ${response.status}`);
+            return {
+                success: false,
+                status: response.status
+            }
         }
 
         //3. parse the stream data into JSON object
         const recentNotes = await response.json();
-        return recentNotes;
+        return {
+            success: true,
+            data: recentNotes
+        }
     } catch (error) {
         console.error('Fetch failed: ', error);
+        return {
+            success: false,
+            status: null
+        }
+    }
+}
+
+export async function loadAllUserAccessibleNotes() {
+    try {
+        const response = await fetch(`/courses/notes/all`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        const result = handleAuth(response);
+
+        if (!result) {
+            return {
+                success: false,
+                status: 401
+            }
+        }
+
+        if (!response.ok) {
+            return {
+                success: false,
+                status: response.status
+            }
+        }
+
+        const allNotes = await response.json();
+        return {
+            success: true,
+            data: allNotes
+        }
+    } catch (error) {
+        console.error('Fetch failed:', error);
+        return {
+            success: false,
+            status: null
+        }
     }
 }
 
@@ -39,20 +89,33 @@ export async function loadNotes(courseId) {
         const result = handleAuth(response);
 
         if (!result) {
-            return;
+            return {
+                success: false,
+                status: 401
+            }
         }
 
         // 2. check if response status is OK
         if (!response.ok) {
-            throw new Error(`Http error! Status: ${response.status}`);
+            return {
+                success: false,
+                status: response.status
+            }
         }
 
         // 3. parse the stream data into a JSON object
         const notes = await response.json();
-        return notes;
+        return {
+            success: true,
+            data: notes
+        }
     } catch (error) {
         // catches network errors or errors thrown above
         console.error('Fetch failed:', error);
+        return {
+            success: false,
+            status: null
+        }
     }
 }
 

@@ -1,0 +1,67 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style2.css">
+    <script type="module" src="/js/pages/notes.js" defer></script>
+    <title>Index</title>
+</head>
+<body>
+    <aside id="sidebar">
+        <div class="logo">Index</div>
+
+        <nav class="sidebar-nav">
+            <ul id="dashboard-item">
+                <li><a href="/dashboard.html">Dashboard</a></li>
+            </ul>
+            <button id="sidebar-label" class="sidebar-label courses-arrow">My courses<span><svg id="sidebar-arrow" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down-icon lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></span></button>
+            <div id="dropdown-menu" class="dropdown-menu">
+                <ul id="course-list">
+
+                </ul>
+            </div>
+            <div id="course-border"></div>
+            <button id="notes" class="sidebar-label notes">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text" data-fg-dqpt66="1.31:39.11302:node_modules/lucide-react:208:17:10318:100:e:FileText::::::B1i5" data-fgid-dqpt66=":rp:" style="flex-shrink: 0; color: var(--muted-foreground);"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>
+                <span>Notes</span>
+            </button>
+        </nav>
+
+
+        <div class="sidebar-user">
+            <div class="user-icon">
+                <!-- <img src="https://w0.peakpx.com/wallpaper/935/887/HD-wallpaper-deku-portrait-hero-green-mha.jpg" alt="headshot of izuku midoriya"> -->
+            </div>
+            <div id="user-info">
+            </div>
+        </div>
+    </aside>
+    <main>
+        <header class="course-header">
+            <div class="user-div">
+                <button class="dark-light-mode-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-moon-icon lucide-moon"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg>
+                </button>
+                <p class="vertical-bar">|</p>
+                <div class="user-menu-container">
+                    <button id="user-icon-btn" class="user-icon-btn">
+                        <div class="user-initials-avatar">
+                            <span id="initials" class="initials"></span>
+                        </div>
+                        <span id="user-icon-name" class="name"></span>
+                        <svg id="profile-arrow" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down-icon lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                </div>
+                <!-- Dropdown Modal Content-->
+                <div id="dropdown-modal" class="dropdown-content">
+                    <button id="logout">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-log-out-icon lucide-log-out"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg>
+                        <span class="logout">Log out</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+        <div id="notes-container"></div>
+    </main>
+</body>
+</html>

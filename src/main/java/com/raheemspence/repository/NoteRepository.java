@@ -15,7 +15,10 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     List<Note> findByCourseIdOrderByUpdatedAtDesc(Long courseId);
 
     @Query("SELECT n FROM Note n JOIN CourseMembership cm ON n.course = cm.course WHERE cm.user.id = :userId ORDER BY n.updatedAt DESC NULLS LAST")
-    List<Note> findAccessibleNotesByUserId(@Param("userId") Long userId, Pageable pageable);
+    List<Note> findAccessibleNotesByUserIdLimit5(@Param("userId") Long userId, Pageable pageable);
+
+    @Query("SELECT n FROM Note n JOIN CourseMembership cm on n.course = cm.course WHERE cm.user.id = :userId ORDER BY n.updatedAt DESC NULLS LAST")
+    List<Note> findAllNotesAccessibleByUser(@Param("userId") Long userId);
 
     // Get note count for a course
     long countByCourseId(Long courseId);

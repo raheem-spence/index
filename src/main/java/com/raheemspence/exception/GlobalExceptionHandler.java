@@ -1,6 +1,7 @@
 package com.raheemspence.exception;
 
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.Map;
 
     The entire thing catches validation errors and returns structured JSON withe field messages
  */
+@CrossOrigin(origins = "*")
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

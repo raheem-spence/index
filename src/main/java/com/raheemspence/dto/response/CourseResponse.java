@@ -10,6 +10,8 @@ import lombok.Setter;
 public class CourseResponse {
     private Long id;
     private String name;
+    private String school;
     private Long memberCount;
     private Long noteCount;
+    private String joinCode;
 }

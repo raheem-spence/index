@@ -37,11 +37,36 @@ public class NoteService {
         this.courseMembershipRepository = courseMembershipRepository;
     }
 
+    public List<NoteResponse> getAllNotes(Long userId) {
+        List<Note> allNotes = noteRepository.findAllNotesAccessibleByUser(userId);
+
+        List<NoteResponse> allNotesResponse = new ArrayList<>();
+
+        for (Note note: allNotes) {
+            NoteResponse noteResponse = new NoteResponse();
+
+            noteResponse.setId(note.getId());
+            noteResponse.setTitle(note.getTitle());
+            noteResponse.setContent(note.getContent());
+            noteResponse.setCreatedAt(note.getCreatedAt());
+            noteResponse.setUpdatedAt(note.getUpdatedAt());
+            noteResponse.setOwnerId(note.getOwner().getId());
+            noteResponse.setOwnerFirstName(note.getOwner().getFirstName());
+            noteResponse.setOwnerLastName(note.getOwner().getLastName());
+            noteResponse.setCourseName(note.getCourse().getName());
+            noteResponse.setCourseId(note.getCourse().getId());
+
+            allNotesResponse.add(noteResponse);
+        }
+
+        return allNotesResponse;
+    }
+
     public List<NoteResponse> getRecentNotes(Long userId) {
 
         Pageable pageable = PageRequest.of(0, 5);
 
-        List<Note> recentNotes = noteRepository.findAccessibleNotesByUserId(userId, pageable);
+        List<Note> recentNotes = noteRepository.findAccessibleNotesByUserIdLimit5(userId, pageable);
 
         List<NoteResponse> recentNotesResponse = new ArrayList<>();
 

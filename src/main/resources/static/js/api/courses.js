@@ -11,20 +11,72 @@ export async function fetchCourses() {
         const result = handleAuth(response);
 
         if (!result) {
-            return;
+            return {
+                success: false,
+                status: 401
+            }
         }
 
         // 2. check if response status is ok
         if (!response.ok) {
-            throw new Error(`HTTP Error! Status: ${response.status}`);
+            return {
+                success: false,
+                status: response.status
+            }
         }
 
         // 3. parse the stream data into a json object
         const courses = await response.json();
-        return courses;
+        return {
+            success: true,
+            data: courses
+        }
 
     } catch (error) {
         console.error('Fetch failed:', error);
+        return {
+            success: false,
+            status: null
+        }
+    }
+}
+
+
+export async function fetchDashboardCourses() {
+    try {
+        const response = await fetch('/course/dashboard', {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        const result = handleAuth(response);
+
+        if (!result) {
+            return {
+                success: false,
+                status: 401
+            }
+        }
+
+        if (!response.ok) {
+            return {
+                success: false,
+                status: response.status
+            }
+        }
+
+        const dashboardCourses = await response.json();
+        return {
+            success: true,
+            data: dashboardCourses
+        }
+
+    } catch (error) {
+        console.error('Fetch failed: ', error);
+        return {
+            success: false,
+            status: null
+        }
     }
 }
 
@@ -38,18 +90,31 @@ export async function fetchCourseDetails(courseId) {
         const result = handleAuth(response);
 
         if (!result) {
-            return;
+            return {
+                success: false,
+                status: 401
+            }
         }
 
         if (!response.ok) {
-            throw new Error(`HTTP Error! Status: ${response.status}`);
+            return {
+                success: false,
+                status: response.status
+            }
         }
 
         const courseDetails = await response.json();
-        return courseDetails;
+        return {
+            success: true,
+            data: courseDetails
+        }
 
     } catch (error) {
         console.error('Fetch failed:', error);
+        return {
+            success: false,
+            status: null
+        }
     }
 }
 
@@ -63,18 +128,31 @@ export async function fetchCourseMembers(courseId) {
         const result = handleAuth(response);
 
         if (!result) {
-            return;
+            return {
+                success: false,
+                status: 401
+            }
         }
         
         if (!response.ok) {
-            throw new Error(`HTTP Error! Status: ${response.status}`);
+            return {
+                success: false,
+                status: response.status
+            }
         }
 
         const courseMembers = await response.json()
-        return courseMembers;
+        return {
+            success: true,
+            data: courseMembers
+        }
 
     } catch(error) {
         console.error('Fetch failed:', error)
+        return {
+            success: false,
+            status: null
+        }
     }
 }
 
@@ -92,19 +170,31 @@ export async function createCourse(courseName) {
         const result = handleAuth(response);
 
         if (!result) {
-            return;
+            return {
+                success: false,
+                status: 401
+            }
         }
 
         if (!response.ok) {
-            throw new Error(`HTTP Error! Status: ${response.status}`);
+            return {
+                success: false,
+                status: response.status
+            }
         }
 
         const newCourse = await response.json();
-        return newCourse;
+        return {
+            success: true,
+            data: newCourse
+        }
 
     } catch(error) {
         console.error('Error:', error);
-        return false;
+        return {
+            success: false,
+            status: null
+        }
     }
 }
 
@@ -122,18 +212,30 @@ export async function joinCourse(joinCode) {
         const result = handleAuth(response);
 
         if (!result) {
-            return;
+            return {
+                success: false,
+                status: 401
+            }
         }
 
         if (!response.ok) {
-            throw new Error(`Http Error! Status: ${response.status}`);
+            return {
+                success: false,
+                status: response.status
+            }
         }
 
         const joinCourse = await response.json();
-        return joinCourse;
+        return {
+            success: true,
+            data: joinCourse
+        };
 
     } catch(error) {
         console.error('Error:', error);
-        return false;
+        return {
+            success: false,
+            status: null
+        }
     }
 }

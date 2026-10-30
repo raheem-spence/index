@@ -2,7 +2,7 @@
 import { fetchCourses, fetchCourseDetails, fetchCourseMembers } from "../api/courses.js";
 import { fetchCurrentUser } from "../api/users.js";
 import { loadNotes, createNote, deleteNote, updateNote } from "../api/notes.js"
-import { formatRelativeTime, delay, formatDate } from "../utilities.js";
+import { formatRelativeTime, delay, formatDate, showToast, copyToClipboard } from "../utilities.js";
 
 // constanst / URL params / DOM elements
 const baseCourseUrl = '/course.html'
@@ -13,7 +13,17 @@ const courseId = Number(urlParams.get('courseId'));
 
 const currSiteLocation = document.getElementById('site-location-div');
 
-const courses = await fetchCourses();
+async function initializeApp() {
+    const coursesResult = await fetchCourses();
+    if (!coursesResult.success) {
+        return; 
+    }
+    const courses = coursesResult.data;
+    renderSideBarCourses(courses);
+    renderRoute(courseId);
+    renderUser();
+}
+
 
 const courseContainer = document.getElementById('course-container');
 
@@ -49,16 +59,37 @@ document.body.appendChild(toast);
 // function definitions
 async function renderCourseView(courseId) {
     // get course details
-    const courseDetails = await fetchCourseDetails(courseId);
+    const courseDetailsResult = await fetchCourseDetails(courseId);
+
+    if (!courseDetailsResult.success) {
+        return;
+    }
+    const courseDetails = courseDetailsResult.data;
 
     // get course members
-    const courseMembers = await fetchCourseMembers(courseId);
+    const courseMembersResult = await fetchCourseMembers(courseId);
+
+    if (!courseMembersResult.success) {
+        return;
+    }
+    const courseMembers = courseMembersResult.data;
 
     // get course notes
-    const courseNotes = await loadNotes(courseId);
+    const courseNotesResult = await loadNotes(courseId);
+
+    if (!courseNotesResult.success) {
+        return;
+    }
+    const courseNotes = courseNotesResult.data;
 
     // get current user
-    const currentUser = await fetchCurrentUser();
+    const currentUserResult = await fetchCurrentUser();
+
+    if (!currentUserResult.success) {
+        return;
+    }
+
+    const currentUser = currentUserResult.data;
 
     const membersModal = renderMembersModal(courseMembers, currentUser);
     const notesContainer = renderCourseNotes(courseNotes, courseDetails);
@@ -98,35 +129,7 @@ async function renderCourseView(courseId) {
 
 
     joinCodeBtn.addEventListener('click', async () => {
-        try {
-                // copy code to clipboard
-                await navigator.clipboard.writeText(courseDetails.joinCode);
-
-                // change the icon
-                const checkMarkString = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" 
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" 
-                                        stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"></path>
-                                        </svg>`;
-                copySvgContainer.style.opacity = 0;
-
-                setTimeout(() => {
-                    copySvgContainer.innerHTML = checkMarkString;
-                    copySvgContainer.style.opacity = 1;
-                }, 150);
-
-                setTimeout(() => {
-                    copySvgContainer.style.opacity = 0;
-
-                    setTimeout(() => {
-                        copySvgContainer.innerHTML = copySvgString;
-                        copySvgContainer.style.opacity = 1;
-                    }, 150);
-                }, 1500);
-
-            } catch (error) {
-                console.error('Failed to copy:', error);
-            }
-       
+        copyToClipboard(copySvgContainer, copySvgString, courseDetails.joinCode);
     });
 
     
@@ -667,14 +670,6 @@ function searchNotes(courseNotes, searchBar, noteList, notesTotal, noteSectionTi
     })
 }
 
-async function showToast(textContent) {
-    toastTxt.textContent = textContent;
-    await delay(300);
-    toast.classList.remove('hidden');
-    await delay(3000);
-    toast.classList.add('hidden');
-}
-
 function addNote(newNoteData) {
     const noteLi = document.createElement('li');
     const noteDiv = document.createElement('div');
@@ -731,7 +726,12 @@ async function renderNoteDetailView(noteData) {
 
     const allBtnsDiv = document.createElement('div');
     
-    const currUser = await fetchCurrentUser();
+    const currUserResult = await fetchCurrentUser();
+    if (!currUserResult.success) {
+        return;
+    }
+
+    const currUser = currUserResult.data;
 
     const backBtn = document.createElement('button');
     const backArrowSvgContainer = document.createElement('div');
@@ -1223,7 +1223,12 @@ function createNotesEmptyState(mainMessage, secondaryMessage) {
 
 async function renderUser() {
 
-    const user = await fetchCurrentUser();
+    const userResult = await fetchCurrentUser();
+    if(!userResult.success) {
+        return;
+    }
+
+    const user = userResult.data;
 
     const usernamePara = document.createElement('p');
     const userEmailPara = document.createElement('p');
@@ -1249,7 +1254,11 @@ async function renderRoute(courseId) {
     let currNote = null;
 
     if (currNoteId !== null) {
-        const notes = await loadNotes(courseId);
+        const notesResult = await loadNotes(courseId);
+        if (!notesResult.success) {
+            return;
+        }
+        const notes = notesResult.data;
         currNote = notes.find(note => note.id === Number(currNoteId));
     }
 
@@ -1322,7 +1331,4 @@ window.addEventListener('popstate', () => {
 
 
 // initial page setup / function calls
-// renderBreadCrumb(courses, courseId);
-renderSideBarCourses(courses);
-renderRoute(courseId);
-renderUser();
+initializeApp();

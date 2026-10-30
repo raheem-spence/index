@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -32,6 +33,17 @@ public class CourseController {
         }
 
         return courseService.getCoursesByUserId(userId);
+    }
+
+    @GetMapping("/dashboard")
+    public List<CourseResponse> getDashboardCourses(HttpSession httpSession) {
+        Long userId = (Long) httpSession.getAttribute("userId");
+
+        if (userId == null) {
+            return List.of();
+        }
+
+        return courseService.getDashboardCourses(userId);
     }
 
     @GetMapping("/{courseId}")
@@ -59,10 +71,14 @@ public class CourseController {
     }
 
     @PostMapping("/join")
-    public JoinCourseResponse joinCourse(@RequestBody JoinCourseRequest joinCourseRequest,
+    public JoinCourseResponse joinCourse(@Valid @RequestBody JoinCourseRequest joinCourseRequest,
                                          HttpSession httpSession) {
 
         Long userId = (Long) httpSession.getAttribute("userId");
+
+        if (userId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session expired");
+        }
 
         return courseService.joinCourse(userId, joinCourseRequest);
     }

@@ -20,7 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -478,7 +477,7 @@ class NoteServiceTest {
 
         List<Note> noteList = List.of(note1, note2);
 
-        when(noteRepository.findAccessibleNotesByUserId(eq(userId), any(Pageable.class))).thenReturn(noteList);
+        when(noteRepository.findAccessibleNotesByUserIdLimit5(eq(userId), any(Pageable.class))).thenReturn(noteList);
 
         // 2. Act
         List<NoteResponse> recentNotesResponse = noteService.getRecentNotes(userId);
@@ -512,7 +511,7 @@ class NoteServiceTest {
         // 1. Arrange
         Long userId = 1L;
 
-        when(noteRepository.findAccessibleNotesByUserId(eq(userId), any(Pageable.class))).thenReturn(List.of());
+        when(noteRepository.findAccessibleNotesByUserIdLimit5(eq(userId), any(Pageable.class))).thenReturn(List.of());
 
         // 2. Act
         List<NoteResponse> emptyList = noteService.getRecentNotes(userId);

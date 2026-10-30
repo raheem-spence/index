@@ -10,16 +10,29 @@ export async function fetchCurrentUser() {
         const result = handleAuth(response);
 
         if (!result) {
-            return;
+            return {
+                success: false,
+                status: 401
+            }
         }
 
         if (!response.ok) {
-            throw new Error(`HTTP Error! Status: ${response.status}`)
+            return {
+                success: false,
+                status: response.status
+            }
         }
 
         const user = await response.json();
-        return user;
+        return {
+            success: true,
+            data: user
+        }
     } catch (error) {
         console.log('Fetch failed:', error);
+        return {
+            success: false,
+            status: null
+        }
     }
 }

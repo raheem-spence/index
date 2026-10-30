@@ -299,7 +299,6 @@ aside{
     align-items: center;
     background-color: transparent;
     border-bottom: solid 1px var(--border);
-    margin-bottom: 1rem;
     padding: 16px;
     transition: background-color 0.2s ease;
     cursor: pointer;

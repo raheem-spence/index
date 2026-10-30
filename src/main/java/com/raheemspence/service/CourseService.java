@@ -192,9 +192,13 @@ public class CourseService {
                         HttpStatus.NOT_FOUND,
                         "User not found")
                 );
+        // Sanitize the join code by removing dashes and spaces and converting to uppercase
+        String cleanedCode = joinCourseRequest.getJoinCode()
+                .replaceAll("[-\\s]", "")
+                .toUpperCase();
 
         // Get course object, throw exception if not found
-        Course course = courseRepository.findByJoinCode(joinCourseRequest.getJoinCode()).
+        Course course = courseRepository.findByJoinCode(cleanedCode).
                 orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Course not found")
@@ -245,6 +249,8 @@ public class CourseService {
 
             courseResponse.setId(course.getId());
             courseResponse.setName(course.getName());
+            courseResponse.setSchool(course.getSchool());
+            courseResponse.setJoinCode(course.getJoinCode());
             courseResponse.setNoteCount(noteRepository.countByCourseId(course.getId()));
             courseResponse.setMemberCount(courseMembershipRepository.countByCourseId(course.getId()));
 

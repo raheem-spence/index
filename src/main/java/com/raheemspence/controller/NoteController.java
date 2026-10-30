@@ -22,6 +22,18 @@ public class NoteController {
         this.noteService = noteService;
     }
 
+    @GetMapping("/notes/all")
+    public List<NoteResponse> getAllNotes(HttpSession httpSession) {
+        // Get user by id
+        Long userId = (Long) httpSession.getAttribute("userId");
+
+        if (userId == null) {
+            return List.of();
+        }
+
+        return noteService.getAllNotes(userId);
+    }
+
     @GetMapping("/notes")
     public List<NoteResponse> getRecentNotes(HttpSession httpSession) {
         // Get user by id

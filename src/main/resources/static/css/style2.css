@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Lora:ital,wght@0,400..700;1,400..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Lora:ital,wght@0,400..700;1,400..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Geist:ital,wght@0,100..900;1,100..900&family=Lora:ital,wght@0,400..700;1,400..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Geist+Mono:ital,wght@0,100..900;1,100..900&family=Geist:ital,wght@0,100..900;1,100..900&family=Lora:ital,wght@0,400..700;1,400..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 :root {
     --base-clr: #11121a;
     --line-clr: #42434a;
@@ -21,12 +23,20 @@
     --gray-border: #E4E3E3;
     --active-course-clr: #d7ddf9; 
     --border: rgba(0, 0, 0, 0.07);
-    --black-text-clr: #141414;
-    --muted-foreground: #6b6b6b;
-    --primary: #286B63;
+    --black-text-clr: oklch(20% .01 230);
+    --muted-foreground: oklch(55% .012 230);
+    --primary: oklch(45% .08 195);
     --accent-hover: #20564F;
     --soft-accent: #E7F0EE;
-
+    --primary-font-color: #f1fbfa;
+    --background: oklch(99% .002 200);
+    --secondary-foreground: oklch(25% .01 230);
+    --secondary: oklch(96.5% .004 220);
+    --border: oklch(92% .004 230);
+    --border-hover: rgba(105, 116, 120, 0.4);
+    --card-hover-bg: #f1f4f5;
+    --bg-secondary: oklch(0.965 0.004 220);
+    --error-red: oklch(57.7% .245 27.325);
 }
 
 *, *::before, *::after{
@@ -42,11 +52,10 @@ main {
 }
 
 html{
-    font-family: Figtree, sans-serif;
+    font-family: Geist, sans-serif;
     font-size: 16px;
 }
-
-
+  
 body{
     display: grid;
     min-height: 100vh;
@@ -55,8 +64,18 @@ body{
     grid-template-areas: 
     "sidebar main"
     "sidebar main";
-    background-color: #f4f5f7f5;
+    background-color: var(--background);
+    letter-spacing:  -.005em;
+    font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
+
+body,
+dialog,
+input {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 
 /* =====================
         Sidebar
@@ -277,53 +296,45 @@ aside{
 .note-div {
     display: flex;
     justify-content: space-between;
-    border-radius: .5em;
-    background-color: white;
-    border: solid 1px #00000012;
+    align-items: center;
+    background-color: transparent;
+    border-bottom: solid 1px var(--border);
     margin-bottom: 1rem;
     padding: 16px;
-    transition: transform 0.2s ease;
+    transition: background-color 0.2s ease;
     cursor: pointer;
 }
 
 .note-div:hover {
-    transform: translateY(-3px);
-    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.05);
+    background-color: var(--bg-secondary);
 }
 
 .note-title {
-    font-family: Fraunces, serif;
-    font-size: 14px;
+    font-family: Geist, sans-serif;
+    font-size: .875rem;
     font-weight: 600;
+    color: var(--black-text-clr);
 }
 
 .note-time {
-    font-family: Figtree, sans-serif;
-    font-size: 12px;
-    color: #6b6b6b;
-}
-
-.note-time-div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.4rem;
+    font-family: Geist, sans-serif;
+    font-size: .75rem;
+    line-height: 1rem;
+    color: var(--muted-foreground);
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 }
 
 .note-course-div {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
 }
 
 .note-owner {
     font-size: 12px;
     color: #6b6b6b;
-}
-
-.note-owner-div {
-    display: flex;
-    gap: 0.3rem;
 }
 
 .note-owner-cls-div {
@@ -333,25 +344,14 @@ aside{
 }
 
 .note-course-name {
-    font-family: Figtree, sans-serif;
-    color: #6b6b6b;
-    font-size: 12px;
-}
-
-.note-initials-div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #5e63ff;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-}
-
-.note-initials {
-    font-size: 7px;
-    color: white;
-    font-weight: 700;
+    font-family: Geist, sans-serif;
+    color: var(--muted-foreground);
+    font-size: 11px;
+    border: 1px solid var(--border);
+    border-radius: .25rem;
+    background-color: var(--secondary);
+    font-weight: 500;
+    padding: 2px 6px;
 }
 
 .join-course-btn {
@@ -367,6 +367,10 @@ aside{
     margin: 1.5rem auto;
     padding: 0.5em 1em;
     font-weight: 500;
+}
+
+.asterisk {
+    color: red;
 }
 
 .plus-sign {
@@ -517,11 +521,10 @@ aside{
 }
 
 .dashboard-title {
-    font-family: Fraunces, serif;
-    font-size: 30px;
+    font-family: Geist;
+    font-size: 1.5rem;
     font-weight: 600;
-    line-height: 1.15;
-    letter-spacing: -0.025rem;
+    line-height: calc(2 / 1.5);
     color: #141414;
 }
 
@@ -646,7 +649,10 @@ aside{
 }
 
 #dashboard-container {
-    padding: 40px 48px;
+    padding: 48px 40px;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 
@@ -654,6 +660,7 @@ aside{
     display: flex;
     justify-content: space-between;
     align-items: start;
+    margin-bottom: 32px;
 }
 
 .dashboard-title-container {
@@ -669,11 +676,14 @@ aside{
 }
 
 .join-btn, .create-cls-btn {
-    font-size: 13.5px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
     font-weight: 500;
-    font-family: Figtree, sans-serif;
-    padding: 9px 16px;
-    border-radius: 12px;
+    font-family: Geist, sans-serif;
+    padding: 8px 12px;
+    border-radius: 6px;
     border: 1px solid;
     cursor: pointer;
 }
@@ -681,7 +691,7 @@ aside{
 .join-btn {
     background-color: #ffffff;
     color: #141414;
-    border-color: rgba(0, 0, 0, 0.07);
+    border-color: #E2E5E7;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     transition: background-color 0.3s ease;
 }
@@ -694,7 +704,7 @@ aside{
 .create-cls-btn, .create-note-btn-course{
     background-color: var(--primary);
     transition: background-color 0.3s ease;
-    color: #ffffff;
+    color: var(--primary-font-color);
 }
 
 .create-cls-btn:hover, .create-note-btn-course:hover {
@@ -704,13 +714,15 @@ aside{
 .courses-header {
     display: flex;
     justify-content: space-between;
-    margin: 24px 0px 16px 0px;
+    margin-bottom: 12px;
 }
 
 .courses-heading {
-    font-size: 15px;
-    font-weight: 700;
+    font-family: Geist, sans-serif;
+    font-size: .875rem;
+    font-weight: 500;
     color: var(--black-text-clr);
+    line-height: calc(1.25 / .875);
 }
 
 .all-courses-btn {
@@ -718,17 +730,24 @@ aside{
     background: transparent;
     cursor: pointer;
     transition: color 0.3s ease;
-    color: #6b6b6b;
+    color: var(--muted-foreground);
+    font-size: .75rem;
+    font-weight: 500;
+    line-height: calc(1 / .75);
+    font-family: Geist, sans-serif;
 }
 
 .all-courses-btn:hover {
-    color: var(--accent-hover);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    color: var(--black-text-clr);
 }
 
 .courses-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
+    margin-bottom: 40px;
 }
 
 .course-card {
@@ -744,8 +763,11 @@ aside{
     border-radius: 8px;
     border: solid 1px #00000012;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
     cursor: pointer;
+    min-width: 0;
+    width: 100%;
+    text-align: left;
 }
 
 .course-a-tag:link, .course-a-tag:visited, .course-a-tag:active {
@@ -755,17 +777,64 @@ aside{
 }
 
 .course-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.10);
+    background-color: var(--card-hover-bg);
+    border-color: var(--border-hover)
+}
+
+.card-header {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    min-width: 0;
+    width: 100%;
+}
+
+.monogram {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--secondary);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    color: var(--secondary-foreground);
+    letter-spacing: 0.025em;
+    font-weight: 600;
+    font-size: 0.75rem;
+    height: 30px;
+    width: 30px;
+}
+
+.course-name-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-width: 0;
+    width: 100%;
+    text-align: left;
 }
 
 .course-name {
-    font-size: 15.5px;
+    color: var(--black-text-clr);
+    font-size: 0.875rem;
     font-weight: 600;
     letter-spacing: -0.015em;
-    font-family: Fraunces, serif;
+    font-family: Geist, sans-serif;
+    width: 100%;
+    text-align: left;
 }
 
+.school {
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+    width: 100%;
+    text-align: left;
+}
+
+.truncate {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
 .course-meta-data {
     display: flex;
     font-family: Figtree;
@@ -773,6 +842,37 @@ aside{
     color: #6b6b6b;
     justify-content: space-between;
     gap: 1rem;
+}
+
+.course-code {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: oklch(55.09% 0.0105 232.51);
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: Geist Mono;
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 6px 8px;
+    letter-spacing: 0.025rem;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.course-code:hover {
+    background-color: #f1f4f5; 
+    color: #1e2528;            
+    border-color: #d1d5d8;
+}
+
+
+.course-card-footer {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
 }
 
 .course-meta-data-div {
@@ -844,8 +944,8 @@ aside{
     color: #6b6b6b;
     gap: 0.4rem;
     align-items: center;
-    font-family: Figtree, sans-serif;
-    border-radius: .65rem;
+    font-family: Geist, sans-serif;
+    border-radius: .5rem;
     border: 1px solid hsla(0, 0%, 0%, 0.071);
     cursor: pointer;
     padding: 4px 10px;
@@ -862,7 +962,7 @@ aside{
 }
 
 .join-code-text {
-    font-family: Figtree, sans-serif;
+    font-family: Geist, sans-serif;
     font-size: 11.5px;
     color: var(--muted-foreground);
 }
@@ -904,7 +1004,7 @@ aside{
 }
 
 .members-modal::backdrop {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(6px);
 }
 
@@ -1014,7 +1114,7 @@ aside{
 }
 
 .joined-date {
-    font-family: Figtree, sans-serif;
+    font-family: Geist, sans-serif;
     font-size: 12px;
     color: #6b6b6b;
 }
@@ -1280,7 +1380,7 @@ aside{
     bottom: 24px;
     right: 24px;
     border-radius: 6px;
-    font-family: Figtree, sans-serif;
+    font-family: Geist, sans-serif;
     background-color: #ffffff;
     color: var(--black-text-clr);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
@@ -1292,7 +1392,7 @@ aside{
 }
 
 .toast-checkmark {
-    color: #16a34a;
+    color: var(--black-text-clr);
 }
 
 .toast-i-icon {
@@ -1300,8 +1400,9 @@ aside{
 }
 
 .field-error {
-    font-size: 13px;
-    color: #dc2626;
+    margin-top: calc(1.5 * .25rem);
+    font-size: .75rem;
+    color: var(--error-red);
 }
 
 .empty-search-notes {
@@ -1691,55 +1792,87 @@ aside{
     text-decoration: underline;
 }
 
-.create-course-modal {
+.create-course-modal, .join-course-modal {
     background-color: #ffffff;
-    width: min(420px, calc(100vw - 32px));
+    width: min(448px, calc(100vw - 32px));
     height: fit-content;
     max-height: calc(100vh - 32px);;
     margin: auto;
-    border-radius: 16px;
-    border: none;
-    transform: scale(1);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
     overflow-y: auto;
+
+    /* closed state by default */
+    opacity: 0;
+    transform: scale(0.96) translateY(6px);
+
+    /* allow-discrete allows transition from display: none */
+    transition:
+        opacity 200ms ease-out,
+        transform 200ms ease-out,
+        overlay 200ms ease-out allow-discrete,
+        display 200ms ease-out allow-discrete;
+
 }
 
-.layers-svg {
-    border-radius: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 42px;
-    width: 42px;
-    background-color: var(--soft-accent);
-    color: var(--primary);
+.create-course-modal[open], .join-course-modal[open] {
+    opacity: 1;
+    transform: scale(1) translateY(0);
 }
+
+/* starting state: where it animates from when it first pops up */
+@starting-style {
+    .create-course-modal[open], .join-course-modal[open] {
+        opacity: 0;
+        transform: scale(0.96) translateY(6px);
+    }
+}
+
 
 .create-course-modal-header {
     display: flex;
     gap: 16px;
-    margin-bottom: 32px;
+    margin-bottom: 16px;
 }
 
 
-.create-course-modal::backdrop {
-    background-color: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(6px);
+.create-course-modal::backdrop, .join-course-modal::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: 
+        opacity 200ms ease-out,
+        overlay 200ms ease-out allow-discrete,
+        display 200ms ease-out allow-discrete;
+}
+
+.create-course-modal[open]::backdrop, .join-course-modal[open]::backdrop {
+    opacity: 1;
+}
+
+@starting-style {
+    .create-course-modal[open]::backdrop, .join-course-modal[open]::backdrop {
+        opacity: 0;
+    }
 }
 
 .create-course-modal-container {
     display: flex;
     flex-direction: column;
-    padding: 18px 32px;
+    padding: 24px;
+    position: relative;
 }
 
 .create-course-close-btn {
+    position: absolute;
     background-color: transparent;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     height: 32px;
     width: 32px;
-    margin-left: auto;
+    right: 16px;
+    top: 16px;
 }
 
 .create-course-close-btn:hover {
@@ -1747,52 +1880,73 @@ aside{
 }
 
 .create-course-title {
-    font-family: Fraunces, serif;
-    font-size: 22px;
+    font-family: Geist, sans-serif;
+    color: var(--black-text-clr);
+    font-size: 1.125rem;
     font-weight: 600;
-    letter-spacing: -0.02em;
-    margin-bottom: 3px;
+    margin-bottom: 6px;
+    line-height: 1.25;
 }
 
 .create-course-msg {
-    font-family: Figtree, sans-serif;
-    font-size: 13px;
+    font-family: Geist, sans-serif;
+    font-size: .875rem;
     color: var(--muted-foreground);
+    line-height: 1.4;
 }
 
-.create-course-scd-msg {
-    font-family: Figtree, sans-serif;
-    font-size: 13px;
-    color: var(--muted-foreground);
+.create-course-name-div {
+    margin-top: 8px;
 }
 
 .create-course-label {
     display: flex;
-    font-family: Figtree, sans-serif;
-    font-size: 14px;
+    font-family: Geist, sans-serif;
+    font-size: .75rem;
     color: var(--black-text-clr);
-    font-weight: 600;
-    gap: 4px;
-    margin-bottom: 4px;
+    font-weight: 500;
+    margin-bottom: calc(1.5 * .25rem);
+    gap: 2px;
 }
 
-.asterisk {
-    color: red;
-}
 
 .create-course-input {
     border-radius: 6px;
-    font-size: 14px;
-    font-family: Figtree, sans-serif;
+    font-size: .875rem;
     border: 1px solid var(--border);
-    padding: 8px 12px;
-    margin-bottom: 8px;
+    padding: 0 12px;
+    height: 2.25rem;
     width: 100%;
+    font-family: Geist, sans-serif;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
-.create-course-input:focus {
+.join-course-input {
+    border-radius: 6px;
+    font-size: .875rem;
+    border: 1px solid var(--border);
+    padding: 0 12px;
+    width: 100%;
+    font-family: "Geist Mono", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    height: 2.25rem;
+    color: var(--black-text-clr);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.create-course-input:focus, .join-course-input:focus {
     outline: none;
     border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(32, 86, 79, 0.18);
+}
+
+
+.create-course-input::placeholder, .join-course-input::placeholder {
+    color: var(--muted-foreground);
 }
 
 .create-course-school-div {
@@ -1802,13 +1956,16 @@ aside{
 .school-label {
     display: flex;
     align-items: center;
+    font-size: .75rem;
+    color: var(--black-text-clr);
+    font-weight: 500;
+    gap: 4px;
 }
 
 .optional {
-    font-size: 10px;
-    color: #6B6B6B;
-    font-style: italic;
-    font-weight: 400;
+    font-size: .75rem;
+    color: var(--muted-foreground);
+    font-weight: 500;
 }
 
 .create-course-btns-container {
@@ -1816,13 +1973,11 @@ aside{
     justify-content: flex-end;
     gap: 8px;
     margin-top: 16px;
-    border-top: 1px solid var(--border);
-    padding-top: 16px;
 }
 
 .create-course-cancel-btn, .create-course-create-btn {
-    font-family: Figtree, sans-serif;
-    border-radius: 8px;
+    font-family: Geist, sans-serif;
+    border-radius: 6px;
     padding: 8px 12px;
     cursor: pointer;
 }
@@ -1835,7 +1990,7 @@ aside{
 }
 
 .create-course-create-btn:hover {
-    background-color: var(--accent-hover);
+    opacity: 0.9;
 }
 
 .create-course-cancel-btn {
@@ -1859,7 +2014,7 @@ aside{
 }
 
 .join-course-scd-msg {
-    font-family: Figtree, sans-serif;
+    font-family: Geist, sans-serif;
     font-size: 13px;
     color: var(--primary);
 }
@@ -1881,4 +2036,85 @@ aside{
 .error-icon {
     color: #B91C1C;
     background-color: #FEF2F2;
+}
+
+#notes-container {
+    padding: 40px 48px;
+}
+
+.all-notes-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 32px;
+}
+
+.create-note-btn {
+    display: flex;
+    align-items: center;
+    font-size: 13.5px;
+    font-weight: 500;
+    font-family: Figtree, sans-serif;
+    padding: 9px 16px;
+    border-radius: 12px;
+    border: 1px solid;
+    cursor: pointer;
+    background-color: var(--primary);
+    transition: background-color 0.3s ease;
+    color: #ffffff;
+    gap: 8px;
+}
+
+.create-note-btn:hover {
+    background-color: var(--accent-hover);
+}
+
+.notes-toolbar {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.notes-toggle-container {
+    background-color: #ebebea;
+    border: 1px solid var(--border);
+    display: flex;
+    padding: 4px;
+    width: fit-content;
+    border-radius: 14px;
+    gap: 8px;
+}
+
+.all-notes-tab, .my-notes-tab { 
+    background-color: #ffffff;
+    box-shadow: rgba(0, 0, 0, 0.08) 0px 1px 3px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--black-text-clr);
+    font-family: Figtree, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 6px 14px;
+}
+
+.notes-search-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.course-filter-btn {
+    background-color: #ffffff;
+    border: 1px solid (var(--border));
+    border-radius: 14px;
+    box-shadow: rgba(0, 0, 0, 0.04) 0px 1px 2px;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: Figtree, sans-serif;
+    gap: 8px;
+    padding: 10px 14px;
 }

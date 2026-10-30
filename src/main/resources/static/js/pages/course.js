@@ -2,7 +2,7 @@
 import { fetchCourses, fetchCourseDetails, fetchCourseMembers } from "../api/courses.js";
 import { fetchCurrentUser } from "../api/users.js";
 import { loadNotes, createNote, deleteNote, updateNote } from "../api/notes.js"
-import { formatRelativeTime, delay, formatDate, showToast } from "../utilities.js";
+import { formatRelativeTime, delay, formatDate, showToast, copyToClipboard } from "../utilities.js";
 
 // constanst / URL params / DOM elements
 const baseCourseUrl = '/course.html'
@@ -129,35 +129,7 @@ async function renderCourseView(courseId) {
 
 
     joinCodeBtn.addEventListener('click', async () => {
-        try {
-                // copy code to clipboard
-                await navigator.clipboard.writeText(courseDetails.joinCode);
-
-                // change the icon
-                const checkMarkString = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" 
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" 
-                                        stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"></path>
-                                        </svg>`;
-                copySvgContainer.style.opacity = 0;
-
-                setTimeout(() => {
-                    copySvgContainer.innerHTML = checkMarkString;
-                    copySvgContainer.style.opacity = 1;
-                }, 150);
-
-                setTimeout(() => {
-                    copySvgContainer.style.opacity = 0;
-
-                    setTimeout(() => {
-                        copySvgContainer.innerHTML = copySvgString;
-                        copySvgContainer.style.opacity = 1;
-                    }, 150);
-                }, 1500);
-
-            } catch (error) {
-                console.error('Failed to copy:', error);
-            }
-       
+        copyToClipboard(copySvgContainer, copySvgString, courseDetails.joinCode);
     });
 
     

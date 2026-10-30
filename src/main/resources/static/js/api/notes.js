@@ -40,6 +40,43 @@ export async function loadDashboardNotes() {
     }
 }
 
+export async function loadAllUserAccessibleNotes() {
+    try {
+        const response = await fetch(`/courses/notes/all`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        const result = handleAuth(response);
+
+        if (!result) {
+            return {
+                success: false,
+                status: 401
+            }
+        }
+
+        if (!response.ok) {
+            return {
+                success: false,
+                status: response.status
+            }
+        }
+
+        const allNotes = await response.json();
+        return {
+            success: true,
+            data: allNotes
+        }
+    } catch (error) {
+        console.error('Fetch failed:', error);
+        return {
+            success: false,
+            status: null
+        }
+    }
+}
+
 
 export async function loadNotes(courseId) {
     try {

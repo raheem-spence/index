@@ -52,7 +52,7 @@ Authentication verifies who the user is. Authorization determines what courses a
 
 ## Access Control Model
 
-Margin uses course-based authorization.
+Index uses course-based authorization.
 
 A user's access is determined by their relationship to a course. Only members of a course can access resources within that course.
 

@@ -37,7 +37,10 @@
     --card-hover-bg: #f1f4f5;
     --bg-secondary: oklch(0.965 0.004 220);
     --error-red: oklch(57.7% .245 27.325);
-}
+    --sidebar: oklch(97.5% .003 220);
+    --nav-active-text: oklch(0.25 0.01 230);
+    --nav-active-bg: oklch(0.93 0.004 220);
+}   
 
 *, *::before, *::after{
     margin: 0;
@@ -84,54 +87,113 @@ aside{
     display: flex;
     flex-direction: column;
     height: 100vh;
+    width: 240px;
     top: 0;
     position: sticky;
     align-self: start;
     grid-area: sidebar;
-    background-color: var(--sidebar-clr);
-    padding: 0.625rem;
+    background-color: var(--sidebar);
+    padding: 12px 8px;
     border-right: solid 1px var(--border-clr);
 }
 
+.logo-div {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
 
-#sidebar ul{
-    list-style: none;
+}
+
+.index-logo {
+    color: white;
+}
+
+.sidebar-toggle-btn {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: background-color 0.15s ease;
+}
+
+.sidebar-toggle-btn:hover {
+    background-color: var(--bg-secondary);
+}
+
+.sidebar-nav {
+    padding: 8px 8px 0 8px;
+}
+
+.nav-list {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    list-style-type: none;
+    gap: 2px;
 }
 
-
-#sidebar a{
-    text-decoration: none;
-    color: black;
-    border-radius: .5em;
+.nav-link {
     display: flex;
+    border-radius: 6px;
+    justify-content: flex-start;
     align-items: center;
-    padding: 0.5em 0.75em;
+    width: 100%;
+    padding: 6px 8px;
+    cursor: pointer;
+    gap: 8px;
+    text-decoration: none;
+    font-size: .875rem;
+    color: var(--muted-foreground);
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-#sidebar a:hover{
-    background-color: var(--hover-clr-light);
+.nav-link:hover {
+    background-color: var(--bg-secondary);
+    color: var(--black-text-clr);
 }
 
-
-#sidebar ul li.active a{
-    background-color: var(--active-course-clr);
+.nav-link.active {
+    background-color: var(--nav-active-bg);
+    color: var(--nav-active-text);
 }
 
-#sidebar ul li.active a svg{
-    fill: var(--accent-clr);
+.nav-link svg {
+    height: 16px;
+    width: 16px;
+    flex-shrink: 0;
 }
 
-#sidebar ul li svg{
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: 0.25rem;
-    text-align: center;
-    padding: 1px;
-    margin-right: 0.5rem;
+.nav-link span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
+.nav-item {
+    display: flex;
+    gap: 2px;
+}
+
+.nav-item svg {
+    height: 16px;
+    width: 16px;
+    flex-shrink: 0;
+    stroke-width: 1.5px;
+}
+
+.nav-item button {
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 6px;
+    background-color: transparent;
+    transition: background-color 0.15s ease;
+}
+
+.nav-item button:hover {
+    background-color: var(--bg-secondary);
+}
+
 
 #course-container {
     flex: 1;
@@ -160,17 +222,12 @@ aside{
 .sidebar-course-name {
     font-size: 13px;
     font-weight: 400;
-    font-family: Figtree, sans-serif;
+    font-family: Geist, sans-serif;
 }
 
 .sidebar-note-btn {
     display: flex;
     align-items: center;
-}
-
-.sidebar-label:hover {
-    background-color: #7c3aed14;
-    border-radius: .5em;
 }
 
 .course-list {

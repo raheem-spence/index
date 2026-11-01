@@ -8,11 +8,46 @@
 </head>
 <body>
     <aside id="sidebar">
-        <div class="logo">Index</div>
+        <div class="logo-div">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24" aria-hidden="true">
+                <!-- The dark rounded tile -->
+                <rect width="64" height="64" rx="15" fill="#12171a" />
+                
+                <!-- The white lowercase "i" -->
+                <path
+                  d="M72 92H281V442H82V534H389V92H568V0H72ZM275 713H387V607H275Z"
+                  transform="translate(14.05 52.00) scale(0.056101 -0.056101)"
+                  fill="#ffffff"
+                />
+              </svg>              
+            <button class="sidebar-toggle-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-left h-4 w-4" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:52:17"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path></svg>
+            </button>
+        </div>
 
         <nav class="sidebar-nav">
-            <ul id="dashboard-item">
-                <li><a href="/dashboard.html">Dashboard</a></li>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="/dashboard.html" class="nav-link active">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-grid h-4 w-4 shrink-0" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:23:7"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/dashboard.html" class="nav-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text h-4 w-4 shrink-0" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:23:7"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>
+                        <span>All Notes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/dashboard.html" class="nav-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers h-4 w-4 shrink-0" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:62:15"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path></svg>
+                        <span>All courses</span>
+                    </a>
+                    <button>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right h-3.5 w-3.5 transition-transform rotate-90" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:71:17"><path d="m9 18 6-6-6-6"></path></svg>
+                    </button>
+                </li>
             </ul>
             <button id="sidebar-label" class="sidebar-label courses-arrow">My courses<span><svg id="sidebar-arrow" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down-icon lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></span></button>
             <div id="dropdown-menu" class="dropdown-menu">
@@ -20,11 +55,11 @@
 
                 </ul>
             </div>
-            <div id="course-border"></div>
-            <button id="notes-btn" class="sidebar-label notes">
+            <!-- <div id="course-border"></div> -->
+            <!-- <button id="notes-btn" class="sidebar-label notes">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text" data-fg-dqpt66="1.31:39.11302:node_modules/lucide-react:208:17:10318:100:e:FileText::::::B1i5" data-fgid-dqpt66=":rp:" style="flex-shrink: 0; color: var(--muted-foreground);"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>
                 <span>Notes</span>
-            </button>
+            </button> -->
         </nav>
 
         <div class="sidebar-user">

@@ -1010,11 +1010,11 @@ function renderSideBarCourses(courses) {
 }
 
 
-function navigateToAllNotes() {
-    sidebarNotesBtn.addEventListener('click', () => {
-        window.location.href = "/notes.html";
-    });
-}
+// function navigateToAllNotes() {
+//     sidebarNotesBtn.addEventListener('click', () => {
+//         window.location.href = "/notes.html";
+//     });
+// }
   
 
 // Render username and email 
@@ -1064,5 +1064,5 @@ function highlightActiveCourse(sideBarCourses) {
 }
 
 initializeDashboard();
-navigateToAllNotes();
+// navigateToAllNotes();
 dashboardMessages(dashboardTitle, dashboardMessage);

@@ -63,12 +63,19 @@ async function initializeDashboard() {
     renderDashboard();
 }
 
+const coursesToggleBtn = document.querySelector('.chevron-btn');
 
-sidebarDropdownBtn.addEventListener('click', e => {
-    e.stopPropagation();
-    dropdownMenu.classList.toggle('open');
-    sidebarArrow.classList.toggle('rotate');
-})
+if (coursesToggleBtn) {
+    coursesToggleBtn.addEventListener('click', () => {
+        const isOpen = coursesToggleBtn.classList.toggle('open');
+        dropdownMenu.classList.toggle('open');
+        coursesToggleBtn.setAttribute('aria-expanded', isOpen);
+
+        if (isOpen) {
+            ulContainer.scrollTop = 0;
+        }
+    })
+}
 
 
 function renderDashboard() {
@@ -983,7 +990,7 @@ function renderSideBarCourses(courses) {
         for (const course of courses) {
             const url = new URL(baseCourseUrl, window.location.origin);
             const courseLi = document.createElement('li');
-            courseLi.classList.add('course');
+            courseLi.classList.add('course-li');
 
 
             const courseATag = document.createElement('a');
@@ -992,13 +999,19 @@ function renderSideBarCourses(courses) {
 
             courseATag.href = url.toString();
 
+            const monogram = getCourseInitials(course.name);
+            const monogramSpan = document.createElement('span');
+            const badgeContent = monogram ? monogram : folderIconSvg;
+            monogramSpan.innerHTML = badgeContent;
+            monogramSpan.classList.add('monogram-sidebar');
+
             const courseName = document.createElement('span');
-            courseName.classList.add('sidebar-course-name');
+            courseName.classList.add('sidebar-course-name', 'truncate');
             courseName.textContent = course.name;
 
-            courseATag.appendChild(courseName);
+            courseATag.append(monogramSpan, courseName);
 
-            courseLi.appendChild(courseATag);
+            courseLi.append(courseATag);
             ulContainer.appendChild(courseLi);
         }
 
@@ -1063,6 +1076,31 @@ function highlightActiveCourse(sideBarCourses) {
     });
 }
 
+function setUpSidebarToggle() {
+    const closeBtn = document.getElementById('sidebar-close-btn');
+    const reopenBtn = document.getElementById('sidebar-reopen-btn');
+
+    // check if user previously closed it in this browser
+    const savedState = localStorage.getItem('sidebar-collapsed');
+    if (savedState === 'true') {
+        document.body.classList.add('sidebar-collapsed');
+    }
+
+    function toggleSidebar() {
+        const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+        localStorage.setItem('sidebar-collapsed', isCollapsed ? 'true' : 'false');
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', toggleSidebar);
+    }
+
+    if (reopenBtn) {
+        reopenBtn.addEventListener('click', toggleSidebar);
+    }
+}
+
 initializeDashboard();
 // navigateToAllNotes();
 dashboardMessages(dashboardTitle, dashboardMessage);
+setUpSidebarToggle();

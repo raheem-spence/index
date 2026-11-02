@@ -2,7 +2,7 @@
 import { fetchCourses, fetchCourseDetails, fetchCourseMembers } from "../api/courses.js";
 import { fetchCurrentUser } from "../api/users.js";
 import { loadNotes, createNote, deleteNote, updateNote } from "../api/notes.js"
-import { formatRelativeTime, delay, formatDate, showToast, copyToClipboard } from "../utilities.js";
+import { formatRelativeTime, delay, formatDate, showToast, copyToClipboard, getCourseInitials } from "../utilities.js";
 
 // constanst / URL params / DOM elements
 const baseCourseUrl = '/course.html'
@@ -53,6 +53,20 @@ toast.classList.add('toast', 'hidden');
 checkMarkSvgContainer.classList.add('toast-checkmark');
 toast.append(checkMarkSvgContainer, toastTxt);
 document.body.appendChild(toast);
+
+const coursesToggleBtn = document.querySelector('.chevron-btn');
+
+if (coursesToggleBtn) {
+    coursesToggleBtn.addEventListener('click', () => {
+        const isOpen = coursesToggleBtn.classList.toggle('open');
+        dropdownMenu.classList.toggle('open');
+        coursesToggleBtn.setAttribute('aria-expanded', isOpen);
+
+        if (isOpen) {
+            ulContainer.scrollTop = 0;
+        }
+    })
+}
 
 
 
@@ -1114,6 +1128,7 @@ async function renderBreadCrumb(courses, courseId) {
 }
 
 
+// ---------- Sidebar ---------- 
 function renderSideBarCourses(courses) {
     // clear ul container
     ulContainer.replaceChildren();
@@ -1131,7 +1146,7 @@ function renderSideBarCourses(courses) {
         for (const course of courses) {
             const url = new URL(baseCourseUrl, window.location.origin);
             const courseLi = document.createElement('li');
-            courseLi.classList.add('course');
+            courseLi.classList.add('course-li');
 
 
             const courseATag = document.createElement('a');
@@ -1140,20 +1155,26 @@ function renderSideBarCourses(courses) {
 
             courseATag.href = url.toString();
 
+            const monogram = getCourseInitials(course.name);
+            const monogramSpan = document.createElement('span');
+            const badgeContent = monogram ? monogram : folderIconSvg;
+            monogramSpan.innerHTML = badgeContent;
+            monogramSpan.classList.add('monogram-sidebar');
+
             const courseName = document.createElement('span');
-            courseName.classList.add('sidebar-course-name');
+            courseName.classList.add('sidebar-course-name', 'truncate');
             courseName.textContent = course.name;
 
-            courseATag.appendChild(courseName);
+            courseATag.append(monogramSpan, courseName);
 
-            courseLi.appendChild(courseATag);
+            courseLi.append(courseATag);
             ulContainer.appendChild(courseLi);
         }
 
         dropdownMenu.appendChild(ulContainer);
 
         const sideBarCourses = document.querySelectorAll('li.course');
-
+        // highlightActiveCourse(sideBarCourses);
     }
 }
 
@@ -1319,11 +1340,7 @@ window.addEventListener('click', () => {
     }
 });
 
-sidebarDropdownBtn.addEventListener('click', e => {
-    e.stopPropagation();
-    dropdownMenu.classList.toggle('open');
-    sidebarArrow.classList.toggle('rotate');
-})
+
 
 window.addEventListener('popstate', () => {
    renderRoute(courseId);

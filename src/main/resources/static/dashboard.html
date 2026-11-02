@@ -20,7 +20,7 @@
                   fill="#ffffff"
                 />
               </svg>              
-            <button class="sidebar-toggle-btn">
+            <button class="sidebar-close-btn" id="sidebar-close-btn">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-left h-4 w-4" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:52:17"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path></svg>
             </button>
         </div>
@@ -40,36 +40,59 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/dashboard.html" class="nav-link">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers h-4 w-4 shrink-0" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:62:15"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path></svg>
-                        <span>All courses</span>
-                    </a>
-                    <button>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right h-3.5 w-3.5 transition-transform rotate-90" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:71:17"><path d="m9 18 6-6-6-6"></path></svg>
-                    </button>
+                    <div class="nav-row">
+                        <a href="/dashboard.html" class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers h-4 w-4 shrink-0" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:62:15"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path></svg>
+                            <span>All courses</span>
+                        </a>
+                        <button type="button" class="chevron-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:71:17"><path d="m9 18 6-6-6-6"></path></svg>
+                        </button>
+                    </div> 
                 </li>
+                <div id="dropdown-menu" class="dropdown-menu">
+                    <ul id="course-list"></ul>
+                </div>
             </ul>
-            <button id="sidebar-label" class="sidebar-label courses-arrow">My courses<span><svg id="sidebar-arrow" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down-icon lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg></span></button>
-            <div id="dropdown-menu" class="dropdown-menu">
-                <ul id="course-list">
-
-                </ul>
-            </div>
-            <!-- <div id="course-border"></div> -->
-            <!-- <button id="notes-btn" class="sidebar-label notes">
-                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text" data-fg-dqpt66="1.31:39.11302:node_modules/lucide-react:208:17:10318:100:e:FileText::::::B1i5" data-fgid-dqpt66=":rp:" style="flex-shrink: 0; color: var(--muted-foreground);"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>
-                <span>Notes</span>
-            </button> -->
         </nav>
 
         <div class="sidebar-user">
-            <div class="user-icon">
-                <img src="https://w0.peakpx.com/wallpaper/935/887/HD-wallpaper-deku-portrait-hero-green-mha.jpg" alt="headshot of izuku midoriya">
-            </div>
-            <div id="user-info">
-            </div>
+           <button type="button" class="sidebar-user-btn">
+               <span class="user-avatar" id="user-avatar"></span>
+                <div class="user-info">
+                    <span class="user-name" id="user-name"></span>
+                    <span class="user-meta" id="user-meta"></span>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" 
+                 class="lucide lucide-chevrons-up-down preview-icon"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/>
+                </svg>
+           </button>
         </div>
     </aside>
+    <button type="button" id="sidebar-reopen-btn" class="sidebar-reopen-btn">
+        <span class="reopen-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24" aria-hidden="true">
+                <!-- The dark rounded tile -->
+                <rect width="64" height="64" rx="15" fill="#12171a" />
+                
+                <!-- The white lowercase "i" -->
+                <path
+                  d="M72 92H281V442H82V534H389V92H568V0H72ZM275 713H387V607H275Z"
+                  transform="translate(14.05 52.00) scale(0.056101 -0.056101)"
+                  fill="#ffffff"
+                />
+              </svg>   
+        </span>
+
+        <span class="reopen-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-left">
+                <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                <path d="M9 3v18"></path>
+            </svg>
+    
+        </span>
+    </button>
     <main>
         <div id="dashboard-container"></div>
     </main>

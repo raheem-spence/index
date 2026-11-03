@@ -2,6 +2,7 @@ import { fetchCourses, createCourse, joinCourse, fetchDashboardCourses } from ".
 import { fetchCurrentUser } from "../api/users.js";
 import { loadDashboardNotes, deleteNote } from "../api/notes.js";
 import { formatRelativeTime, formatDate, showToast, getCourseInitials, formatJoinCode, copyToClipboard} from "../utilities.js";
+import { loadCurrentUser, loadSidebarCourses } from "../script.js";
 
 // ---------- Configuration ---------- 
 const baseCourseUrl = '/course.html';
@@ -14,33 +15,19 @@ const courseId = urlParams.get('courseId');
 
 
 // ---------- DOM Elements ---------- 
-const ulContainer = document.getElementById('course-list');
-
-const userDiv = document.getElementById("user-info");
-
 const dashboardDiv = document.getElementById("dashboard-container");
 const dashboardHeader = document.createElement('div');
 const dashboardTitleContainer = document.createElement('div');
 const dashboardTitle = document.createElement('h1');
 const dashboardMessage = document.createElement('p');
 
-const dropdownMenu = document.getElementById('dropdown-menu');
-const sidebarDropdownBtn = document.getElementById('sidebar-label');
-const sidebarArrow = document.getElementById('sidebar-arrow');
-
-const sidebarNotesBtn = document.getElementById('notes-btn');
-
-const userBtn = document.getElementById('user-icon-btn');
-const dropdownModal = document.getElementById('dropdown-modal');
-const profileArrow = document.getElementById('profile-arrow');
-
-const userIconName = document.getElementById('user-icon-name');
-const userInitials = document.getElementById('initials');
-
 let recentNotes = null;
 let dashboardCourses = null;
 
 async function initializeDashboard() {
+    // Show user info
+    const user = await loadCurrentUser();
+    dashboardMessages(user, dashboardTitle, dashboardMessage);
 
     const recentNotesResult = await loadDashboardNotes();
     if (!recentNotesResult.success) {
@@ -59,24 +46,8 @@ async function initializeDashboard() {
         return;
     }
     dashboardCourses = dashboardCoursesResult.data;
-    renderSideBarCourses(courses);
     renderDashboard();
 }
-
-const coursesToggleBtn = document.querySelector('.chevron-btn');
-
-if (coursesToggleBtn) {
-    coursesToggleBtn.addEventListener('click', () => {
-        const isOpen = coursesToggleBtn.classList.toggle('open');
-        dropdownMenu.classList.toggle('open');
-        coursesToggleBtn.setAttribute('aria-expanded', isOpen);
-
-        if (isOpen) {
-            ulContainer.scrollTop = 0;
-        }
-    })
-}
-
 
 function renderDashboard() {
 
@@ -183,8 +154,8 @@ function renderDashboard() {
 
 // ---------- Initialization ---------- 
 
-// Show user info
-const user = await renderUser();
+// // Show user info
+// const user = await loadCurrentUser();
 
 // ---------- Dashboard ----------
 function renderDashboardCourses(coursesGrid, dashboardCourses) {
@@ -305,16 +276,6 @@ function renderJoinCourseModal() {
 
     const joinCourseModalContainer = document.createElement('div');
 
-    // close btn
-    const joinCourseCloseBtn = document.createElement('button');
-    const closeBtnString = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" 
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
-                            stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
-                            <path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>`;   
-    
-    joinCourseCloseBtn.innerHTML = closeBtnString;
-    joinCourseCloseBtn.setAttribute('aria-label', 'Close');
-
     const joinCourseModalHeader = document.createElement('div');
 
     const joinCourseTitleMsgDiv = document.createElement('div');
@@ -352,7 +313,6 @@ function renderJoinCourseModal() {
     joinCourseModal.classList.add('join-course-modal');
     joinCourseModalHeader.classList.add('create-course-modal-header');
     joinCourseModalContainer.classList.add('create-course-modal-container');
-    joinCourseCloseBtn.classList.add('create-course-close-btn');
     joinCourseTitle.classList.add('create-course-title');
     joinCourseMsg.classList.add('create-course-msg');
     joinCourseInput.classList.add('join-course-input');
@@ -363,10 +323,6 @@ function renderJoinCourseModal() {
     joinCourseJoinBtn.classList.add('create-course-create-btn');
 
     joinCourseCancelBtn.addEventListener('click', () => {
-        joinCourseModal.close();
-    })
-
-    joinCourseCloseBtn.addEventListener('click', () => {
         joinCourseModal.close();
     })
 
@@ -428,7 +384,7 @@ function renderJoinCourseModal() {
             } 
 
             if (coursesResult.success) {
-                renderSideBarCourses(coursesResult.data);
+                await loadSideBarCourses(coursesResult.data);
             } else {
                 showToast("Course joined! Refresh to update sidebar.");
                 console.error("Join course succeeded, but sidebar refresh failed");
@@ -463,7 +419,7 @@ function renderJoinCourseModal() {
     joinCourseTitleMsgDiv.append(joinCourseTitle, joinCourseMsg);
     joinCourseModalHeader.append(joinCourseTitleMsgDiv);
     joinCourseCodeDiv.append(joinCourseLabel, joinCourseInput, joinCourseError);
-    joinCourseModalContainer.append(joinCourseCloseBtn, joinCourseModalHeader, joinCourseCodeDiv, joinCourseBtnsContainer);
+    joinCourseModalContainer.append(joinCourseModalHeader, joinCourseCodeDiv, joinCourseBtnsContainer);
     joinCourseModal.append(joinCourseModalContainer);
 
     return joinCourseModal;
@@ -476,17 +432,6 @@ function renderCreateCourseModal() {
     const createCourseModal = document.createElement('dialog');
 
     const createCourseModalContainer = document.createElement('div');
-
-    // close btn
-    const createCourseCloseBtn = document.createElement('button');
-    const closeBtnString = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" 
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
-                            stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x">
-                            <path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>`;   
-    
-    createCourseCloseBtn.innerHTML = closeBtnString;
-    createCourseCloseBtn.setAttribute('aria-label', 'Close');
-
 
     const createCourseModalHeader = document.createElement('div');
 
@@ -543,7 +488,6 @@ function renderCreateCourseModal() {
     createCourseModal.classList.add('create-course-modal');
     createCourseModalHeader.classList.add('create-course-modal-header');
     createCourseModalContainer.classList.add('create-course-modal-container');
-    createCourseCloseBtn.classList.add('create-course-close-btn');
     createCourseTitle.classList.add('create-course-title');
     createCourseMsg.classList.add('create-course-msg');
     asterisk.classList.add('asterisk');
@@ -559,10 +503,6 @@ function renderCreateCourseModal() {
     
 
     createCourseCancelBtn.addEventListener('click', () => {
-        createCourseModal.close();
-    })
-
-    createCourseCloseBtn.addEventListener('click', () => {
         createCourseModal.close();
     })
 
@@ -622,7 +562,7 @@ function renderCreateCourseModal() {
                 }
 
                 if (coursesResult.success) {
-                    renderSideBarCourses(coursesResult.data);
+                    await loadSideBarCourses(coursesResult.data);
                 } else {
                     showToast("Course created! Refresh to update sidebar.");
                     console.error("Course creation succeeded, but sidebar refresh failed");
@@ -646,7 +586,7 @@ function renderCreateCourseModal() {
     createCourseNameDiv.append(createCourseLabel, createCourseInput, createCourseError);
     schoolLabel.append(optional);
     createCourseSchoolDiv.append(schoolLabel, schoolInput);
-    createCourseModalContainer.append(createCourseCloseBtn, createCourseModalHeader, createCourseNameDiv, createCourseSchoolDiv, createCourseBtnsContainer);
+    createCourseModalContainer.append(createCourseModalHeader, createCourseNameDiv, createCourseSchoolDiv, createCourseBtnsContainer);
     createCourseModal.append(createCourseModalContainer);
 
     return createCourseModal;
@@ -972,76 +912,8 @@ function getJoinCourseError(joinCourseRequest) {
     return null;
 }
 
-// ---------- Sidebar ---------- 
-function renderSideBarCourses(courses) {
-    // clear ul container
-    ulContainer.replaceChildren();
 
-    if (courses.length === 0) {
-        const emptyMsgSidebarDiv = document.createElement('div');
-
-        emptyMsgSidebarDiv.textContent = "You have no courses yet..."
-        emptyMsgSidebarDiv.classList.add('empty-sidebar');
-        ulContainer.appendChild(emptyMsgSidebarDiv);
-        
-    } else {
-        const fieldName = "courseId";
-
-        for (const course of courses) {
-            const url = new URL(baseCourseUrl, window.location.origin);
-            const courseLi = document.createElement('li');
-            courseLi.classList.add('course-li');
-
-
-            const courseATag = document.createElement('a');
-            const fieldValue = course.id;
-            url.searchParams.set(fieldName, fieldValue);
-
-            courseATag.href = url.toString();
-
-            const monogram = getCourseInitials(course.name);
-            const monogramSpan = document.createElement('span');
-            const badgeContent = monogram ? monogram : folderIconSvg;
-            monogramSpan.innerHTML = badgeContent;
-            monogramSpan.classList.add('monogram-sidebar');
-
-            const courseName = document.createElement('span');
-            courseName.classList.add('sidebar-course-name', 'truncate');
-            courseName.textContent = course.name;
-
-            courseATag.append(monogramSpan, courseName);
-
-            courseLi.append(courseATag);
-            ulContainer.appendChild(courseLi);
-        }
-
-        dropdownMenu.appendChild(ulContainer);
-
-        const sideBarCourses = document.querySelectorAll('li.course');
-        highlightActiveCourse(sideBarCourses);
-    }
-}
-
-
-// function navigateToAllNotes() {
-//     sidebarNotesBtn.addEventListener('click', () => {
-//         window.location.href = "/notes.html";
-//     });
-// }
-  
-
-// Render username and email 
-async function renderUser() {
-
-    const userResult = await fetchCurrentUser();
-    if(!userResult.success) {
-        return;
-    }
-    const user = userResult.data;
-    return user;
-}
-
-function dashboardMessages(dashboardTitle, dashboardMessage) {
+function dashboardMessages(user, dashboardTitle, dashboardMessage) {
     const now = new Date();
     const hour = now.getHours();
 
@@ -1062,45 +934,4 @@ function dashboardMessages(dashboardTitle, dashboardMessage) {
 
 }
 
-// ---------- Rendering ---------- 
-
-function highlightActiveCourse(sideBarCourses) {
-    const currentHref = window.location.href
-    sideBarCourses.forEach(course => {
-        const currentCourse = course.querySelector("a");
-        const href = currentCourse.getAttribute("href");
-
-        if(href == currentHref){
-                course.classList.add("active");
-        }
-    });
-}
-
-function setUpSidebarToggle() {
-    const closeBtn = document.getElementById('sidebar-close-btn');
-    const reopenBtn = document.getElementById('sidebar-reopen-btn');
-
-    // check if user previously closed it in this browser
-    const savedState = localStorage.getItem('sidebar-collapsed');
-    if (savedState === 'true') {
-        document.body.classList.add('sidebar-collapsed');
-    }
-
-    function toggleSidebar() {
-        const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
-        localStorage.setItem('sidebar-collapsed', isCollapsed ? 'true' : 'false');
-    }
-
-    if (closeBtn) {
-        closeBtn.addEventListener('click', toggleSidebar);
-    }
-
-    if (reopenBtn) {
-        reopenBtn.addEventListener('click', toggleSidebar);
-    }
-}
-
 initializeDashboard();
-// navigateToAllNotes();
-dashboardMessages(dashboardTitle, dashboardMessage);
-setUpSidebarToggle();

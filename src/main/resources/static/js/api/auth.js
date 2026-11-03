@@ -7,3 +7,7 @@ export function handleAuth(response) {
         return true;
     }
 }
+
+// add login fetch
+// add logout fetch
+// add signup fetch

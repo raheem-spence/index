@@ -3,8 +3,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style2.css">
-    <script type="module" src="/js/script.js" defer></script>
-    <script type="module" src="/js/pages/dashboard.js" defer></script>
     <title>Index</title>
 </head>
 <body>
@@ -42,7 +40,7 @@
                 </li>
                 <li class="nav-item">
                     <div class="nav-row">
-                        <a href="/dashboard.html" class="nav-link">
+                        <a href="/courses.html" class="nav-link">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers h-4 w-4 shrink-0" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:62:15"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path></svg>
                             <span>All courses</span>
                         </a>
@@ -136,7 +134,39 @@
         </span>
     </button>
     <main>
-        <div id="dashboard-container"></div>
+        <div id="dashboard-container">
+            <div class="dashboard-header" id="dashboard-header">
+                <div class="dashboard-title-container">
+                    <h1 class="dashboard-title" id="dashboard-title"></h1>
+                    <p class="dashboard-msg" id="dashboard-msg"></p>
+                </div>
+                <div class="btn-container">
+                    <button class="join-btn" id="join-btn">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+                            class="lucide lucide-user-plus preview-icon">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle>
+                            <line x1="19" x2="19" y1="8" y2="14"></line><line x1="22" x2="16" y1="11" y2="11"></line>
+                            </svg>
+                        </div>
+                        Join course
+                    </button>
+                    <button class="create-cls-btn" id="create-cls-btn">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+                            class="lucide lucide-plus h-4 w-4" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path>
+                            </svg>
+                        </div>
+                        Create course
+                    </button>
+                </div>
+            </div>
+            <div class="dashboard-content" id="dashboard-content"></div>
+        </div>
     </main>
 </body>
+<script type="module" src="/js/script.js" defer></script>
+<script type="module" src="/js/pages/dashboard.js" defer></script>
 </html>

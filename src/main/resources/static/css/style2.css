@@ -1052,13 +1052,24 @@ dialog.modal-dialog:focus-visible {
     border-bottom: 1px solid var(--border);
 }
 
-#dashboard-container, #notes-container {
+#dashboard-container, #notes-container, #courses-container {
     padding: 48px 40px;
     max-width: 900px;
     width: 100%;
     margin: 0 auto;
 }
 
+.all-courses-header {
+    display: flex;
+    flex-direction: column;
+}
+
+.all-courses-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 32px;
+}
 
 .dashboard-header {
     display: flex;
@@ -1070,7 +1081,7 @@ dialog.modal-dialog:focus-visible {
 .dashboard-title-container {
     display: flex;
     flex-direction: column;
-    gap: 0.7rem;
+    gap: 0.375rem;
 }
 
 .btn-container {
@@ -1150,7 +1161,7 @@ dialog.modal-dialog:focus-visible {
 .courses-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px;
+    gap: .75rem;
     margin-bottom: 40px;
 }
 
@@ -1557,30 +1568,55 @@ dialog.modal-dialog:focus-visible {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-radius: 10px;
+    border-radius: .5rem;
     position: relative;
     padding: 8px 14px;
     gap: 8px;
-    width: 280px;
+    width: 100%;
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.04);
     background-color: #ffffff;
-    border: 1px solid var(--gray-border);
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
+    transition: border-color 0.15s ease;
 }
 
+
 .search-bar-container input{
-    font-family: Figtree, sans-serif;
-    font-size: 13px;
-    color: #141414;
+    font-family: Geist, sans-serif;
+    font-size: .875rem;
+    color: var(--text-primary);
     width: 100%;
     outline: none;
     border: none;
     line-height: 1.5;
 }
 
+.search-bar-container:focus-within {
+    border-color: var(--primary);
+}
+
 .search-bar-container .search-icon {
     display: block;
     flex-shrink: 0;
     color: #6b6b6b;
+}
+
+.no-results-state {
+    display: flex;
+    grid-column: 1 / -1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1.5rem;
+    text-align: center;
+}
+
+.no-results-title {
+    font-size: .875rem;
+    font-weight: 400;
+    font-family: inherit;
+    color: var(--muted-foreground);
+    letter-spacing: -0.01rem;
 }
 
 .create-note-btn-course {
@@ -2325,7 +2361,6 @@ dialog.modal-dialog:focus-visible {
 .create-course-input:focus, .join-course-input:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(32, 86, 79, 0.18);
 }
 
 

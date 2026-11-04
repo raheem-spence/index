@@ -69,6 +69,8 @@ public class CourseService {
             courseResponse.setName(name);
             courseResponse.setMemberCount(memberships);
             courseResponse.setNoteCount(notes);
+            courseResponse.setJoinCode(course.getJoinCode());
+            courseResponse.setSchool(course.getSchool());
 
             // add dto to list
             courseResponseList.add(courseResponse);

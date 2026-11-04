@@ -2,12 +2,11 @@ import { fetchCourses, createCourse, joinCourse, fetchDashboardCourses } from ".
 import { fetchCurrentUser } from "../api/users.js";
 import { loadDashboardNotes, deleteNote } from "../api/notes.js";
 import { formatRelativeTime, formatDate, showToast, getCourseInitials, formatJoinCode, copyToClipboard} from "../utilities.js";
-import { loadCurrentUser, loadSidebarCourses } from "../script.js";
+import { loadCurrentUser, loadSidebarCourses, renderJoinCourseModal, renderCreateCourseModal} from "../script.js";
 
 // ---------- Configuration ---------- 
 const baseCourseUrl = '/course.html';
 const baseDashboardUrl = '/dashboard.html';
-const baseNoteUrl = '/notes.html';
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const courseId = urlParams.get('courseId');
@@ -16,15 +15,49 @@ const courseId = urlParams.get('courseId');
 
 // ---------- DOM Elements ---------- 
 const dashboardDiv = document.getElementById("dashboard-container");
-const dashboardHeader = document.createElement('div');
-const dashboardTitleContainer = document.createElement('div');
-const dashboardTitle = document.createElement('h1');
-const dashboardMessage = document.createElement('p');
+const dashboardHeader = document.getElementById('dashboard-header');
+const dashboardTitle = document.getElementById('dashboard-title');
+const dashboardMessage = document.getElementById('dashboard-msg');
+const createClsBtn = document.getElementById('create-cls-btn');
+const joinBtn = document.getElementById('join-btn');
+const dashboardContent = document.getElementById('dashboard-content');
 
 let recentNotes = null;
 let dashboardCourses = null;
 
 async function initializeDashboard() {
+
+    if (createClsBtn) {
+        createClsBtn.addEventListener('click', () => {
+            const modal = renderCreateCourseModal( async () => {
+                const response = await fetchDashboardCourses();
+
+                if (response.success) {
+                    dashboardCourses = response.data;
+                    renderDashboard();
+                }
+            });
+            document.body.append(modal);
+            modal.showModal();
+            document.body.style.overflow = 'hidden';
+        });
+    }
+
+    if (joinBtn) {
+        joinBtn.addEventListener('click', () => {
+            const modal = renderJoinCourseModal( async () => {
+                const response = await fetchDashboardCourses();
+
+                if (response.success) {
+                    dashboardCourses = response.data;
+                    renderDashboard();
+                }
+            });
+            document.body.append(modal);
+            modal.showModal();
+            document.body.style.overflow = 'hidden';
+        });
+    }
     // Show user info
     const user = await loadCurrentUser();
     dashboardMessages(user, dashboardTitle, dashboardMessage);
@@ -46,116 +79,65 @@ async function initializeDashboard() {
         return;
     }
     dashboardCourses = dashboardCoursesResult.data;
+
     renderDashboard();
 }
 
 function renderDashboard() {
+    dashboardHeader.classList.remove('hidden');
 
-    dashboardDiv.replaceChildren();
+    dashboardContent.replaceChildren();
 
-    const btnContainer = document.createElement('div');
-
-    const joinClsBtn = document.createElement('button');
-    const createClsBtn = document.createElement('button');
-
+    // courses section
     const coursesSection = document.createElement('section');
     const coursesHeader = document.createElement('div');
     const coursesHeading = document.createElement('h2');
     const allCoursesBtn = document.createElement('button');
     const coursesGrid = document.createElement('div');
 
+    coursesHeading.textContent = "My courses";
+    allCoursesBtn.textContent = "View all";
+
+    coursesHeader.classList.add('courses-header');
+    coursesHeading.classList.add('courses-heading');
+    allCoursesBtn.classList.add('all-courses-btn');
+    coursesGrid.classList.add('courses-grid');
+
+    allCoursesBtn.addEventListener('click', () => {
+        window.location.href = '/courses.html';
+    })
+
+    coursesHeader.append(coursesHeading, allCoursesBtn);
+    coursesSection.append(coursesHeader, coursesGrid);
+
+    // notes section
     const notesSection = document.createElement('section');
     const recentNotesHeader = document.createElement('div');
     const recentNotesHeading = document.createElement('h2');
     const allNotesBtn = document.createElement('button');
 
-    const joinSvgContainer = document.createElement('div');
-    const joinSvgString = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" 
-                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" 
-                            stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-plus preview-icon">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                            <line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>`;
-
-    joinSvgContainer.innerHTML = joinSvgString;
-
-    const plusSvgContainer = document.createElement('div');
-    const plusSvgString = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
-                        class="lucide lucide-plus h-4 w-4" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path>
-                        </svg>`;
-    plusSvgContainer.innerHTML = plusSvgString;
-
-    joinClsBtn.textContent = "Join course";
-    createClsBtn.textContent = "Create course";
-    coursesHeading.textContent = "My courses";
     recentNotesHeading.textContent = "Recent Notes"
-
-    allCoursesBtn.textContent = "View all";
     allNotesBtn.textContent = "View all";
 
-    btnContainer.append(joinClsBtn, createClsBtn);
-
-    dashboardTitle.classList.add('dashboard-title');
-    dashboardMessage.classList.add('dashboard-msg');
-    dashboardHeader.classList.add('dashboard-header');
-    joinClsBtn.classList.add('join-btn');
-    createClsBtn.classList.add('create-cls-btn');
-    btnContainer.classList.add('btn-container');
-    dashboardTitleContainer.classList.add('dashboard-title-container');
-
-    coursesHeader.classList.add('courses-header');
     recentNotesHeader.classList.add('courses-header');
     recentNotesHeading.classList.add('courses-heading');
-    coursesHeading.classList.add('courses-heading');
-    allCoursesBtn.classList.add('all-courses-btn');
     allNotesBtn.classList.add('all-courses-btn');
-    coursesGrid.classList.add('courses-grid');
 
-    joinClsBtn.prepend(joinSvgContainer);
-    createClsBtn.prepend(plusSvgContainer);
-    coursesHeader.append(coursesHeading, allCoursesBtn);
+    allNotesBtn.addEventListener('click', () => {
+        window.location.href = '/notes.html';
+    });
+   
     recentNotesHeader.append(recentNotesHeading, allNotesBtn);
-    coursesSection.append(coursesHeader, coursesGrid);
-
     notesSection.append(recentNotesHeader);
 
-    dashboardTitleContainer.append(dashboardTitle, dashboardMessage);
+    dashboardContent.append(coursesSection, notesSection);
 
-    dashboardHeader.replaceChildren();
-
-    dashboardHeader.append(dashboardTitleContainer, btnContainer);
-
-    const createCourseModal = renderCreateCourseModal();
-    const joinCourseModal = renderJoinCourseModal();
-
-    createClsBtn.addEventListener('click', () => {
-        createCourseModal.showModal();
-        document.body.style.overflow = 'hidden';
-    })
-
-    createCourseModal.addEventListener('close', () => {
-        document.body.style.overflow = "";
-    })
-
-    joinClsBtn.addEventListener('click', () => {
-        joinCourseModal.showModal();
-        document.body.style.overflow = 'hidden';
-    })
-
-    joinCourseModal.addEventListener('close', () => {
-        document.body.style.overflow = "";
-    })
-
-    dashboardDiv.append(dashboardHeader, coursesSection, notesSection, createCourseModal, joinCourseModal);
     renderDashboardCourses(coursesGrid, dashboardCourses);
     renderDashboardNotes(notesSection);
 }
 
 
 // ---------- Initialization ---------- 
-
-// // Show user info
-// const user = await loadCurrentUser();
 
 // ---------- Dashboard ----------
 function renderDashboardCourses(coursesGrid, dashboardCourses) {
@@ -269,344 +251,6 @@ function renderDashboardCourses(coursesGrid, dashboardCourses) {
     }
 }
 
-function renderJoinCourseModal() {
-
-// join course modal
-    const joinCourseModal = document.createElement('dialog');
-
-    const joinCourseModalContainer = document.createElement('div');
-
-    const joinCourseModalHeader = document.createElement('div');
-
-    const joinCourseTitleMsgDiv = document.createElement('div');
-    const joinCourseTitle = document.createElement('h2');
-    const joinCourseMsg = document.createElement('p');
-
-    joinCourseTitle.textContent = "Join course";
-    joinCourseMsg.textContent = "Enter the join code shared by a classmate.";
-
-
-    // course code input bar
-    const joinCourseCodeDiv = document.createElement('div');
-    const joinCourseLabel = document.createElement('label');
-    const joinCourseInput = document.createElement('input');
-    const joinCourseError = document.createElement('p');
-    
-
-    joinCourseError.textContent = "";
-    joinCourseError.classList.add('field-error', 'hidden');
-
-    joinCourseCodeDiv.classList.add('create-course-name-div');
-
-    // cancel and create buttons
-    const joinCourseBtnsContainer = document.createElement('div');
-    const joinCourseCancelBtn = document.createElement('button');
-    const joinCourseJoinBtn = document.createElement('button');
-
-    joinCourseCancelBtn.textContent = "Cancel";
-    joinCourseJoinBtn.textContent = "Join course";
-
-    joinCourseLabel.textContent = "Join code";
-    joinCourseInput.placeholder = "ABC-123";
-    joinCourseInput.autofocus = true;
-    joinCourseInput.setAttribute('autocapitalize', 'characters');
-    joinCourseModal.classList.add('join-course-modal');
-    joinCourseModalHeader.classList.add('create-course-modal-header');
-    joinCourseModalContainer.classList.add('create-course-modal-container');
-    joinCourseTitle.classList.add('create-course-title');
-    joinCourseMsg.classList.add('create-course-msg');
-    joinCourseInput.classList.add('join-course-input');
-    joinCourseLabel.classList.add('create-course-label');
-
-    joinCourseBtnsContainer.classList.add('create-course-btns-container');
-    joinCourseCancelBtn.classList.add('create-course-cancel-btn');
-    joinCourseJoinBtn.classList.add('create-course-create-btn');
-
-    joinCourseCancelBtn.addEventListener('click', () => {
-        joinCourseModal.close();
-    })
-
-    joinCourseModal.addEventListener('close', () => {
-        resetJoinCourseModal(joinCourseInput, joinCourseError);
-        document.body.style.overflow = "";
-    })
-
-    joinCourseModal.addEventListener('click', (e) => {
-        // get the exact coordinates and size of the modal box
-        const rect = joinCourseModal.getBoundingClientRect();
-
-        // check if the click coordinates were outside those boundaries
-        const clickedOutside = 
-        e.clientX < rect.left ||
-        e.clientX > rect.right ||
-        e.clientY > rect.bottom ||
-        e.clientY < rect.top;
-
-        if (clickedOutside) {
-            joinCourseModal.close();
-        }
-    });
-
-    joinCourseInput.addEventListener('input', () => {
-        joinCourseError.classList.add('hidden');
-    })
-
-    joinCourseJoinBtn.addEventListener('click', async () => {
-        const rawInput = joinCourseInput.value;
-        const cleanedCode = rawInput.replace(/[-\s]/g, "").toUpperCase();
-
-        const joinCourseRequest = {
-            joinCode: cleanedCode
-        }
-
-        const error = getJoinCourseError(joinCourseRequest);
-
-        if (error) {
-            joinCourseError.textContent = error;
-            joinCourseError.classList.remove('hidden');
-            return;
-        }
-        
-        const joinResult = await joinCourse(joinCourseRequest);
-        
-        if (joinResult.success) {
-            const dashboardCoursesResult = await fetchDashboardCourses();
-            const coursesResult = await fetchCourses();
-            const courseName = joinResult.data.courseName;
-
-            if (dashboardCoursesResult.success) {
-                dashboardCourses = dashboardCoursesResult.data;
-                showToast(`Joined ${courseName}`);
-                renderDashboard();
-            } else {
-                showToast("Course joined! Refresh to see it.");
-                console.error("Join course succeeded, but dashboard refresh failed");
-            } 
-
-            if (coursesResult.success) {
-                await loadSideBarCourses(coursesResult.data);
-            } else {
-                showToast("Course joined! Refresh to update sidebar.");
-                console.error("Join course succeeded, but sidebar refresh failed");
-            }
-
-            joinCourseModal.close();
-        } else {
-
-            if (joinResult.status === 400) {
-                // show the message for existing course member
-                joinCourseError.textContent = "You're already in this course";
-            } else if (joinResult.status === 404) {
-                // show message for course not found
-                joinCourseError.textContent = "No course found with this code";
-
-            } else if (joinResult.status === 500) {
-                // show generic failure message
-                joinCourseError.textContent = "Could not join course. Try again";
-            } else {
-                // show generic failure message
-                joinCourseError.textContent = "Unable to join course";
-            }
-            
-            joinCourseError.classList.remove('hidden');
-            
-        }
-        
-    });
-
-
-    joinCourseBtnsContainer.append(joinCourseCancelBtn, joinCourseJoinBtn);
-    joinCourseTitleMsgDiv.append(joinCourseTitle, joinCourseMsg);
-    joinCourseModalHeader.append(joinCourseTitleMsgDiv);
-    joinCourseCodeDiv.append(joinCourseLabel, joinCourseInput, joinCourseError);
-    joinCourseModalContainer.append(joinCourseModalHeader, joinCourseCodeDiv, joinCourseBtnsContainer);
-    joinCourseModal.append(joinCourseModalContainer);
-
-    return joinCourseModal;
-    
-}
-
-function renderCreateCourseModal() {
-
-    // create course modal
-    const createCourseModal = document.createElement('dialog');
-
-    const createCourseModalContainer = document.createElement('div');
-
-    const createCourseModalHeader = document.createElement('div');
-
-    const createCourseTitleMsgDiv = document.createElement('div');
-    const createCourseTitle = document.createElement('h1');
-    const createCourseMsg = document.createElement('p');
-
-    createCourseTitle.textContent = "Create a course";
-    createCourseMsg.textContent = "Bring your classmates' notes together in one place.";
-
-
-    // course name input bar
-    const createCourseNameDiv = document.createElement('div');
-    const createCourseLabel = document.createElement('label');
-    const asterisk = document.createElement('span');
-    const createCourseInput = document.createElement('input');
-    const createCourseError = document.createElement('p');
-
-    const createCourseSchoolDiv = document.createElement('div');
-    const schoolLabel = document.createElement('label');
-    const optional = document.createElement('span');
-    const schoolInput = document.createElement('input');
-
-    createCourseInput.autofocus = true;
-
-    createCourseError.textContent = "";
-    createCourseError.classList.add('field-error', 'hidden');
-
-
-    schoolLabel.textContent = "School name";
-    optional.textContent = "(optional)";
-    schoolInput.placeholder = "e.g. Bates College";
-
-    createCourseNameDiv.classList.add('create-course-name-div');
-    createCourseSchoolDiv.classList.add('create-course-school-div');
-    optional.classList.add('optional');
-    schoolLabel.classList.add('school-label');
-
-
-
-
-    // cancel and create buttons
-    const createCourseBtnsContainer = document.createElement('div');
-    const createCourseCancelBtn = document.createElement('button');
-    const createCourseCreateBtn = document.createElement('button');
-
-    createCourseCancelBtn.textContent = "Cancel";
-    createCourseCreateBtn.textContent = "Create course";
-
-    createCourseLabel.textContent = "Course name";
-    asterisk.textContent = "*";
-    createCourseInput.placeholder = "e.g. Microbiology";
-
-    createCourseModal.classList.add('create-course-modal');
-    createCourseModalHeader.classList.add('create-course-modal-header');
-    createCourseModalContainer.classList.add('create-course-modal-container');
-    createCourseTitle.classList.add('create-course-title');
-    createCourseMsg.classList.add('create-course-msg');
-    asterisk.classList.add('asterisk');
-    createCourseInput.classList.add('create-course-input');
-    createCourseLabel.classList.add('create-course-label');
-
-    schoolInput.classList.add('create-course-input');
-    schoolLabel.classList.add('create-course-label');
-
-    createCourseBtnsContainer.classList.add('create-course-btns-container');
-    createCourseCancelBtn.classList.add('create-course-cancel-btn');
-    createCourseCreateBtn.classList.add('create-course-create-btn');
-    
-
-    createCourseCancelBtn.addEventListener('click', () => {
-        createCourseModal.close();
-    })
-
-    createCourseModal.addEventListener('close', () => {
-        resetCreateCourseModal(createCourseInput, schoolInput, createCourseError);
-        document.body.style.overflow = "";
-    })
-
-    createCourseInput.addEventListener('input', () => {
-        createCourseError.classList.add('hidden');
-    })
-
-    createCourseModal.addEventListener('click', (e) => {
-        // get the coordinates and size of the modal
-        const rect = createCourseModal.getBoundingClientRect();
-
-        // check if click coordinates were outside those boundaries
-        const clickedOutside = 
-        e.clientX < rect.left ||
-        e.clientX > rect.right ||
-        e.clientY > rect.bottom ||
-        e.clientY < rect.top;
-
-        if (clickedOutside) {
-            createCourseModal.close();
-        }
-    });
-
-    createCourseCreateBtn.addEventListener('click', async () => {
-        const courseRequest = {
-            courseName: createCourseInput.value.trim(),
-            school: schoolInput.value.trim()
-        };
-
-        const error = getCreateCourseError(courseRequest);
-
-        if (error) {
-            createCourseError.textContent = error;
-            createCourseError.classList.remove('hidden');
-            return;
-
-        } else {
-            const createResult = await createCourse(courseRequest);
-
-            if (createResult.success) {
-                const dashboardCoursesResult = await fetchDashboardCourses();
-                const coursesResult = await fetchCourses();
-                const courseName = createResult.data.courseName;
-
-                if (dashboardCoursesResult.success) {
-                    dashboardCourses = dashboardCoursesResult.data;
-                    showToast(`${courseName} created`);
-                    renderDashboard();
-                } else {
-                    showToast("Course created! Refresh to see it.");
-                    console.error("Coures creation succeeded, but dashboard refresh failed");
-                }
-
-                if (coursesResult.success) {
-                    await loadSideBarCourses(coursesResult.data);
-                } else {
-                    showToast("Course created! Refresh to update sidebar.");
-                    console.error("Course creation succeeded, but sidebar refresh failed");
-                }
-               
-                createCourseModal.close();
-            } else {
-                createCourseError.textContent = "Could not create course. Try again"
-                createCourseError.classList.remove('hidden');
-                console.error("Something went wrong on our end. Please try again later.");
-            }
-
-        }
-    })
-
-
-    createCourseBtnsContainer.append(createCourseCancelBtn, createCourseCreateBtn);
-    createCourseLabel.append(asterisk);
-    createCourseTitleMsgDiv.append(createCourseTitle, createCourseMsg);
-    createCourseModalHeader.append(createCourseTitleMsgDiv);
-    createCourseNameDiv.append(createCourseLabel, createCourseInput, createCourseError);
-    schoolLabel.append(optional);
-    createCourseSchoolDiv.append(schoolLabel, schoolInput);
-    createCourseModalContainer.append(createCourseModalHeader, createCourseNameDiv, createCourseSchoolDiv, createCourseBtnsContainer);
-    createCourseModal.append(createCourseModalContainer);
-
-    return createCourseModal;
-}
-
-function resetCreateCourseModal(createCourseInput, schoolInput, createCourseError) {
-    // empty input fields
-    createCourseInput.value = "";
-    schoolInput.value = "";
-
-    // restore classes
-    createCourseError.classList.add('hidden');
-}
-
-function resetJoinCourseModal(joinCourseInput, joinCourseError) {
-    joinCourseInput.value = "";
-
-    joinCourseError.classList.add('hidden');
-}
-
 function renderDashboardNotes(notesSection) {
 
     const noteList = document.createElement('ul');
@@ -665,7 +309,9 @@ function renderDashboardNotes(notesSection) {
 }
 
 async function renderRecentNoteDetailView(noteData) {
-    dashboardDiv.replaceChildren();
+    dashboardHeader.classList.add('hidden');
+
+    dashboardContent.replaceChildren();
 
     const noteDetailContainer = document.createElement('div');
 
@@ -854,7 +500,7 @@ async function renderRecentNoteDetailView(noteData) {
         noteMetaDataDiv.append(initialsDiv, noteOwnerDateDiv, metadataSeparatorTwo, noteCourseDiv);
         backBtn.prepend(backArrowSvgContainer);
         noteDetailContainer.append(allBtnsDiv, noteTitle, noteMetaDataDiv, noteContent);
-        dashboardDiv.append(noteDetailContainer);
+        dashboardContent.append(noteDetailContainer);
     } else {
         const viewOnlyDiv = document.createElement('div');
         const eyeIconSvgContainer = document.createElement('div');
@@ -878,7 +524,7 @@ async function renderRecentNoteDetailView(noteData) {
         noteMetaDataDiv.append(initialsDiv, noteOwnerDateDiv, metadataSeparatorTwo, noteCourseDiv);
         backBtn.prepend(backArrowSvgContainer);
         noteDetailContainer.append(allBtnsDiv, noteTitle, noteMetaDataDiv, noteContent);
-        dashboardDiv.append(noteDetailContainer);
+        dashboardContent.append(noteDetailContainer);
     }
 }
 

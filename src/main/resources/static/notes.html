@@ -135,7 +135,75 @@
         </span>
     </button>
     <main>
-        <div id="notes-container"></div>
+        <div id="notes-container">
+            <div class="all-notes-header">
+                <div class="all-notes-heading">
+                    <div class="dashboard-title-container">
+                        <h1 class="dashboard-title">All notes</h1>
+                        <p class="dashboard-msg" id="notes-count"></p>
+                    </div>
+                    <div class="btn-container">
+                            <a href="create-note.html" class="create-note-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" 
+                                class="lucide lucide-plus h-4 w-4" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path>
+                                </svg> 
+                                Create note
+                            </a>
+                    </div>
+                </div>
+                <div class="search-bar-container">
+                    <div class="search-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                            fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" 
+                            stroke-linejoin="round" class="lucide lucide-search preview-icon">
+                            <path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle>
+                        </svg>
+                    </div>
+                    <input placeholder="Search notes..."  id="notes-search">
+                </div>
+            </div>
+            <div class="notes-toolbar" id="notes-toolbar">
+                <div id="scope-toggle" class="segmented-control" role="tablist" aria-label="Note scope">
+                    <button
+                    type="button"
+                    class="segmented-btn active"
+                    data-scope="all"
+                    role="tab"
+                    aria-selected="true"
+                    >
+                    All notes 
+                    </button>
+                    <button
+                    type="button"
+                    class="segmented-btn"
+                    data-scope="mine"
+                    role="tab"
+                    aria-selected="false"
+                    >
+                    My notes
+                    </button>
+                </div>
+                <div id="course-filter" class="course-filter">
+                    <button
+                    type="button"
+                    class="filter-trigger"
+                    id="course-filter-trigger"
+                    aria-haspopup="listbox"
+                    aria-expanded="false"
+                    >
+                    <span id="selected-course-label" class="filter-label">All courses</span>
+                    <svg class="chevron-icon-filter" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="m6 9 6 6 6-6"/>
+                      </svg>
+                    </button>
+                    <div id="course-filter-menu" class="filter-menu hidden" role="listbox">
+                        <button type="button" class="filter-option active" data-course-id="">All courses</button>
+                    </div>
+                </div>
+            </div>
+            <ul id="note-list" class="note-list"></ul>
+        </div>
     </main>
 </body>
 <script type="module" src="/js/pages/notes.js" defer></script>

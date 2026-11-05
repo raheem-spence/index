@@ -289,6 +289,13 @@ body.sidebar-collapsed .sidebar-reopen-btn {
     transition: transform 0.2s ease;
 }
 
+.chevron-icon-filter {
+    color: var(--muted-foreground);
+    flex-shrink: 0;
+    stroke-width: 1.5px;
+    transition: transform 0.2s ease;
+}
+
 .chevron-btn.open .chevron-icon {
     transform: rotate(90deg);
 }
@@ -790,9 +797,8 @@ dialog.modal-dialog:focus-visible {
 
 
 .active{
-    background-color: var(--active-course-clr);
-    fill: var(--accent-clr);
-    font-weight: 600;
+    background-color: #ffffff;
+    color: var(--text-primary);
 }
 
 
@@ -1059,12 +1065,12 @@ dialog.modal-dialog:focus-visible {
     margin: 0 auto;
 }
 
-.all-courses-header {
+.all-courses-header, .all-notes-header {
     display: flex;
     flex-direction: column;
 }
 
-.all-courses-heading {
+.all-courses-heading, .all-notes-heading {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
@@ -1090,7 +1096,7 @@ dialog.modal-dialog:focus-visible {
     gap: 1rem;
 }
 
-.join-btn, .create-cls-btn {
+.join-btn, .create-cls-btn, .create-note-btn {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -1101,6 +1107,7 @@ dialog.modal-dialog:focus-visible {
     border-radius: 6px;
     border: 1px solid;
     cursor: pointer;
+    text-decoration: none;
 }
 
 .join-btn {
@@ -1116,13 +1123,13 @@ dialog.modal-dialog:focus-visible {
 
 }
 
-.create-cls-btn, .create-note-btn-course{
+.create-cls-btn, .create-note-btn {
     background-color: var(--primary);
     transition: opacity 0.3s ease;
     color: var(--primary-font-color);
 }
 
-.create-cls-btn:hover, .create-note-btn-course:hover {
+.create-cls-btn:hover, .create-note-btn:hover {
     opacity: 0.92;
 }
 
@@ -1617,20 +1624,6 @@ dialog.modal-dialog:focus-visible {
     font-family: inherit;
     color: var(--muted-foreground);
     letter-spacing: -0.01rem;
-}
-
-.create-note-btn-course {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    border-radius: 10px;
-    padding: 8px 18px;
-    font-family: Figtree, sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    border: 1px solid var(--border);
 }
 
 .notes-list-heading-div {
@@ -2458,38 +2451,48 @@ dialog.modal-dialog:focus-visible {
     background-color: #FEF2F2;
 }
 
-
-.all-notes-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    margin-bottom: 32px;
+.segmented-control {
+    padding: .125rem;
+    background-color: var(--secondary);
+    border: 1px solid var(--border);
+    border-radius: .5rem;
 }
 
-.create-note-btn {
-    display: flex;
+.segmented-btn.active {
+    background-color: #ffffff;
+    color: var(--text-primary);
+    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.15);;
+}
+
+.segmented-btn {
+    display: inline-flex;
     align-items: center;
-    font-size: 13.5px;
+    background-color: transparent;
+    justify-content: center;
+    font-size: .75rem;
+    font-family: inherit;
     font-weight: 500;
-    font-family: Figtree, sans-serif;
-    padding: 9px 16px;
-    border-radius: 12px;
-    border: 1px solid;
+    white-space: nowrap;
+    color: var(--muted-foreground);
+    height: 2.25rem;
     cursor: pointer;
-    background-color: var(--primary);
-    transition: background-color 0.3s ease;
-    color: #ffffff;
-    gap: 8px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    line-height: calc(1/.75);
+    transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.create-note-btn:hover {
-    background-color: var(--accent-hover);
+.segmented-btn:hover {
+    color: var(--text-primary);
 }
 
 .notes-toolbar {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 24px;
+    flex-wrap: wrap;
 }
 
 .notes-toggle-container {
@@ -2502,36 +2505,82 @@ dialog.modal-dialog:focus-visible {
     gap: 8px;
 }
 
-.all-notes-tab, .my-notes-tab { 
-    background-color: #ffffff;
-    box-shadow: rgba(0, 0, 0, 0.08) 0px 1px 3px;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text-primary);
-    font-family: Figtree, sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    padding: 6px 14px;
-}
-
-.notes-search-controls {
-    display: flex;
-    gap: 8px;
-}
-
-.course-filter-btn {
-    background-color: #ffffff;
-    border: 1px solid (var(--border));
-    border-radius: 14px;
-    box-shadow: rgba(0, 0, 0, 0.04) 0px 1px 2px;
-    color: var(--muted-foreground);
-    cursor: pointer;
-    display: flex;
+.filter-trigger {
+    display: inline-flex;
+    justify-content: center;
     align-items: center;
-    font-size: 13px;
+    font-family: inherit;
+    color: var(--text-primary);
+    font-size: .75rem;
     font-weight: 500;
-    font-family: Figtree, sans-serif;
-    gap: 8px;
-    padding: 10px 14px;
+    background-color: var(--secondary);
+    border-radius: 9999px;
+    padding: 0 10px;
+    outline: none;
+    gap: .25rem;
+    height: 2rem;
+    border: none;
+    max-width: 220px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.filter-trigger:hover {
+    background-color: oklch(95.5% .004 220);
+}
+
+.course-filter {
+    position: relative;
+}
+
+.filter-menu.hidden, .filter-menu[hidden] {
+    display: none;
+}
+
+.filter-menu {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0px;
+    background-color: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: inherit;
+    padding: 4px;
+    min-width: 180px;
+    width: max-content;
+    z-index: 50;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.filter-option {
+    position: relative;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    transition: background-color 0.15s ease;
+    white-space: nowrap;
+    text-align: left;
+    padding: 4px 24px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: inherit;
+    width: 100%;
+}
+
+.filter-option:hover {
+    background-color: var(--bg-secondary);
+}
+
+.filter-option.active::before {
+    content: "";
+    position: absolute;
+    left: 9px;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--text-primary);
+    transform: translateY(-50%);
 }

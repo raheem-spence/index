@@ -37,6 +37,7 @@
     --sidebar: oklch(97.5% .003 220);
     --nav-active-text: oklch(0.25 0.01 230);
     --nav-active-bg: oklch(0.93 0.004 220);
+    --card: #ffffff;
 }   
 
 *, *::before, *::after{
@@ -764,20 +765,6 @@ dialog.modal-dialog:focus-visible {
     padding: 2px 6px;
 }
 
-.join-course-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: var(--accent-bg);
-    color: var(--accent-clr);
-    border-radius: 0.25rem;
-    min-height: 3rem;
-    width: 85%;
-    border: 1px solid var(--accent-border);
-    margin: 1.5rem auto;
-    padding: 0.5em 1em;
-    font-weight: 500;
-}
 
 .asterisk {
     color: red;
@@ -1058,7 +1045,7 @@ dialog.modal-dialog:focus-visible {
     border-bottom: 1px solid var(--border);
 }
 
-#dashboard-container, #notes-container, #courses-container {
+#dashboard-container, #notes-container, #courses-container, #create-note-container {
     padding: 48px 40px;
     max-width: 900px;
     width: 100%;
@@ -1112,7 +1099,7 @@ dialog.modal-dialog:focus-visible {
 
 .join-btn {
     background-color: #ffffff;
-    color: #141414;
+    color: var(--text-primary);
     border-color: #E2E5E7;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     transition: background-color 0.3s ease;
@@ -1776,18 +1763,6 @@ dialog.modal-dialog:focus-visible {
     transform: scale(0.98);
 }
 
-.visually-hidden {
-    border: none;
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-}
-
 .toast.hidden {
     opacity: 0;
     transform: translateY(8px);
@@ -1802,36 +1777,59 @@ dialog.modal-dialog:focus-visible {
     width: 350px;
     font-size: 14px;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     position: fixed;
-    padding: 16px 12px;
+    padding: 14px 16px;
     z-index: 9999;
     bottom: 24px;
     right: 24px;
     border-radius: 6px;
     font-family: Geist, sans-serif;
-    background-color: #ffffff;
+    background-color: var(--card);
     color: var(--text-primary);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
                 0 2px 4px -2px rgba(0, 0, 0, 0.1),
                 0 10px 15px -3px rgba(0, 0, 0, 0.05);
     border: 1px solid var(--border);
     opacity: 1;
+    transform: translate(0);
     transition: opacity 0.4s ease-out, transform 0.4s ease-out;
 }
 
-.toast-checkmark {
-    color: var(--text-primary);
+.toast.toast-offscreen {
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none; /* prevents blocking clicks while fadind */
 }
 
-.toast-i-icon {
-    color: #2563EB;
+/* icon container */
+.toast-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.toast-success .toast-icon {
+    color: var(--primary)
+}
+
+.toast-info .toast-icon {
+    color: #2563eb;
+}
+
+.toast-error .toast-icon {
+    color: #ef4444;
 }
 
 .field-error {
     margin-top: calc(1.5 * .25rem);
     font-size: .75rem;
     color: var(--error-red);
+}
+
+.toast-message {
+    line-height: 1.4;
 }
 
 .empty-search-notes {
@@ -2080,7 +2078,7 @@ dialog.modal-dialog:focus-visible {
 }
 
 .cancel-btn {
-    font-family: Figtree, sans-serif;
+    font-family: Geist, sans-serif;
     background-color: #ffffff;
     color: var(--muted-foreground);
     border: 1px solid rgba(0, 0, 0, 0.18);
@@ -2549,12 +2547,46 @@ dialog.modal-dialog:focus-visible {
     font-family: inherit;
     padding: 4px;
     min-width: 180px;
-    width: max-content;
+    width: 260px;
+    max-width: 260px;
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
     z-index: 50;
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-.filter-option {
+/* modern Firefox & standard browsers */
+.filter-menu {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.15) transparent; /* light thumb, invisible track */
+}
+
+/* chrome, safari, edge (WebKit) */
+.filter-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.filter-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.filter-menu::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.15); /* soft, subtle grey */
+    border-radius: 9999px;
+}
+
+.filter-menu::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.28); /* slightly darker on hover */
+}
+
+
+.filter-menu.create-note {
+    left: 0px;
+    right: auto;
+}
+
+.filter-option, .filter-menu button {
     position: relative;
     cursor: pointer;
     background-color: transparent;
@@ -2567,6 +2599,12 @@ dialog.modal-dialog:focus-visible {
     font-size: 0.75rem;
     font-family: inherit;
     width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    flex-shrink: 0;
+    min-height: 28px;
+    line-height: 1.4;
 }
 
 .filter-option:hover {
@@ -2583,4 +2621,263 @@ dialog.modal-dialog:focus-visible {
     border-radius: 50%;
     background-color: var(--text-primary);
     transform: translateY(-50%);
+}
+
+.create-note-back-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: var(--muted-foreground);
+    font-size: .75rem;
+    font-weight: 500;
+    font-family: inherit;
+    gap: .375rem;
+    transition: color 0.15s ease;
+}
+
+.create-note-back-nav:hover {
+    color: var(--text-primary);
+}
+
+.create-note-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.create-note-heading {
+    display: flex;
+    align-items: center;
+    gap: .375rem;
+}
+
+.create-note-helper-text {
+    font-size: .75rem;
+    font-family: inherit;
+    color: var(--muted-foreground);
+    flex-shrink: 0;
+}
+
+.note-title-input {
+    background-color: transparent;
+    font-family: inherit;
+    font-size: 30px;
+    font-weight: 600;
+    color: var(--text-primary);
+    border: none;
+    outline: none;
+    min-width: 0px;
+    width: 100%;
+    margin-top: 1.5rem;
+    line-height: 1.25;
+}
+
+.note-title-input::placeholder {
+    color: var(--muted-foreground);
+    opacity: 0.6;
+}
+
+.note-body-textarea {
+    font-family: inherit;
+    font-size: 1rem;
+    color: var(--text-primary);
+    line-height: 1.75;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    margin-top: 1rem;
+    width: 100%;
+    min-height: 320px;
+}
+
+.note-body-textarea::placeholder {
+    color: var(--muted-foreground);
+    opacity: 0.6;
+}
+
+/* accessibility: hide native input from view but keep it accessible to screen readers */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: none;
+}
+
+.attachments-section {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+}
+
+.attachments-title {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    font-family: inherit;
+}
+
+.attachments-title svg {
+    color: var(--muted-foreground);
+}
+
+.attachments-icon {
+    display: inline-block;
+    flex-shrink: 0;
+    vertical-align: middle;
+    color: var(--muted-foreground);
+}
+
+.attachments-meta {
+    color: var(--muted-foreground);
+    font-size: .875rem;
+    font-family: inherit;
+    font-weight: 400;
+}
+
+.attachments-header {
+    display: flex;
+    align-items: center;
+}
+
+.dropzone-icons {
+    display: flex;
+    gap: .5rem;
+    color: var(--muted-foreground);
+}
+
+.dropzone-icons .left {
+    rotate: -10deg;
+}
+
+.dropzone-icons .right {
+    rotate: 10deg;
+}
+.dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .75rem;
+    padding: 32px 20px;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    background-color: var(--card);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.dropzone:hover, .dropzone:focus-visible {
+    border-color: var(--muted-foreground);
+    outline: none;
+}
+
+.dropzone.drag-over {
+    border-color: var(--primary);
+    background-color: rgba(13, 148, 136, 0.04); /* subtle teal */
+}
+
+.dropzone-icon {
+    color: var(--muted-foreground);
+}
+
+.dropzone-text {
+    font-size: .8125rem;
+    font-family: inherit;
+    color: var(--text-primary);
+}
+
+.dropzone-text strong {
+    font-weight: 600;
+}
+
+#staged-files-list {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.staged-file-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background-color: var(--card);
+    font-size: .875rem; /* 14px */
+    font-family: inherit;
+    transition: border-color 0.15s ease;
+}
+
+.staged-file-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0; /* allows text to truncate inside flexbox */
+    flex: 1;
+}
+
+.staged-file-name {
+    color: var(--text-primary);
+    font-weight: 500;
+    font-family: inherit;
+}
+
+.staged-file-size {
+    color: var(--muted-foreground);
+    font-size: .75rem; /* 12px */
+    font-family: inherit;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.remove-file-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    flex-shrink: 0;
+    z-index: 1;
+    transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.remove-file-btn:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-secondary);
+}
+
+.remove-file-btn:focus-visible {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.2);
+}
+
+.remove-file-btn svg, .remove-file-btn svg * {
+    display: block;
+    pointer-events: none;
 }

@@ -54,25 +54,46 @@ export function delay(milliseconds) {
     });
 }
 
-export async function showToast(textContent) {
-    const toast = document.createElement('div');
-    const toastTxt = document.createElement('span');
-    const checkMarkSvgContainer = document.createElement('div');
-    checkMarkSvgContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path fill-rule="evenodd"
-                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                                        clip-rule="evenodd"/>
-                                        </svg>`;
+const TOAST_ICONS = {
+    // checkmark
+    success: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path fill-rule="evenodd"
+    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+    clip-rule="evenodd"/>
+    </svg>`,
 
-    toast.classList.add('toast', 'hidden');
-    checkMarkSvgContainer.classList.add('toast-checkmark');
-    toast.append(checkMarkSvgContainer, toastTxt);
-    document.body.appendChild(toast);
+    // quiet 'i'
+    info: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
     
-    toastTxt.textContent = textContent;
-    await delay(300);
-    toast.classList.remove('hidden');
+    // calm error '!'
+    error: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
+};
+
+export async function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+
+    toast.className = `toast toast-${type} toast-offscreen`;
+
+    const iconSvg = TOAST_ICONS[type] || TOAST_ICONS.info || '';
+    
+    toast.innerHTML = `
+        <span class="toast-icon" aria-hidden="true">${iconSvg}</span>
+        <span class="toast-message">${message}</span>
+    `;
+
+    document.body.appendChild(toast);
+
+    // small delay to make sure DOM paint before animating the toast
+    await delay(20);
+    toast.classList.remove('toast-offscreen');
+
     await delay(3000);
-    toast.classList.add('hidden');
+
+    toast.classList.add('toast-offscreen');
+
+
+    // wait 400ms then remove toast from DOM
+    await delay(400);
+    toast.remove();
 }
 
 const STOP_WORDS = new Set(["to", "of", "and", "in", "intro", "introduction"]);

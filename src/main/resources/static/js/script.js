@@ -5,6 +5,13 @@ import { getCourseInitials, showToast } from "./utilities.js";
 // wait until the browser is done parsing all html elements before running scripts,
 // preventing 'null' errors when looking up DOM ids like buttons and inputs
 document.addEventListener('DOMContentLoaded', () => {
+    // check if a previous page left a toast
+    const pendingToast = sessionStorage.getItem('pendingToast');
+    if (pendingToast) {
+        showToast(pendingToast);
+        sessionStorage.removeItem('pendingToast');
+    }
+    
     setUpSidebarToggle();
     initializePopover();
     injectGlobalModals();

@@ -212,3 +212,29 @@ export async function deleteNote(courseId, noteId) {
         return false;
     }
 }
+
+export async function fetchNoteById(noteId) {
+    
+    try {
+        const response = await fetch(`/notes/${noteId}`);
+        if (response.ok) {
+            return await response.json();
+        }
+    } catch (error) {
+        console.info("Direct endpoint not available, falling back to note collection.");
+    }
+
+        // fallback: endpoint isnt deployed yet
+        // fetch all notes and find it (keeps testing going)
+        const allResponse = await fetch('/courses/notes/all', {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (!allResponse.ok) {
+            throw new Error(`Failed to fetch notes: ${allResponse.status}`);
+        }
+
+        const notes = await allResponse.json();
+        return notes.find(n => String(n.id) === String(noteId) || null);
+}

@@ -56,16 +56,22 @@ export function delay(milliseconds) {
 
 const TOAST_ICONS = {
     // checkmark
-    success: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path fill-rule="evenodd"
-    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-    clip-rule="evenodd"/>
-    </svg>`,
+    success: `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" stroke="#ffffff" 
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check preview-icon">
+            <circle cx="12" cy="12" r="10"/><path d="m16 9-5.5 5.5L8 12"/></svg>`,
+  
 
     // quiet 'i'
-    info: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
+    info:   `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" stroke="#ffffff" stroke-width="2" 
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>`,
     
     // calm error '!'
-    error: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
+    error: `<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="#ffffff" fill-rule="evenodd" clip-rule="evenodd" stroke-width="2" 
+            stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>`
 };
 
 export async function showToast(message, type = 'success') {

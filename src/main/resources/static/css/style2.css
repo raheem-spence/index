@@ -62,7 +62,6 @@ html{
 }
   
 body{
-    display: flex;
     min-height: 100dvh;
     margin: 0;
     background-color: var(--background);
@@ -714,6 +713,8 @@ dialog.modal-dialog:focus-visible {
     padding: 16px;
     transition: background-color 0.2s ease;
     cursor: pointer;
+    text-decoration: none;
+    color: inherit;
 }
 
 .note-div:hover {
@@ -1045,7 +1046,8 @@ dialog.modal-dialog:focus-visible {
     border-bottom: 1px solid var(--border);
 }
 
-#dashboard-container, #notes-container, #courses-container, #create-note-container {
+#dashboard-container, #notes-container, #courses-container, 
+#create-note-container, #note-detail-container{
     padding: 48px 40px;
     max-width: 900px;
     width: 100%;
@@ -1811,7 +1813,7 @@ dialog.modal-dialog:focus-visible {
 }
 
 .toast-success .toast-icon {
-    color: var(--primary)
+    color: var(--primary);
 }
 
 .toast-info .toast-icon {
@@ -2623,7 +2625,7 @@ dialog.modal-dialog:focus-visible {
     transform: translateY(-50%);
 }
 
-.create-note-back-nav {
+.back-link {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2636,7 +2638,7 @@ dialog.modal-dialog:focus-visible {
     transition: color 0.15s ease;
 }
 
-.create-note-back-nav:hover {
+.back-link:hover {
     color: var(--text-primary);
 }
 
@@ -2880,4 +2882,183 @@ dialog.modal-dialog:focus-visible {
 .remove-file-btn svg, .remove-file-btn svg * {
     display: block;
     pointer-events: none;
+}
+
+.note-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+
+.owner-actions {
+    display: flex;
+    gap: 4px;
+}
+
+
+.action-btns {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: transparent;
+    gap: 8px;
+    outline: none;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background-color 0.15s ease;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: .75rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.action-btns:hover {
+    background-color: var(--bg-secondary);
+}
+
+/* default for mobile (applied to all screens) */
+.note-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: .75rem;
+    column-gap: 2rem;
+    padding: 16px 0;
+    margin-top: 20px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+/* conditional rule for larger screens */
+@media (min-width: 640px) {
+    .note-meta-grid {
+        grid-template-columns: 1fr 1fr; /* locks into 2 columns */
+    }
+}
+
+.note-detail-title {
+    font-family: inherit;
+    color: var(--text-primary);
+    font-size: 1.875rem;
+}
+
+.list-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted-foreground);
+}
+
+.list-description {
+    font-family: inherit;
+    font-size: .75rem;
+    color: var(--muted-foreground);
+}
+
+.list-item {
+    font-family: inherit;
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: .875rem;
+}
+
+.note-body {
+    font-family: inherit;
+    color: var(--text-primary);
+    font-size: 15px;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    margin-top: 20px;
+    line-height: calc(7 * .25rem);
+}
+
+.note-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    margin-top: 32px;
+    padding-top: 16px;
+}
+
+.copy-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 12px;
+    font-family: inherit;
+    font-size: .75rem;
+    font-weight: 500;
+    gap: 8px;
+    border: none;
+    border-radius: 6px;
+    background-color: transparent;
+    transition: background-color 0.15s ease;
+    cursor: pointer;
+}
+
+.copy-btn:hover {
+    background-color: var(--bg-secondary);
+}
+
+.helpful-btn {
+    display: flex;
+    justify-content: center;
+    height: 2rem;
+    align-items: center;
+    color: var(--muted-foreground);
+    font-family: inherit;
+    font-size: .75rem;
+    gap: 8px;
+    padding: 0 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    border: 1px solid var(--border);
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    background-color: var(--background);
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.helpful-btn:hover {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.helpful-btn:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+.helpful-count:empty {
+    display: none;
+}
+
+.has-voted {
+    border-color: color-mix(in oklab, var(--primary) 40%, transparent);
+    background-color: color-mix(in oklab, var(--primary) 10%, transparent);
+    color: var(--primary);
+    transition: background-color 0.15s ease;
+}
+
+.has-voted:hover {
+    background-color: color-mix(in oklab, var(--primary) 15%, transparent);
+    color: var(--primary)
+}
+
+.course-link {
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: var(--bg-secondary);
+    color: var(--text-primary);
+    font-family: inherit;
+    transition: text-decoration-color 0.15s ease;
+}
+
+.course-link:hover {
+    text-decoration-color: var(--text-primary);
 }

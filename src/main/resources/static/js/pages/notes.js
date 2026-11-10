@@ -202,6 +202,7 @@ function setUpCourseDropdown() {
     });
 }
 
+
 // =======================================================
 // Rendering & Helpers
 // =======================================================
@@ -217,10 +218,10 @@ function renderAllNotesView(notesToRender) {
     }
 }
 
-
 function addNote(newNoteData) {
     const noteLi = document.createElement('li');
-    const noteDiv = document.createElement('div');
+    const noteDiv = document.createElement('a');
+    noteDiv.href = `/note-detail.html?id=${newNoteData.id}`;
 
     const noteTitle = document.createElement('span');
     const noteOwnerClsDiv = document.createElement('div');

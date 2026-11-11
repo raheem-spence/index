@@ -1,5 +1,5 @@
 // imports (what helper functions or api calls we need?)
-import { fetchNoteById, updateNote } from "../api/notes.js";
+import { deleteNote, fetchNoteById, updateNote } from "../api/notes.js";
 import { formatDate, showToast } from "../utilities.js"
 
 let currentNote = null;
@@ -12,6 +12,12 @@ const dropzoneSection = document.getElementById('dropzone-section');
 
 const saveChangesBtn = document.getElementById('save-changes-btn');
 const cancelChangesBtn = document.getElementById('cancel-changes-btn');
+
+const deleteBtn = document.getElementById('delete-note-btn');
+const deleteText = document.getElementById('delete-text');
+const yesDeleteBtn = document.getElementById('yes-delete-btn');
+const noDeleteBtn = document.getElementById('no-delete-btn');
+const deleteConfirmGroup = document.getElementById('delete-confirm-group');
 
 const editInput = document.getElementById('edit-input');
 const noteTitle = document.getElementById('note-title');
@@ -41,6 +47,7 @@ function initializeNoteDetailPage() {
     initializeHelpfulButton();
     initializeCopyLinkButton();
     initializeEditActions();
+    intializeDeleteActions();
     
 }
 
@@ -67,6 +74,14 @@ function initializeEditActions() {
     }
 }
 
+function intializeDeleteActions() {
+    deleteBtn.addEventListener('click', showDeleteConfirmation);
+
+    noDeleteBtn.addEventListener('click', hideDeleteConfirmation);
+
+    yesDeleteBtn.addEventListener('click', handleDeleteNote);
+}
+
 
 async function renderNoteDetail(noteId) {
 
@@ -89,7 +104,6 @@ async function renderNoteDetail(noteId) {
         const modificationEl = document.getElementById('note-modification');
         const dateEl = document.getElementById('note-date');
         const noteCourseLinkEl = document.getElementById('note-course-link');
-        const editBtnEl = document.getElementById('edit-note-btn');
 
         // attachments
         const attachmentsGridEl = document.getElementById('note-attachments-grid');
@@ -290,7 +304,6 @@ function enterEditMode(currentNote) {
 
     viewActions.classList.add('hidden');
     editActions.classList.remove('hidden')
-    
 
     // swap the footer with a dropzone for attachments
     if (!footer || !dropzoneSection) return;
@@ -367,5 +380,34 @@ async function handleSaveNote(currNote, editedTitle, editedContent, saveChangesB
         showToast('Unable to save note changes', 'error');
         console.error('Unable to save note changes:', error);
         return;
+    }
+}
+
+function showDeleteConfirmation() {
+    deleteBtn.classList.add('hidden');
+    deleteConfirmGroup.classList.remove('hidden');
+}
+
+function hideDeleteConfirmation() {
+    deleteBtn.classList.remove('hidden');
+    deleteConfirmGroup.classList.add('hidden');
+}
+
+async function handleDeleteNote() {
+    hideDeleteConfirmation();
+    deleteBtn.disabled = true;
+    deleteText.textContent = 'Deleting...';
+
+    try {
+        await deleteNote(currentNote.courseId, currentNote.id);
+
+        sessionStorage.setItem('pendingToast', 'Note deleted');
+        window.location.href = '/notes.html';
+
+    } catch (error) {
+        deleteBtn.disabled = false;
+        deleteText.textContent = 'Delete';
+        console.error('Delete failed:', error);
+        showToast('Unable to delete note', 'error');
     }
 }

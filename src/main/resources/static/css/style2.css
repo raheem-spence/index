@@ -3181,3 +3181,46 @@ dialog.modal-dialog:focus-visible {
     align-items: center;
     flex-wrap: wrap;
 }
+
+#delete-confirm-group {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+    font-size: .75rem;
+}
+
+.delete-confirmation-text {
+    color: var(--muted-foreground);
+}
+
+.yes-delete-btn, .no-delete-btn {
+    border-radius: 6px;
+    font-size: .75rem;
+    border: none;
+    padding: 3px 5px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color 0.15s ease, opacity 0.15s ease;
+    font-weight: 500;
+    line-height: calc(1 / .75);
+}
+
+.yes-delete-btn {
+    background-color: var(--error-red);
+    color: var(--primary-font-color);
+}
+
+.yes-delete-btn:hover {
+    opacity: 0.92;
+}
+
+.no-delete-btn {
+    background-color: transparent;
+    color: var(--text-primary);
+}
+
+.no-delete-btn:hover {
+    background-color: var(--bg-secondary);
+}

@@ -158,15 +158,23 @@
                             </path><path d="m15 5 4 4"></path></svg>
                             Edit
                         </button>
-                        <button type="button" id="delete-note-btn" class="action-btns">
-                            <!-- delete icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
-                            fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" 
-                            class="lucide lucide-trash2 lucide-trash-2" aria-hidden="true">
-                            <path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M3 6h18"></path>
-                            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                            Delete
-                        </button>
+                        
+                        <div id="delete-actions-container">
+                            <button type="button" id="delete-note-btn" class="action-btns">
+                                <!-- delete icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" 
+                                class="lucide lucide-trash2 lucide-trash-2" aria-hidden="true">
+                                <path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M3 6h18"></path>
+                                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                <span id="delete-text">Delete</span>
+                            </button>
+                            <div id="delete-confirm-group" class="hidden">
+                                <span class="delete-confirmation-text">Delete?</span>
+                                <button type="button" id="yes-delete-btn" class="yes-delete-btn">Yes</button>
+                                <button type="button" id="no-delete-btn" class="no-delete-btn">No</button>
+                            </div>
+                        </div>
                     </div>
                     <div id="edit-actions" class="hidden">
                         <button type="button" id="save-changes-btn" class="save-changes-btn">

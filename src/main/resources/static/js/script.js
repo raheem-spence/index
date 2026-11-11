@@ -8,7 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // check if a previous page left a toast
     const pendingToast = sessionStorage.getItem('pendingToast');
     if (pendingToast) {
-        showToast(pendingToast);
+        setTimeout(() => {
+            showToast(pendingToast);
+        }, 175)
+
         sessionStorage.removeItem('pendingToast');
     }
     

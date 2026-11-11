@@ -224,17 +224,17 @@ export async function fetchNoteById(noteId) {
         console.info("Direct endpoint not available, falling back to note collection.");
     }
 
-        // fallback: endpoint isnt deployed yet
-        // fetch all notes and find it (keeps testing going)
-        const allResponse = await fetch('/courses/notes/all', {
-            method: 'GET',
-            credentials: 'include'
-        });
+    // fallback: endpoint isnt deployed yet
+    // fetch all notes and find it (keeps testing going)
+    const allResponse = await fetch('/courses/notes/all', {
+        method: 'GET',
+        credentials: 'include'
+    });
 
-        if (!allResponse.ok) {
-            throw new Error(`Failed to fetch notes: ${allResponse.status}`);
-        }
+    if (!allResponse.ok) {
+        throw new Error(`Failed to fetch notes: ${allResponse.status}`);
+    }
 
-        const notes = await allResponse.json();
-        return notes.find(n => String(n.id) === String(noteId) || null);
+    const notes = await allResponse.json();
+    return notes.find(n => String(n.id) === String(noteId) || null);
 }

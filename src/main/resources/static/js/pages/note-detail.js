@@ -1,6 +1,23 @@
 // imports (what helper functions or api calls we need?)
-import { fetchNoteById } from "../api/notes.js";
+import { fetchNoteById, updateNote } from "../api/notes.js";
 import { formatDate, showToast } from "../utilities.js"
+
+let currentNote = null;
+
+const viewActions = document.getElementById('view-actions');
+const editActions = document.getElementById('edit-actions');
+
+const footer = document.getElementById('note-footer');
+const dropzoneSection = document.getElementById('dropzone-section');
+
+const saveChangesBtn = document.getElementById('save-changes-btn');
+const cancelChangesBtn = document.getElementById('cancel-changes-btn');
+
+const editInput = document.getElementById('edit-input');
+const noteTitle = document.getElementById('note-title');
+
+const noteBody = document.getElementById('note-body');
+const editTextArea = document.getElementById('edit-textarea');
 
 // event listener for when the DOMContentLoaded so when the HTML parser has finished loading the DOM tree except images, css styles
 // helps so we dont access an element that isn't on the page yet and get null
@@ -15,7 +32,6 @@ function initializeNoteDetailPage() {
     const noteId = urlParams.get('id');
 
     if (!noteId) {
-        console.log('error');
         showError('No note specified', `This link doesn't point to a note. Head back to all notes and pick one from the list.`, 'no-note');
         return;
     };
@@ -24,7 +40,31 @@ function initializeNoteDetailPage() {
     renderNoteDetail(noteId);
     initializeHelpfulButton();
     initializeCopyLinkButton();
+    initializeEditActions();
     
+}
+
+function initializeEditActions() {
+    const editBtn = document.getElementById('edit-note-btn');
+    if (editBtn) {
+        editBtn.addEventListener('click', () => {
+            if (currentNote) enterEditMode(currentNote);
+        });
+    }
+
+    if (saveChangesBtn) {
+        saveChangesBtn.addEventListener('click', () => {
+            const updatedTitle = editInput.value.trim();
+            const updatedContent = editTextArea.value.trim();
+            handleSaveNote(currentNote, updatedTitle, updatedContent, saveChangesBtn);
+        });
+    }
+
+    if (cancelChangesBtn) {
+        cancelChangesBtn.addEventListener('click', () => {
+            exitEditMode(editActions, viewActions, editInput, noteTitle, footer, dropzoneSection, currentNote);
+        })
+    }
 }
 
 
@@ -33,14 +73,13 @@ async function renderNoteDetail(noteId) {
     try {
     // get the note data
         const noteData = await fetchNoteById(noteId);
-        console.log(noteData);
-        
         
         if (!noteData) {
             showError('Note not found', `This note may have been deleted, or the link is incorrect.`, 'no-note');
             return;
         }
 
+        currentNote = noteData;
         // render DOM
         // get DOM elements 
         const titleEl = document.getElementById('note-title');
@@ -49,7 +88,8 @@ async function renderNoteDetail(noteId) {
         const authorEl = document.getElementById('note-author');
         const modificationEl = document.getElementById('note-modification');
         const dateEl = document.getElementById('note-date');
-        const noteCourseLinkEl = document.getElementById('note-course-link')
+        const noteCourseLinkEl = document.getElementById('note-course-link');
+        const editBtnEl = document.getElementById('edit-note-btn');
 
         // attachments
         const attachmentsGridEl = document.getElementById('note-attachments-grid');
@@ -227,4 +267,105 @@ function initializeCopyLinkButton() {
             showToast('Failed to copy link', 'error');
         }
     });
+}
+
+function enterEditMode(currentNote) {
+    // swap the h1 to input (prefilled with current content)
+    if (!editInput) return;
+
+    editInput.value = currentNote.title;
+    noteTitle.classList.add('hidden');
+    editInput.classList.remove('hidden');
+    editInput.focus();
+
+    // swap div to textarea (prefilled with current content)
+    if (!noteBody || !editTextArea) return;
+
+    editTextArea.value = currentNote.content;
+    noteBody.classList.add('hidden');
+    editTextArea.classList.remove('hidden');
+    
+    // swap the header buttons to save and cancel
+    if (!viewActions || !editActions) return;
+
+    viewActions.classList.add('hidden');
+    editActions.classList.remove('hidden')
+    
+
+    // swap the footer with a dropzone for attachments
+    if (!footer || !dropzoneSection) return;
+    footer.classList.add('hidden');
+    dropzoneSection.classList.remove('hidden');
+}
+
+function exitEditMode(editActions, viewActions, editInput, noteTitle, footer, dropzoneSection, currentNote) {
+    editActions.classList.add('hidden');
+    viewActions.classList.remove('hidden');
+
+    editInput.classList.add('hidden');
+    noteTitle.classList.remove('hidden');
+
+    footer.classList.remove('hidden');
+    dropzoneSection.classList.add('hidden');
+    renderNoteDetail(currentNote.id);
+}
+
+async function handleSaveNote(currNote, editedTitle, editedContent, saveChangesBtn) {
+    // if values are empty, alert the user
+    if (editedTitle.length === 0 && editedContent.length === 0) {
+        showToast('Title and content is required', 'info');
+        return;
+    }
+
+    if (editedTitle.length === 0) {
+        showToast('Title is required', 'info');
+        return;
+    }
+
+    if (editedContent.length === 0) {
+        showToast('Content is required', 'info');
+        return;
+    }
+
+    // if changes are identical to original note
+    if (currNote.title === editedTitle && currNote.content === editedContent) {
+        console.log('no changes!');
+        exitEditMode(editActions, viewActions, editInput, noteTitle, footer, dropzoneSection, currNote);
+        return;
+    }
+    // Set save changes button to disabled and text to "Saving..." so they cant double click
+    saveChangesBtn.textContent = 'Saving...';
+    saveChangesBtn.disabled = true;
+
+    const editedNoteData = {
+        title: editedTitle,
+        content: editedContent
+    }
+
+    try {
+        const response = await updateNote(currNote.courseId, editedNoteData, currNote.id);
+
+        if (!response) {
+            showToast('Unable to save changes', 'error');
+            saveChangesBtn.disabled = false;
+            saveChangesBtn.textContent = 'Save changes';
+            return;
+        }
+
+        saveChangesBtn.disabled = false;
+        saveChangesBtn.textContent = 'Save changes';
+
+        setTimeout(() => {
+            showToast('Note changes saved');
+        }, 175);
+        exitEditMode(editActions, viewActions, editInput, noteTitle, footer, dropzoneSection, currNote);
+
+
+    } catch (error) {
+        saveChangesBtn.disabled = false;
+        saveChangesBtn.textContent = 'Save changes';
+        showToast('Unable to save note changes', 'error');
+        console.error('Unable to save note changes:', error);
+        return;
+    }
 }

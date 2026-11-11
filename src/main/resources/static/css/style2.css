@@ -1085,7 +1085,7 @@ dialog.modal-dialog:focus-visible {
     gap: 1rem;
 }
 
-.join-btn, .create-cls-btn, .create-note-btn {
+.join-btn, .create-cls-btn, .create-note-btn, .error-redirect-a-tag, .retry-btn {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -1099,7 +1099,7 @@ dialog.modal-dialog:focus-visible {
     text-decoration: none;
 }
 
-.join-btn {
+.join-btn, .error-redirect-a-tag {
     background-color: #ffffff;
     color: var(--text-primary);
     border-color: #E2E5E7;
@@ -1107,18 +1107,18 @@ dialog.modal-dialog:focus-visible {
     transition: background-color 0.3s ease;
 }
 
-.join-btn:hover {
+.join-btn:hover, .error-redirect-a-tag:hover {
     background-color: #ebebea;
 
 }
 
-.create-cls-btn, .create-note-btn {
+.create-cls-btn, .create-note-btn, .retry-btn {
     background-color: var(--primary);
     transition: opacity 0.3s ease;
     color: var(--primary-font-color);
 }
 
-.create-cls-btn:hover, .create-note-btn:hover {
+.create-cls-btn:hover, .create-note-btn:hover, .retry-btn:hover {
     opacity: 0.92;
 }
 
@@ -2626,9 +2626,8 @@ dialog.modal-dialog:focus-visible {
 }
 
 .back-link {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
     text-decoration: none;
     color: var(--muted-foreground);
     font-size: .75rem;
@@ -2965,6 +2964,19 @@ dialog.modal-dialog:focus-visible {
     font-size: .875rem;
 }
 
+#note-detail-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-bottom: 48px;
+}
+
+.note-document {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
 .note-body {
     font-family: inherit;
     color: var(--text-primary);
@@ -2973,6 +2985,7 @@ dialog.modal-dialog:focus-visible {
     white-space: pre-wrap;
     margin-top: 20px;
     line-height: calc(7 * .25rem);
+    flex: 1;
 }
 
 .note-footer {
@@ -3061,4 +3074,41 @@ dialog.modal-dialog:focus-visible {
 
 .course-link:hover {
     text-decoration-color: var(--text-primary);
+}
+
+.error-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 80px;
+    height: 50vh;
+}
+
+.error-title-msg {
+    font-family: inherit;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 20px;
+}
+
+.error-helper-msg {
+    font-family: inherit;
+    color: var(--muted-foreground);
+    font-size: .875rem;
+    margin-top: 8px;
+    margin-bottom: 28px;
+}
+
+.error-svg-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    color: var(--muted-foreground);
+    width: 3rem;
+    height: 3rem;
 }

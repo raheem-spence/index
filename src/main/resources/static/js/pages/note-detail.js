@@ -15,7 +15,8 @@ function initializeNoteDetailPage() {
     const noteId = urlParams.get('id');
 
     if (!noteId) {
-        showError('No note ID specified in URL.');
+        console.log('error');
+        showError('No note specified', `This link doesn't point to a note. Head back to all notes and pick one from the list.`, 'no-note');
         return;
     };
 
@@ -34,8 +35,9 @@ async function renderNoteDetail(noteId) {
         const noteData = await fetchNoteById(noteId);
         console.log(noteData);
         
+        
         if (!noteData) {
-            showError('Note not found or may have been deleted.');
+            showError('Note not found', `This note may have been deleted, or the link is incorrect.`, 'no-note');
             return;
         }
 
@@ -83,15 +85,97 @@ async function renderNoteDetail(noteId) {
         }
 
     } catch (error) {
-        showError('Unable to show note. Check your connection.');
+        showError(`Couldn't load this note`, `Check your connection and try again.`, 'no-wifi', () => renderNoteDetail(noteId));
         console.error(error);
     }
 }
 
 
-// error display if note is unable to load
-function showError(message) {
+const ERROR_ICONS = {
+    // note icon with question mark
+    'no-note': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" 
+    fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" 
+    aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z">
+    </path><path d="M12 17h.01"></path><path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3"></path>
+    </svg>`,
 
+    'no-wifi': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" 
+    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 20h.01"></path><path d="M8.5 16.429a5 5 0 0 1 7 0">
+    </path><path d="M5 12.859a10 10 0 0 1 5.17-2.69"></path><path d="M19 12.859a10 10 0 0 0-2.007-1.523">
+    </path><path d="M2 8.82a15 15 0 0 1 4.177-2.643"></path><path d="M22 8.82a15 15 0 0 0-11.288-3.764"></path><path d="m2 2 20 20"></path>
+    </svg>`
+}
+
+// error display if note is unable to load
+function showError(mainMessage, helperMsg, type = 'no-note', retryFn = null) {
+    // empty parent container
+    const noteDetailContainer = document.getElementById('note-detail-container');
+
+    // defensive guard if container isn't present, exit 
+    if (!noteDetailContainer) return;
+
+    noteDetailContainer.replaceChildren();
+
+    // DOM elements for error display
+    const backLink = document.createElement('a');
+    backLink.href = '/notes.html';
+    backLink.classList.add('back-link');
+
+    const backArrowSvgContainer = document.createElement('div');
+    backArrowSvgContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" 
+                                    fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" 
+                                    aria-hidden="true"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path>
+                                    </svg>`;
+
+    const backLinkSpan = document.createElement('span');
+    backLinkSpan.textContent = "All notes";
+
+    backLink.append(backArrowSvgContainer, backLinkSpan);
+
+    const iconSvg = ERROR_ICONS[type] || ERROR_ICONS['no-note'] || '';
+    const errorContainer = document.createElement('div');
+    errorContainer.classList.add('error-container');
+
+    const errorSvgContainer = document.createElement('div');
+
+    errorSvgContainer.innerHTML = iconSvg;
+    errorSvgContainer.classList.add('error-svg-container');
+
+    const errorTitleMsg = document.createElement('h1');
+    const errorHelperMsg = document.createElement('p');
+
+    errorTitleMsg.textContent = mainMessage;
+    errorHelperMsg.textContent = helperMsg;
+
+    errorTitleMsg.classList.add('error-title-msg');
+    errorHelperMsg.classList.add('error-helper-msg');
+    
+    const errorRedirectATag = document.createElement('a');
+    errorRedirectATag.textContent = 'Back to All Notes';
+    errorRedirectATag.href = "/notes.html";
+
+    errorRedirectATag.classList.add('error-redirect-a-tag');
+
+    const btnsContainer = document.createElement('div');
+    btnsContainer.classList.add('btn-container');
+
+    btnsContainer.append(errorRedirectATag);
+
+    if ( typeof retryFn === 'function') {
+        // create DOM elements
+        const retryBtn = document.createElement('button');
+        retryBtn.type = 'button';
+        retryBtn.classList.add('retry-btn');
+        retryBtn.textContent = 'Try again';
+        btnsContainer.prepend(retryBtn);
+        retryBtn.addEventListener('click', () => {
+            retryFn();
+        })
+    }
+
+    errorContainer.append(errorSvgContainer, errorTitleMsg, errorHelperMsg, btnsContainer);
+    noteDetailContainer.append( backLink, errorContainer);
 }
 
 // helpful counter

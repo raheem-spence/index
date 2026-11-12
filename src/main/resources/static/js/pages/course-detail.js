@@ -8,6 +8,7 @@ const membersDialog = document.getElementById('members-dialog');
 const modalMemberList = document.getElementById('modal-member-list');
 const joinCodeBtn = document.getElementById('course-detail-join-code-btn');
 const copySvgContainer = document.getElementById('copy-svg-container');
+const createNoteBtnEl = document.getElementById('create-note-btn')
 
 const COPY_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
                         stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
@@ -69,10 +70,15 @@ function initailizeCourseDetailPage() {
     joinCodeBtn.addEventListener('click', () => {
         copyToClipboard(copySvgContainer, COPY_ICON_SVG, joinCode);
     });
+
+    if (createNoteBtnEl) {
+        const url = new URL(createNoteBtnEl.href);
+        url.searchParams.set('courseId', courseId);
+        createNoteBtnEl.href = url.toString();
+    }
 }
 
 async function renderCourseDetail(courseId) {
-    window.renderCourseDetail = renderCourseDetail;
 
     // get course details 
     try {

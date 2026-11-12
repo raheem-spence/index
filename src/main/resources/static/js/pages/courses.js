@@ -2,11 +2,7 @@ import { fetchCourses } from "../api/courses.js";
 import { formatJoinCode, getCourseInitials, copyToClipboard } from "../utilities.js";
 import { renderCreateCourseModal, renderJoinCourseModal } from "../script.js";
 
-const baseCoursesUrl = '/courses.html';
-const baseCourseUrl = '/course.html';
-const queryString = window.location.search;
-const urlParams = new URLSearchParams(queryString);
-const courseId = urlParams.get('courseId');
+const baseCourseUrl = '/course-detail.html';
 
 const coursesGrid = document.getElementById('courses-grid');
 const coursesCount = document.getElementById('courses-count');
@@ -130,7 +126,7 @@ function createCourseCard(course) {
 
     memberSvgContainer.innerHTML = memberSvgString;
     notesSvgContainer.innerHTML = notesSvgString;
-    courseATag.href = `${baseCourseUrl}?courseId=${course.id}`;
+    courseATag.href = `${baseCourseUrl}?id=${course.id}`;
 
     courseCard.dataset.id = course.id;
 

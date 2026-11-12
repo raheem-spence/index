@@ -13,16 +13,16 @@ const courseId = Number(urlParams.get('courseId'));
 
 const currSiteLocation = document.getElementById('site-location-div');
 
-async function initializeApp() {
-    const coursesResult = await fetchCourses();
-    if (!coursesResult.success) {
-        return; 
-    }
-    const courses = coursesResult.data;
-    renderSideBarCourses(courses);
-    renderRoute(courseId);
-    renderUser();
-}
+// async function initializeApp() {
+//     const coursesResult = await fetchCourses();
+//     if (!coursesResult.success) {
+//         return; 
+//     }
+//     const courses = coursesResult.data;
+//     renderSideBarCourses(courses);
+//     renderRoute(courseId);
+//     renderUser();
+// }
 
 
 const courseContainer = document.getElementById('course-container');

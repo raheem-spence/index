@@ -5,7 +5,7 @@ import { formatRelativeTime, formatDate, showToast, getCourseInitials, formatJoi
 import { loadCurrentUser, loadSidebarCourses, renderJoinCourseModal, renderCreateCourseModal} from "../script.js";
 
 // ---------- Configuration ---------- 
-const baseCourseUrl = '/course.html';
+const baseCourseUrl = '/course-detail.html';
 const baseDashboardUrl = '/dashboard.html';
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);

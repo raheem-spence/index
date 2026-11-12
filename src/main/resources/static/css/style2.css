@@ -56,17 +56,21 @@ main {
     transition: margin-left 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-html{
+html {
     font-family: Geist, sans-serif;
     font-size: 16px;
 }
   
-body{
+body {
     min-height: 100dvh;
     margin: 0;
     background-color: var(--background);
     letter-spacing:  -.005em;
     font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body.no-scroll {
+    overflow: hidden;
 }
 
 body,
@@ -1047,7 +1051,7 @@ dialog.modal-dialog:focus-visible {
 }
 
 #dashboard-container, #notes-container, #courses-container, 
-#create-note-container, #note-detail-container{
+#create-note-container, #note-detail-container, #course-detail-container {
     padding: 48px 40px;
     max-width: 900px;
     width: 100%;
@@ -1129,7 +1133,7 @@ dialog.modal-dialog:focus-visible {
     margin-bottom: 12px;
 }
 
-.courses-heading {
+.courses-heading, .notes-heading {
     font-family: Geist, sans-serif;
     font-size: .875rem;
     font-weight: 500;
@@ -1265,9 +1269,9 @@ dialog.modal-dialog:focus-visible {
 }
 .course-meta-data {
     display: flex;
-    font-family: Figtree;
+    font-family: inherit;
     font-size: 12.5px;
-    color: #6b6b6b;
+    color: var(--muted-foreground);
     justify-content: space-between;
     gap: 1rem;
 }
@@ -3223,4 +3227,243 @@ dialog.modal-dialog:focus-visible {
 
 .no-delete-btn:hover {
     background-color: var(--bg-secondary);
+}
+
+.course-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+    margin-top: 32px;
+}
+
+.course-info-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.course-meta-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 6px;
+    flex: 1;
+}
+
+.course-detail-monogram {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--secondary);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    color: var(--secondary-foreground);
+    letter-spacing: 0.025em;
+    font-weight: 600;
+    font-size: 0.875rem;
+    height: 42px;
+    width: 42px;
+}
+
+.course-detail-name {
+    font-family: inherit;
+    overflow-wrap: break-word;
+    font-size: 1.875rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.course-detail-meta-data {
+    display: inline-flex;
+    font-family: inherit;
+    color: var(--muted-foreground);
+    font-size: .75rem;
+    gap: 6px;
+}
+
+.members-dialog-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    outline: none;
+    border: none;
+    background-color: transparent;
+    color: var(--muted-foreground);
+    gap: 4px;
+    transition: color 0.15s ease, text-decoration 0.15s ease;
+    cursor: pointer;
+}
+
+.members-dialog-btn:hover {
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.more-actions-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: .75rem;
+    font-weight: 500;
+    border-radius: 6px;
+    outline: none;
+    border: none;
+    background-color: transparent;
+    transition: background-color 0.15s ease;
+    padding: 6px;
+    width: 2rem;
+    height: 2rem;
+    position: relative;
+}
+
+.more-actions-btn:hover {
+    background-color: var(--bg-secondary);
+}
+
+.course-detail-join-code-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    font-size: .75rem;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--muted-foreground);
+    transition: color 0.15s ease;
+    gap: 4px;
+}
+
+.course-detail-join-code-btn span {
+    color: var(--text-primary);
+}
+
+.course-detail-join-code-btn:hover {
+    color: var(--text-primary);
+}
+
+.notes-section-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.note-count {
+    display: inline-flex;
+    font-family: inherit;
+    font-size: .75rem;
+    background-color: var(--bg-secondary);
+    color: var(--muted-foreground);
+    border-radius: 50%;
+    padding: 2px 8px;
+    margin-left: 4px;
+}
+
+.course-detail-modal-header {
+    font-family: inherit;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1.125rem;
+}
+
+.modal-container {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    gap: 1rem;
+}
+
+.modal-member-list {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+.modal-member-list:last-child {
+    border-bottom: none;
+}
+
+.members-modal-li {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    font-family: inherit;
+    color: var(--text-primary);
+    padding: 10px 12px;
+    list-style: none;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.members-name {
+    font-size: .875rem;
+    font-family: inherit;
+    color: var(--text-primary);
+    line-height: calc(1.25 / .875);
+}
+
+.members-initials {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border-radius: 50%;
+    height: 28px;
+    width: 28px;
+    font-size: 11px;
+    font-family: inherit;
+    font-weight: 600;
+}
+
+.options-menu {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0px;
+    border-radius: 6px;
+    padding: 4px;
+    background-color: var(--card);
+    min-width: 150px;
+    z-index: 50;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.options-menu button {
+    font-family: inherit;
+    color: var(--text-primary);
+    font-size: .875rem;
+    padding: 8px;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    background-color: transparent;
+    transition: background-color 0.15s ease;
+}
+
+.options-menu button:hover {
+    background-color: var(--bg-secondary);
+}
+
+.option {
+    display: inline-flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+}
+
+.option.leave {
+    color: var(--error-red);
+}
+
+.options-popup-container {
+    position: relative;
 }

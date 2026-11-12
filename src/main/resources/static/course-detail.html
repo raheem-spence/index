@@ -1,0 +1,239 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style2.css">
+    <title>Index</title>
+</head>
+<body>
+    <aside id="sidebar">
+        <div class="logo-div">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24" aria-hidden="true">
+                <!-- The dark rounded tile -->
+                <rect width="64" height="64" rx="15" fill="#12171a" />
+                
+                <!-- The white lowercase "i" -->
+                <path
+                  d="M72 92H281V442H82V534H389V92H568V0H72ZM275 713H387V607H275Z"
+                  transform="translate(14.05 52.00) scale(0.056101 -0.056101)"
+                  fill="#ffffff"
+                />
+              </svg>              
+            <button class="sidebar-close-btn" id="sidebar-close-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-left h-4 w-4" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:52:17"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path></svg>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="/dashboard.html" class="nav-link active">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-grid h-4 w-4 shrink-0" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:23:7"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/notes.html" class="nav-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text h-4 w-4 shrink-0" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:23:7"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>
+                        <span>All Notes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <div class="nav-row">
+                        <a href="/courses.html" class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers h-4 w-4 shrink-0" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:62:15"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path></svg>
+                            <span>All courses</span>
+                        </a>
+                        <button type="button" class="chevron-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="chevron-icon" aria-hidden="true" data-tsd-source="/src/components/AppShell.tsx:71:17"><path d="m9 18 6-6-6-6"></path></svg>
+                        </button>
+                    </div> 
+                </li>
+                <div id="dropdown-menu" class="dropdown-menu">
+                    <ul id="course-list"></ul>
+                </div>
+            </ul>
+        </nav>
+
+        
+        <div class="sidebar-user">
+
+            <!-- aria-haspopup="menu" tells screen readers this button opens a popup menu instead of navigating. -->
+            <!-- aria-expanded="false" tells screen readers whether the menu is currently open (true) or closed (false). -->
+           <button type="button" class="user-menu-btn" id="user-menu-btn" aria-haspopup="menu" aria-expanded="false">
+               <span class="user-avatar" id="user-avatar"></span>
+                <div class="user-info">
+                    <span class="user-name" id="user-name"></span>
+                    <span class="user-email truncate" id="user-email"></span>
+                </div>
+                <!-- chevrons up/down svg icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" 
+                 class="lucide lucide-chevrons-up-down preview-icon"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/>
+                </svg>
+           </button>
+
+           <!-- the 'role' attribute tells screen readers and assistive tech what an element does when standard HTML tags don't convey it. -->
+           <div class="user-popover hidden" id="user-popover" role="menu">
+            <button type="button" class="popover-item" id="theme-toggle-btn" role="menuitem">
+                <!-- sun/moon icon -->
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+                </svg>
+                <span>Toggle theme</span>
+            </button>
+            <a href="/settings.html" class="popover-item" role="menuitem">
+                <!-- settings gear icon -->
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <span>Settings</span>
+            </a>
+
+            <!-- feeeback button -->
+            <button type="button" class="popover-item" id="open-feedback-btn" role="menuitem">
+                <svg class="popover-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  <span>Send feedback</span>
+            </button>
+            <div class="popover-divider"></div>
+            <button type="button" class="popover-item popover-logout"  id="logout-btn" role="menuitem">
+                <!-- Log out door icon -->
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" x2="9" y1="12" y2="12"/>
+                </svg>
+                <span>Log out</span>
+            </button>
+           </div>
+        </div>
+    </aside>
+    <button type="button" id="sidebar-reopen-btn" class="sidebar-reopen-btn">
+        <span class="reopen-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24" aria-hidden="true">
+                <!-- The dark rounded tile -->
+                <rect width="64" height="64" rx="15" fill="#12171a" />
+                
+                <!-- The white lowercase "i" -->
+                <path
+                  d="M72 92H281V442H82V534H389V92H568V0H72ZM275 713H387V607H275Z"
+                  transform="translate(14.05 52.00) scale(0.056101 -0.056101)"
+                  fill="#ffffff"
+                />
+              </svg>   
+        </span>
+
+        <span class="reopen-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-panel-left">
+                <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                <path d="M9 3v18"></path>
+            </svg>
+    
+        </span>
+    </button>
+    <main>
+        <div id="course-detail-container">
+            <nav id="course-detail-nav-header">
+                <a href="/courses.html" class="back-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left h-3.5 w-3.5" aria-hidden="true"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path>
+                    </svg>
+                    <span>All courses</span>
+                </a>
+            </nav>
+            <header id="course-detail-header" class="course-detail-header">
+                <div id="course-info-container" class="course-info-container">
+                    <div id="course-monogram" class="course-detail-monogram"></div>
+                    <div id="course-meta-container" class="course-meta-container">
+                        <h1 id="course-name" class="course-detail-name"></h1>
+                        <div id="course-meta-data" class="course-detail-meta-data">
+                            <span id="school"></span>
+                            <span>·</span>
+                            <button type="button" id="members-dialog-btn" class="members-dialog-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path>
+                                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle>
+                                </svg>
+                                <span id="member-count"></span>
+                            </button>
+                            <dialog id="members-dialog" class="join-course-modal">
+                                <div class="modal-container">
+                                    <h2 class="course-detail-modal-header">
+                                        <span id="modal-member-count"></span>
+                                        Members
+                                    </h2>
+                                    <ul id="modal-member-list" class="modal-member-list"></ul>
+                                </div>
+                            </dialog>
+                            <span>·</span>
+                            <button type="button" id="course-detail-join-code-btn" class="course-detail-join-code-btn">
+                                code
+                                <span id="join-code"></span>
+                                <!-- copy icon -->
+                                <div id="copy-svg-container">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                                        stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+                                    </svg>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="options-popup-container" class="options-popup-container">
+                    <button type="button" id="more-actions-btn" class="more-actions-btn" aria-haspopup="listbox" aria-expanded="false">
+                        <!-- ellipses iconn -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" 
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" 
+                        aria-hidden="true"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                    </button>
+                    <div id="options-menu" class="options-menu hidden" role="listbox">
+                        <button type="button" class="option" id="copy-link-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7A5 5 0 0 1 7 7h2"/>
+                                <path d="M15 7h2a5 5 0 1 1 0 10h-2"/><line x1="8" x2="16" y1="12" y2="12"/>
+                            </svg>
+                            Copy invite link</button>
+                        <button type="button" class="option leave" id="leave-course-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" 
+                                stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            </svg>
+                            Leave course
+                        </button>
+                    </div>
+                </div>
+            </header>
+            <div id="notes-section-header">
+                <div id="notes-section-top" class="notes-section-top">
+                    <h2 class="notes-heading">Notes
+                        <span id="note-count" class="note-count"></span>
+                    </h2>
+                    <a href="/create-note.html" class="create-note-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path>
+                        </svg>
+                        Create note
+                    </a>
+                </div>
+                <div class="search-bar-container">
+                    <div class="search-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search preview-icon">
+                            <path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle>
+                        </svg>
+                    </div>
+                    <input type="text" autocomplete="off" placeholder="Search notes or authors..." id="notes-search">
+                </div>
+            </div>
+            <ul id="note-list" class="note-list"></ul>
+        </div>
+    </main>
+</body>
+<script type="module" src="/js/pages/course-detail.js" defer></script>
+<script type="module" src="/js/script.js" defer></script>
+</html>

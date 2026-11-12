@@ -11,4 +11,5 @@ public class CourseDetailsResponse {
     private Long memberCount;
     private Long noteCount;
     private String joinCode;
+    private String school;
 }

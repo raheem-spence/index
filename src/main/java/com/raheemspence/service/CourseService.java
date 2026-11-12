@@ -110,6 +110,7 @@ public class CourseService {
         courseDetailsResponse.setMemberCount(courseMembershipRepository.countByCourseId(course.getId()));
         courseDetailsResponse.setNoteCount(noteRepository.countByCourseId(course.getId()));
         courseDetailsResponse.setJoinCode(course.getJoinCode());
+        courseDetailsResponse.setSchool(course.getSchool());
 
         return courseDetailsResponse;
     }

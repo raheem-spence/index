@@ -240,11 +240,11 @@ function setUpSidebarToggle() {
     // check if user previously closed it in this browser
     const savedState = localStorage.getItem('sidebar-collapsed');
     if (savedState === 'true') {
-        document.body.classList.add('sidebar-collapsed');
+        document.documentElement.classList.add('sidebar-collapsed');
     }
 
     function toggleSidebar() {
-        const isCollapsed = document.body.classList.toggle('sidebar-collapsed');
+        const isCollapsed = document.documentElement.classList.toggle('sidebar-collapsed');
         localStorage.setItem('sidebar-collapsed', isCollapsed ? 'true' : 'false');
     }
 
@@ -303,7 +303,7 @@ export async function loadCurrentUser() {
 
 // ---------- Sidebar ---------- 
 export function renderSideBarCourses(courses)  {
-    const baseCourseUrl = `/course.html`;
+    const baseCourseUrl = `/course-detail.html`;
     // clear ul container
     const ulContainer = document.getElementById('course-list');
     if (!ulContainer) return;
@@ -324,7 +324,7 @@ export function renderSideBarCourses(courses)  {
         ulContainer.appendChild(emptyMsgSidebarDiv);
         
     } else {
-        const fieldName = "courseId";
+        const fieldName = "id";
 
         for (const course of courses) {
             const url = new URL(baseCourseUrl, window.location.origin);

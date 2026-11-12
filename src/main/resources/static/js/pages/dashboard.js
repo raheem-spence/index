@@ -9,7 +9,7 @@ const baseCourseUrl = '/course-detail.html';
 const baseDashboardUrl = '/dashboard.html';
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
-const courseId = urlParams.get('courseId');
+const courseId = urlParams.get('id');
 
 
 
@@ -200,7 +200,7 @@ function renderDashboardCourses(coursesGrid, dashboardCourses) {
 
             memberSvgContainer.innerHTML = memberSvgString;
             notesSvgContainer.innerHTML = notesSvgString;
-            courseATag.href = `${baseCourseUrl}?courseId=${course.id}`;
+            courseATag.href = `${baseCourseUrl}?id=${course.id}`;
 
             courseCard.dataset.id = course.id;
 

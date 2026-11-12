@@ -80,14 +80,13 @@ input {
   -moz-osx-font-smoothing: grayscale;
 }
 
- body.sidebar-collapsed aside {
+ .sidebar-collapsed aside {
     transform: translateX(-100%);
  }
 
- body.sidebar-collapsed main {
+ .sidebar-collapsed main {
     margin-left: 0;
  }
-
 
 /* =====================
         Sidebar
@@ -182,7 +181,7 @@ aside{
     color: var(--text-primary);
 }
 
-body.sidebar-collapsed .sidebar-reopen-btn {
+.sidebar-collapsed .sidebar-reopen-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -2965,7 +2964,7 @@ dialog.modal-dialog:focus-visible {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    padding-bottom: 48px;
+    padding: 48px 40px;
 }
 
 .note-document {
@@ -3236,7 +3235,7 @@ dialog.modal-dialog:focus-visible {
     padding-bottom: 32px;
     border-bottom: 1px solid var(--border);
     margin-bottom: 40px;
-    margin-top: 32px;
+    margin-top: 24px;
 }
 
 .course-info-container {
@@ -3466,4 +3465,11 @@ dialog.modal-dialog:focus-visible {
 
 .options-popup-container {
     position: relative;
+}
+
+#course-detail-nav-header, .note-detail-header {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    margin-bottom: 24px;
 }

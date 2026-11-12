@@ -95,6 +95,18 @@ async function renderNoteDetail(noteId) {
         }
 
         currentNote = noteData;
+
+        const user = getCurrentUser();
+
+        // check if current user is the author
+        const isOwner = user && currentNote && (user.id === currentNote.ownerId);
+
+        if (isOwner) {
+            document.getElementById('owner-actions').classList.remove('hidden');
+        } else {
+            document.getElementById('owner-actions').classList.add('hidden');
+        }
+        
         // render DOM
         // get DOM elements 
         const titleEl = document.getElementById('note-title');
@@ -409,5 +421,14 @@ async function handleDeleteNote() {
         deleteText.textContent = 'Delete';
         console.error('Delete failed:', error);
         showToast('Unable to delete note', 'error');
+    }
+}
+
+function getCurrentUser() {
+    try {
+        const raw = sessionStorage.getItem('index_user');
+        return raw ? JSON.parse(raw) :null;
+    } catch {
+        return null;
     }
 }

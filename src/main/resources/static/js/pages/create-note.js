@@ -72,7 +72,7 @@ function getPreselectedCourseId() {
 
     // params.get('courseId') looks for the courseId=... and returns its value as a string ("15"), null if no courseId 
     const params = new URLSearchParams(window.location.search);
-    return params.get('courseId');
+    return params.get('id');
 }
 
 // =======================================================

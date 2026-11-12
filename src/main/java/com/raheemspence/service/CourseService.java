@@ -10,6 +10,7 @@ import com.raheemspence.repository.CourseMembershipRepository;
 import com.raheemspence.repository.CourseRepository;
 import com.raheemspence.repository.NoteRepository;
 import com.raheemspence.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -261,5 +262,14 @@ public class CourseService {
         }
 
         return dashboardCoursesResponse;
+    }
+
+    @Transactional
+    public void removeUserFromCourse(Long userId, Long courseId) {
+        // get course membership
+        CourseMembership courseMembership = courseMembershipRepository.findByUserIdAndCourseId(userId, courseId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have access to course"));
+
+        courseMembershipRepository.delete(courseMembership);
     }
 }

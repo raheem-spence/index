@@ -1,4 +1,4 @@
-import { fetchCourseDetails, fetchCourseMembers } from "../api/courses.js";
+import { fetchCourseDetails, fetchCourseMembers, leaveCourse} from "../api/courses.js";
 import { loadNotes } from "../api/notes.js";
 import { formatJoinCode, getCourseInitials, formatRelativeTime, copyToClipboard, showToast } from "../utilities.js";
 
@@ -9,6 +9,11 @@ const modalMemberList = document.getElementById('modal-member-list');
 const joinCodeBtn = document.getElementById('course-detail-join-code-btn');
 const copySvgContainer = document.getElementById('copy-svg-container');
 const createNoteBtnEl = document.getElementById('create-note-btn')
+const leaveCourseBtnEl = document.getElementById('leave-course-btn');
+const leaveDialogEl = document.getElementById('leave-dialog');
+const leavingCourseEl = document.getElementById('course-leaving');
+const cancelLeaveBtnEl = document.getElementById('cancel-leave-btn');
+const confirmLeaveBtnEl = document.getElementById('confirm-leave-btn');
 
 const COPY_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
                         stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
@@ -18,6 +23,7 @@ const COPY_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height
 let courseNotes = []
 let searchQuery = '';
 let joinCode = '';
+let leavingCourse = '';
 
 document.addEventListener('DOMContentLoaded', () => {
     initailizeCourseDetailPage();
@@ -71,6 +77,46 @@ function initailizeCourseDetailPage() {
         copyToClipboard(copySvgContainer, COPY_ICON_SVG, joinCode);
     });
 
+    if (leaveCourseBtnEl && leaveDialogEl) {
+        leaveCourseBtnEl.addEventListener('click', () => {
+            leavingCourseEl.textContent = leavingCourse;
+            document.body.classList.add('no-scroll');
+            leaveDialogEl.showModal();
+        });
+    }
+
+    if (leaveDialogEl) {
+        leaveDialogEl.addEventListener('click', (e) => {
+            const rect = leaveDialogEl.getBoundingClientRect();
+            
+            const clickedOutside = 
+            e.clientX > rect.right ||
+            e.clientX < rect.left ||
+            e.clientY > rect.bottom ||
+            e.clientY < rect.top;
+
+            if (clickedOutside) {
+                leaveDialogEl.close();
+            }
+        })
+    
+        leaveDialogEl.addEventListener('close', () => {
+            document.body.classList.remove('no-scroll');
+        });
+    }
+
+    if (cancelLeaveBtnEl && leaveDialogEl) {
+        cancelLeaveBtnEl.addEventListener('click', () => {
+            leaveDialogEl.close();
+        })
+    }
+
+    if (confirmLeaveBtnEl && leaveDialogEl) {
+        confirmLeaveBtnEl.addEventListener('click', async () => {
+            handleLeaveCourse(courseId);
+        })
+    }
+
     if (createNoteBtnEl) {
         const url = new URL(createNoteBtnEl.href);
         url.searchParams.set('courseId', courseId);
@@ -103,6 +149,7 @@ async function renderCourseDetail(courseId) {
         
         courseNotes = notes.data;
         const courseData = courseDetails.data;
+        leavingCourse = courseData.name;
 
         const courseMonogram = document.getElementById('course-monogram');
         const courseName = document.getElementById('course-name');
@@ -386,4 +433,20 @@ function setUpOptionsDropDown() {
         menu.classList.add('hidden');
         trigger.setAttribute('aria-expanded', 'false');
     })
+}
+
+async function handleLeaveCourse(courseId) {
+    try {
+        confirmLeaveBtnEl.disabled = true;
+        confirmLeaveBtnEl.textContent = 'Leaving...';
+
+        await leaveCourse(courseId);
+        sessionStorage.setItem('pendingToast',  `Left ${leavingCourse}`);
+        window.location.href = '/courses.html';
+    } catch (error) {
+        confirmLeaveBtnEl.disabled = false;
+        confirmLeaveBtnEl.textContent = 'Leave course';
+        console.error('Error:', error);
+        showToast('Unable to leave course', 'error');
+    }
 }

@@ -212,6 +212,18 @@
                             Leave course
                         </button>
                     </div>
+                        <dialog id="leave-dialog" class="join-course-modal">
+                            <div class="leave-modal-container">
+                                <h2 class="leave-course-header">
+                                    Leave course?
+                                </h2>
+                                <p class="leave-course-msg">You'll lose access to <span id="course-leaving"></span>. Your notes stay in the course, and you'll need the join code to come back.</p>
+                                <div id="decision-btns">
+                                    <button type="button" id="cancel-leave-btn" class="cancel-leave-btn">Cancel</button>
+                                    <button type="button" id="confirm-leave-btn" class="confirm-leave-btn">Leave course</button>
+                                </div>
+                            </div>
+                        </dialog>
                 </div>
             </header>
             <div id="notes-section-header">

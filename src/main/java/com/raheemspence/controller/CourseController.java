@@ -83,4 +83,15 @@ public class CourseController {
         return courseService.joinCourse(userId, joinCourseRequest);
     }
 
+    @DeleteMapping("/{courseId}/leave")
+    public void leaveCourse(@PathVariable Long courseId, HttpSession httpSession) {
+        Long userId = (Long) httpSession.getAttribute("userId");
+
+        if (userId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Session expired");
+        }
+
+        courseService.removeUserFromCourse(userId, courseId);
+    }
+
 }

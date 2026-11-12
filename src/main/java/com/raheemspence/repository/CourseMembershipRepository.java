@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface CourseMembershipRepository extends JpaRepository<CourseMembership, Long> {
@@ -28,6 +29,8 @@ public interface CourseMembershipRepository extends JpaRepository<CourseMembersh
     boolean existsByUserIdAndCourseId(Long userId, Long courseId);
 
     List<CourseMembership> findByUserId(Long userId);
+
+    Optional<CourseMembership> findByUserIdAndCourseId(Long userId, Long courseId);
 
     long countByCourseId(Long courseId);
 

@@ -3473,3 +3473,66 @@ dialog.modal-dialog:focus-visible {
     min-height: 32px;
     margin-bottom: 24px;
 }
+
+.leave-modal-container {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+}
+
+.leave-course-header {
+    font-family: inherit;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.leave-course-msg {
+    font-family: inherit;
+    font-size: .875rem;
+    color: var(--muted-foreground);
+    line-height: calc(1.25 / .875);
+    margin-bottom: 8px;
+}
+
+#decision-btns {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .5rem;
+    padding-top: 8px;
+}
+
+.cancel-leave-btn, .confirm-leave-btn {
+    font-family: inherit;
+    font-size: .875rem;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, opacity 0.15s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    outline: none;
+}
+
+.cancel-leave-btn {
+    color: var(--text-primary);
+    background-color: var(--card);
+    border: 1px solid var(--border);
+}
+
+.cancel-leave-btn:hover {
+    background-color: var(--bg-secondary);
+}
+
+.confirm-leave-btn {
+    color: var(--primary-font-color);
+    background-color: var(--error-red);
+    border: none;
+}
+
+.confirm-leave-btn:hover {
+    opacity: 0.90;
+}
+

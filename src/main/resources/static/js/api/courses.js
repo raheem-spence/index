@@ -239,3 +239,16 @@ export async function joinCourse(joinCode) {
         }
     }
 }
+
+export async function leaveCourse(courseId) {
+    const response = await fetch(`/course/${courseId}/leave`, {
+        method: 'DELETE',
+        credentials: 'include'
+    });
+
+    handleAuth(response);
+
+    if (!response.ok) {
+        throw new Error(`Failed to leave course: ${response.status}`);
+    }
+}

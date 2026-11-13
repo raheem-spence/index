@@ -5,14 +5,13 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Login | Index</title>
-        <script type="module" src="/js/pages/login.js" defer></script>
         <link rel="stylesheet" href="css/styles.css">
     </head>
 
     <body>
         <div class="login-signup" id="login">
             <form id="login-form">
-                <h2>Sign in to <span>Index</span></h2>
+                <h2>Log in to <span>Index</span></h2>
                 <div class="input-container">
                     <input required id="email" type="email" autofocus autocomplete="off">
                     <span class="input-txt">EMAIL</span>
@@ -21,8 +20,8 @@
                     <input required id="password" type="password" autofocus autocomplete="off">
                     <span class="input-txt">PASSWORD</span>
                 </div>
-                <div class="error-msg hidden" id="error-box">That email and password combination is incorrect.</div>
-                <button id="login-btn" type="submit">Log In</button>
+                <div class="error-msg hidden" id="error-box"></div>
+                <button id="login-btn" type="submit">Log in</button>
                 
                 <div class="login-links">
                     <a href="">Reset password</a>
@@ -31,4 +30,5 @@
             </form>
         </div>
     </body>
+    <script type="module" src="/js/pages/login.js" defer></script>
 </html>

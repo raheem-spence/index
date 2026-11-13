@@ -12,36 +12,49 @@ if (loginBtn) {
     // Add listener
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        errorDiv.classList.add('hidden');
+        loginBtn.disabled = true;
+        loginBtn.textContent = "Logging in...";
+
         const email = document.getElementById("email").value;
         const password = document.getElementById("password").value;
 
         try {
-        const response = await fetch("/auth/login", {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                email: email,
-                password: password
-            }),
-         
-        });
+            const response = await fetch("/auth/login", {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                }),
+            
+            });
 
-        if (response.ok) {
-            window.location.href = "/dashboard.html";
-    
-        } else {
+            if (response.ok) {
+                window.location.href = "/dashboard.html";
+        
+            } else {
+                errorDiv.textContent = 'That email and password combination is incorrect.'
+                errorDiv.classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error("LOGIN ERROR:", error);
+            errorDiv.textContent = 'Unable to connect. Please try again';
             errorDiv.classList.remove('hidden');
-        }
-     } catch (err) {
-            console.log("LOGIN ERROR:", err);
+        } finally {
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Log in';
         }
     });
-} else {
+} else if (signupForm) {
     signupForm.addEventListener('submit', async(e) => {
         e.preventDefault();
+        errorDiv.classList.add('hidden');
+        createAcctBtn.disabled = true;
+        createAcctBtn.textContent = 'Creating account...';
 
         const firstName = document.getElementById("first-name").value;
         const lastName = document.getElementById("last-name").value;
@@ -71,14 +84,18 @@ if (loginBtn) {
             if (response.ok) {
                 window.location.href = "/dashboard.html";
             } else {
-                data = await response.json()
-                errorDiv.textContent = data.message;
+                const data = await response.json()
+                errorDiv.textContent = data.message || 'Unable to create account. Please try again.';
                 errorDiv.classList.remove('hidden');
             }
 
         } catch (error) {
-            console.log("LOGIN ERROR:", error)
+            console.error("SIGNUP ERROR:", error);
+            errorDiv.textContent = 'Unable to connect. Please try again.';
+            errorDiv.classList.remove('hidden');
+        } finally {
+            createAcctBtn.disabled = false;
+            createAcctBtn.textContent = 'Create account';
         }
-
-    })
+    });
 }

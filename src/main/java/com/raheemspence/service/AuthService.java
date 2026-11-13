@@ -5,6 +5,7 @@ import com.raheemspence.dto.request.SignUpRequest;
 import com.raheemspence.dto.response.SignUpResponse;
 import com.raheemspence.model.User;
 import com.raheemspence.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

@@ -5,6 +5,8 @@ import com.raheemspence.dto.request.SignUpRequest;
 import com.raheemspence.dto.response.SignUpResponse;
 import com.raheemspence.model.User;
 import com.raheemspence.service.AuthService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,4 +46,19 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<?> destroySession(HttpSession httpSession, HttpServletResponse response) {
+        if (httpSession != null) {
+            // destroys the session and unbinds any object tied to it
+            httpSession.invalidate();
+        }
+
+        Cookie cookie = new Cookie("JSESSIONID", null);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0); // tells browser to delete it immediately
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok("Logged out successfully");
+    }
 }

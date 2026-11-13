@@ -1,6 +1,7 @@
 import { fetchCurrentUser } from "./api/users.js";
 import { fetchCourses, joinCourse, createCourse } from "./api/courses.js";
 import { getCourseInitials, showToast } from "./utilities.js";
+import { logoutUser } from "./api/auth.js";
 
 // wait until the browser is done parsing all html elements before running scripts,
 // preventing 'null' errors when looking up DOM ids like buttons and inputs
@@ -153,15 +154,17 @@ function initializeLogoutModal() {
     // confirm logout
     confirmBtn?.addEventListener('click', async () => {
         confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Logging out...';
 
         try {
-            if (typeof logout === 'function') {
-                await logout();
-            }
-        } catch (err) {
-            console.error('Logout failed:', err);
-        } finally {
+            await logoutUser();
+            sessionStorage.clear();
             window.location.href = '/login.html';
+        } catch (error) {
+            console.error('Logout failed:', error);
+            showToast("Unable to log out. Please try again.");
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = 'Log out';
         }
     });
 }
@@ -753,4 +756,5 @@ function getCreateCourseError(courseRequest) {
 
     return null;
 }
+
 

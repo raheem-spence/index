@@ -117,9 +117,41 @@ public class SecurityConfig {
                         ctx.securityContextRepository(repo)   // ← tells Spring where sessions live
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/notes/**").permitAll()
+                        // public pages and assets (anyone can visit)
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/login.html",
+                                "/signup.html",
+                                "/auth/**", // login, register endpoints
+                                "/css/**", // styles
+                                "/js/**", // scripts need for login
+                                "/assets/**", // images, logos
+                                "/favicon.svg"
+                                ).permitAll()
+
+                        // protected HTML pages (MUST be authenticated)
+                        .requestMatchers(
+                                "/dashboard.html",
+                                "/courses.html",
+                                "/notes.html",
+                                "/create-note.html"
+                        ).authenticated()
+
+                        // all API routes require authentication (except /auth/** above)
+                        .requestMatchers("/api/**").authenticated()
+
+                        // any other request
                         .anyRequest().permitAll()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            // if unauthenticated user tries to visit a protected page,
+                            // send an instant HTTP 302 Found redirect to /login.html
+                            response.sendRedirect("/login.html");
+                        })
                 );
+
 
                 /* this tells Spring to actually construct the real security system cause before we were configuring the
         builder basically designing the security system blueprint. Everything before this line is configuration(instructions)

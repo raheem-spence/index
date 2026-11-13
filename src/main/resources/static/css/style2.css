@@ -3536,3 +3536,7 @@ dialog.modal-dialog:focus-visible {
     opacity: 0.90;
 }
 
+
+.note-detail-course {
+    grid-column: span 2;
+}

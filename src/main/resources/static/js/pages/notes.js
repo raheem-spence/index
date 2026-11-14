@@ -220,8 +220,8 @@ function renderAllNotesView(notesToRender) {
 
 function addNote(newNoteData) {
     const noteLi = document.createElement('li');
-    const noteDiv = document.createElement('a');
-    noteDiv.href = `/note-detail.html?id=${newNoteData.id}`;
+    const noteATag = document.createElement('a');
+    noteATag.href = `/note-detail.html?id=${newNoteData.id}`;
 
     const noteTitle = document.createElement('span');
     const noteOwnerClsDiv = document.createElement('div');
@@ -231,7 +231,7 @@ function addNote(newNoteData) {
 
     const noteTime = document.createElement('span');
 
-    noteDiv.classList.add('note-div');
+    noteATag.classList.add('note-a-tag');
     noteTitle.classList.add('note-title', 'truncate');
     noteOwner.classList.add('note-owner');
     noteTime.classList.add('note-time');
@@ -248,8 +248,8 @@ function addNote(newNoteData) {
 
     noteCourseDiv.append(noteCls, noteOwner)
     noteOwnerClsDiv.append(noteTitle, noteCourseDiv);
-    noteDiv.append(noteOwnerClsDiv, noteTime);
-    noteLi.append(noteDiv);
+    noteATag.append(noteOwnerClsDiv, noteTime);
+    noteLi.append(noteATag);
 
     return noteLi;
 }

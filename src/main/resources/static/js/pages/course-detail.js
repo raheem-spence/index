@@ -20,7 +20,8 @@ const COPY_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height
                         <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
                         </svg>`;
 
-let courseNotes = []
+let courseNotes = [];
+let courseData = null;
 let searchQuery = '';
 let joinCode = '';
 let leavingCourse = '';
@@ -34,7 +35,20 @@ function initailizeCourseDetailPage() {
     const queryString = window.location.search
     const urlParams = new URLSearchParams(queryString);
     const courseId = urlParams.get('id');
+    const from = urlParams.get('from');
+    
+    const backATag = document.getElementById('back-link');
+    const backDestination = document.getElementById('back-destination');
 
+    if (backATag && backDestination) {
+        if (from === 'dashboard') {
+            backATag.href = '/dashboard.html';
+            backDestination.textContent = 'Dashboard';
+        } else {
+            backATag.href = '/courses.html';
+            backDestination.textContent = 'All courses';
+        }
+    }
     if (!courseId) {
         showError('No course specified', `This link doesn't point to course. Head back to all courses and pick one from the list.`, 'no-course');
         return;
@@ -139,8 +153,8 @@ async function renderCourseDetail(courseId) {
         if (!courseDetails.data) {
             showError('Course not found', `This course may have been deleted, or the link is incorrect.`, 'no-course');
         }
+        courseData = courseDetails.data;
        
-
         if (!notes.data) return;
          
         if (!courseMembers.data) return;
@@ -148,7 +162,6 @@ async function renderCourseDetail(courseId) {
         const members = courseMembers.data;
         
         courseNotes = notes.data;
-        const courseData = courseDetails.data;
         leavingCourse = courseData.name;
 
         const courseMonogram = document.getElementById('course-monogram');
@@ -197,8 +210,8 @@ function renderNotesList(notesToRender) {
 
 function addNote(newNoteData) {
     const noteLi = document.createElement('li');
-    const noteDiv = document.createElement('a');
-    noteDiv.href = `/note-detail.html?id=${newNoteData.id}`;
+    const noteATag = document.createElement('a');
+    noteATag.href = `/note-detail.html?id=${newNoteData.id}`;
 
     const noteTitle = document.createElement('span');
     const noteOwnerClsDiv = document.createElement('div');
@@ -208,7 +221,7 @@ function addNote(newNoteData) {
 
     const noteTime = document.createElement('span');
 
-    noteDiv.classList.add('note-div');
+    noteATag.classList.add('note-a-tag');
     noteTitle.classList.add('note-title', 'truncate');
     noteOwner.classList.add('note-owner');
     noteTime.classList.add('note-time');
@@ -225,8 +238,8 @@ function addNote(newNoteData) {
 
     noteCourseDiv.append(noteCls, noteOwner)
     noteOwnerClsDiv.append(noteTitle, noteCourseDiv);
-    noteDiv.append(noteOwnerClsDiv, noteTime);
-    noteLi.append(noteDiv);
+    noteATag.append(noteOwnerClsDiv, noteTime);
+    noteLi.append(noteATag);
 
     return noteLi;
 }
@@ -428,7 +441,10 @@ function setUpOptionsDropDown() {
     });
 
     copyLinkBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(window.location.href);
+        if (!courseData?.joinCode) return;
+
+        const inviteLink = `${window.location.origin}/join.html?code=${formatJoinCode(courseData.joinCode)}`
+        navigator.clipboard.writeText(inviteLink);
         showToast('Invite link copied');
         menu.classList.add('hidden');
         trigger.setAttribute('aria-expanded', 'false');

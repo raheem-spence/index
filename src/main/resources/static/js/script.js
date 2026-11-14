@@ -78,7 +78,6 @@ function initializePopover() {
     const container = document.querySelector('.sidebar-user');
     const userBtn = document.getElementById('user-menu-btn');
     const popover = document.getElementById('user-popover');
-    const logoutBtn = document.getElementById('logout-btn');
 
     // if these elements arent on the page, do nothing
     if (!container || !userBtn || !popover) return;

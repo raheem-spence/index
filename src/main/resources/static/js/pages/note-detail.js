@@ -36,6 +36,20 @@ function initializeNoteDetailPage() {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
     const noteId = urlParams.get('id');
+    const from = urlParams.get('from');
+
+    const backATag = document.getElementById('back-link');
+    const backDestination = document.getElementById('back-destination');
+    
+    if (backATag && backDestination) {
+        if (from === 'dashboard') {
+            backATag.href = '/dashboard.html';
+            backDestination.textContent = 'Dashboard';
+        } else {
+            backATag.href = '/notes.html';
+            backDestination.textContent = 'All notes'
+        }
+    }
 
     if (!noteId) {
         showError('No note specified', `This link doesn't point to a note. Head back to all notes and pick one from the list.`, 'no-note');
@@ -47,7 +61,7 @@ function initializeNoteDetailPage() {
     initializeHelpfulButton();
     initializeCopyLinkButton();
     initializeEditActions();
-    intializeDeleteActions();
+    initializeDeleteActions();
     
 }
 
@@ -74,7 +88,7 @@ function initializeEditActions() {
     }
 }
 
-function intializeDeleteActions() {
+function initializeDeleteActions() {
     deleteBtn.addEventListener('click', showDeleteConfirmation);
 
     noDeleteBtn.addEventListener('click', hideDeleteConfirmation);

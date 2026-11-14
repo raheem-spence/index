@@ -707,7 +707,7 @@ dialog.modal-dialog:focus-visible {
     padding: 0.5em;
 }
 
-.note-div {
+.note-a-tag {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -720,7 +720,7 @@ dialog.modal-dialog:focus-visible {
     color: inherit;
 }
 
-.note-div:hover {
+.note-a-tag:hover {
     background-color: var(--bg-secondary);
 }
 

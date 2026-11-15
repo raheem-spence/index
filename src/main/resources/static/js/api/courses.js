@@ -1,4 +1,3 @@
-import { handleAuth } from "./auth.js";
 
 export async function fetchCourses() {
     try {
@@ -7,15 +6,6 @@ export async function fetchCourses() {
             method: 'GET',
             credentials: 'include'
         });
-
-        const result = handleAuth(response);
-
-        if (!result) {
-            return {
-                success: false,
-                status: 401
-            }
-        }
 
         // 2. check if response status is ok
         if (!response.ok) {
@@ -49,15 +39,6 @@ export async function fetchDashboardCourses() {
             credentials: 'include'
         });
 
-        const result = handleAuth(response);
-
-        if (!result) {
-            return {
-                success: false,
-                status: 401
-            }
-        }
-
         if (!response.ok) {
             return {
                 success: false,
@@ -87,15 +68,6 @@ export async function fetchCourseDetails(courseId) {
             credentials: 'include'
         });
 
-        const result = handleAuth(response);
-
-        if (!result) {
-            return {
-                success: false,
-                status: 401
-            }
-        }
-
         if (!response.ok) {
             return {
                 success: false,
@@ -124,15 +96,6 @@ export async function fetchCourseMembers(courseId) {
             method: 'GET',
             credentials: 'include'
         });
-
-        const result = handleAuth(response);
-
-        if (!result) {
-            return {
-                success: false,
-                status: 401
-            }
-        }
         
         if (!response.ok) {
             return {
@@ -167,15 +130,6 @@ export async function createCourse(courseName) {
             body: JSON.stringify(courseName)
         });
 
-        const result = handleAuth(response);
-
-        if (!result) {
-            return {
-                success: false,
-                status: 401
-            }
-        }
-
         if (!response.ok) {
             return {
                 success: false,
@@ -209,15 +163,6 @@ export async function joinCourse(joinCode) {
             body: JSON.stringify(joinCode)
         });
 
-        const result = handleAuth(response);
-
-        if (!result) {
-            return {
-                success: false,
-                status: 401
-            }
-        }
-
         if (!response.ok) {
             return {
                 success: false,
@@ -245,8 +190,6 @@ export async function leaveCourse(courseId) {
         method: 'DELETE',
         credentials: 'include'
     });
-
-    handleAuth(response);
 
     if (!response.ok) {
         throw new Error(`Failed to leave course: ${response.status}`);

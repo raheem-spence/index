@@ -1,4 +1,4 @@
-import { handleAuth } from "./auth.js";
+
 
 export async function loadDashboardNotes() {
     try {
@@ -8,14 +8,6 @@ export async function loadDashboardNotes() {
             credentials: 'include'
         });
 
-        const result = handleAuth(response);
-
-        if (!result) {
-            return {
-                success: false,
-                status: 401
-            }
-        }
 
         // 2. check if response is ok
         if (!response.ok) {
@@ -47,15 +39,6 @@ export async function loadAllUserAccessibleNotes() {
             credentials: 'include'
         });
 
-        const result = handleAuth(response);
-
-        if (!result) {
-            return {
-                success: false,
-                status: 401
-            }
-        }
-
         if (!response.ok) {
             return {
                 success: false,
@@ -85,15 +68,6 @@ export async function loadNotes(courseId) {
             method: 'GET',
             credentials: 'include'
         });
-
-        const result = handleAuth(response);
-
-        if (!result) {
-            return {
-                success: false,
-                status: 401
-            }
-        }
 
         // 2. check if response status is OK
         if (!response.ok) {
@@ -131,12 +105,6 @@ export async function createNote(courseId, noteData) {
             body: JSON.stringify(noteData) // converts JS object into a JSON string
         });
 
-        const result = handleAuth(response);
-
-        if (!result) {
-            return;
-        }
-
         if(!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -162,12 +130,6 @@ export async function updateNote(courseId, noteData, noteId) {
             body: JSON.stringify(noteData)
         });
 
-        const result = handleAuth(response);
-
-        if (!result) {
-            return;
-        }
-
         if (response.status === 403) {
             return false;
         }
@@ -190,12 +152,6 @@ export async function deleteNote(courseId, noteId) {
             method: 'DELETE',
             credentials: 'include'
         });
-
-        const result = handleAuth(response);
-
-        if (!result) {
-            return false;
-        }
 
         if (response.status === 403) {
             return false;

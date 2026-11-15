@@ -7,49 +7,57 @@ const errorDiv = document.getElementById('error-box');
 const loginForm = document.getElementById('login-form');
 const signupForm = document.getElementById('signup-form');
 
+const params = new URLSearchParams(window.location.search);
+const inviteCode = params.get('code');
+const targetUrl = inviteCode ? `/join.html?code=${encodeURIComponent(inviteCode)}` : '/dashboard.html';
+
 // Check if element exists, meaning we are on that page
 if (loginBtn) {
     // Add listener
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        errorDiv.classList.add('hidden');
-        loginBtn.disabled = true;
-        loginBtn.textContent = "Logging in...";
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorDiv.classList.add('hidden');
+            loginBtn.disabled = true;
+            loginBtn.textContent = "Logging in...";
 
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
 
-        try {
-            const response = await fetch("/auth/login", {
-                method: "POST",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                }),
+            try {
+                const response = await fetch("/auth/login", {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    }),
+                
+                });
+
+                if (response.ok) {
+                    window.location.href = targetUrl;
             
-            });
-
-            if (response.ok) {
-                window.location.href = "/dashboard.html";
-        
-            } else {
-                errorDiv.textContent = 'That email and password combination is incorrect.'
+                } else {
+                    errorDiv.textContent = 'That email and password combination is incorrect.'
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("LOGIN ERROR:", error);
+                errorDiv.textContent = 'Unable to connect. Please try again';
                 errorDiv.classList.remove('hidden');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Log in';
             }
-        } catch (error) {
-            console.error("LOGIN ERROR:", error);
-            errorDiv.textContent = 'Unable to connect. Please try again';
-            errorDiv.classList.remove('hidden');
-        } finally {
-            loginBtn.disabled = false;
-            loginBtn.textContent = 'Log in';
-        }
-    });
-} else if (signupForm) {
+        });
+    }
+}   
+
+if (signupForm) {
     signupForm.addEventListener('submit', async(e) => {
         e.preventDefault();
         errorDiv.classList.add('hidden');
@@ -82,7 +90,7 @@ if (loginBtn) {
 
         
             if (response.ok) {
-                window.location.href = "/dashboard.html";
+                window.location.href = targetUrl;
             } else {
                 const data = await response.json()
                 errorDiv.textContent = data.message || 'Unable to create account. Please try again.';

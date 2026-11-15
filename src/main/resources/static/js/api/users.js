@@ -1,4 +1,3 @@
-import { handleAuth } from "./auth.js";
 
 export async function fetchCurrentUser() {
     try {
@@ -6,15 +5,6 @@ export async function fetchCurrentUser() {
             method: 'GET',
             credentials: 'include'
         });
-
-        const result = handleAuth(response);
-
-        if (!result) {
-            return {
-                success: false,
-                status: 401
-            }
-        }
 
         if (!response.ok) {
             return {

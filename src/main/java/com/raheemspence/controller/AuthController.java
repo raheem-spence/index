@@ -1,6 +1,5 @@
 package com.raheemspence.controller;
 
-import com.raheemspence.config.SecurityConfig;
 import com.raheemspence.dto.request.LoginRequest;
 import com.raheemspence.dto.request.SignUpRequest;
 import com.raheemspence.dto.response.SignUpResponse;
@@ -39,8 +38,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request,
-                                   HttpServletResponse httpResponse,
-                                   HttpServletRequest httpRequest,
+                                   HttpServletResponse httpServletResponse,
+                                   HttpServletRequest httpServletRequest,
                                    HttpSession httpSession) {
 
         // verify user credentials
@@ -54,22 +53,35 @@ public class AuthController {
 
         // create an empty SecurityContext and pin the badge to it
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication((authToken));
+        context.setAuthentication(authToken);
 
         // save the SecurityContext into the session using Spring's repository
-        securityContextRepository.saveContext(context, httpRequest, httpResponse);
+        securityContextRepository.saveContext(context, httpServletRequest, httpServletResponse);
 
         return ResponseEntity.ok("Login successful");
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<SignUpResponse> signup(@RequestBody SignUpRequest request) {
+    public ResponseEntity<SignUpResponse> signup(@RequestBody SignUpRequest request,
+                                                 HttpSession httpSession,
+                                                 HttpServletRequest httpServletRequest,
+                                                 HttpServletResponse httpServletResponse) {
         SignUpResponse signUpResponse = authService.signup(request);
 
         if (signUpResponse.getStatus().equals("Error")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(signUpResponse);
         } else {
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(signUpResponse);
+            httpSession.setAttribute("userId",signUpResponse.getUserId());
+
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), null, List.of());
+
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(authToken);
+
+            securityContextRepository.saveContext(context, httpServletRequest, httpServletResponse);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(signUpResponse);
         }
     }
 

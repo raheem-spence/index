@@ -62,10 +62,11 @@ public class AuthService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
         signUpResponse.setStatus("Success");
         signUpResponse.setMessage("User created successfully");
+        signUpResponse.setUserId(savedUser.getId());
 
         return signUpResponse;
     }

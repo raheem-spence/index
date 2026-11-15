@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style2.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <title>Join a course — Index</title>
+</head>
+<body>
+    <main id="join-page-container" class="join-page-container">
+        <header class="join-page-header">
+            <a href="">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="28" height="28" aria-hidden="true">
+                    <!-- The teal rounded tile  -->
+                    <rect width="64" height="64" rx="15" fill="#006363" />
+                    
+                    <!-- The white lowercase "i" -->
+                    <path
+                      d="M72 92H281V442H82V534H389V92H568V0H72ZM275 713H387V607H275Z"
+                      transform="translate(14.05 52.00) scale(0.056101 -0.056101)"
+                      fill="#ffffff"
+                    />
+                  </svg>    
+                  <span>Index</span>          
+            </a>
+        </header>
+        <section class="join-page-section">
+            <p class="section-first-msg">COURSE INVITATION</p>
+            <h1 id="join-heading">Your classmates.
+                <br>
+                One shared space.
+            </h1>
+            <p class="section-second-msg" id="join-subhead">You've been invited to a course on Index. Join your classmates and keep your course materials together.</p>
+            <div class="invite-code-container">
+                <span class="invite-code-text">Invite code</span>
+                <span id="invite-code" class="join-invite-code"></span>
+            </div>
+            <div id="spinner-container" class="spinner-container">
+                <div id="spinner" class="spinner"></div>
+                <span>Getting your invitation ready...</span>
+            </div>
+            <div class="btn-actions" id="btn-actions">
+                <a href="/signup.html" id="create-accnt-a-tag"  class="create-accnt-a-tag">Create account to join
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                </a>
+                <a href="/login.html" id="login-a-tag" class="login-a-tag">Log in to join</a>
+                <p>Your invitation will be waiting after you log in.</p>
+            </div>
+            <a href="" id="home-btn" class="home-btn-a-tag hidden">Back to Index</a>
+            <a href="" class="back-link landing-page-a-tag" id="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left h-3.5 w-3.5" aria-hidden="true"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path>
+                </svg>
+                Back to Index</a>
+        </section>
+        <footer class="join-page-footer">Index · Your courses, together.</footer>
+    </main>
+    <script type="module" src="js/pages/join.js" defer></script>
+</body>
+</html>

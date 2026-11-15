@@ -123,6 +123,7 @@ public class SecurityConfig {
                                 "/index.html",
                                 "/login.html",
                                 "/signup.html",
+                                "/join.html",
                                 "/auth/**", // login, register endpoints
                                 "/css/**", // styles
                                 "/js/**", // scripts need for login
@@ -137,9 +138,6 @@ public class SecurityConfig {
                                 "/notes.html",
                                 "/create-note.html"
                         ).authenticated()
-
-                        // all API routes require authentication (except /auth/** above)
-                        .requestMatchers("/api/**").authenticated()
 
                         // any other request
                         .anyRequest().permitAll()

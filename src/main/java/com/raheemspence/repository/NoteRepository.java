@@ -9,8 +9,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface NoteRepository extends JpaRepository<Note, Long> {
-    List<Note> findByOwnerId(Long ownerId);
-
 
     List<Note> findByCourseIdOrderByUpdatedAtDesc(Long courseId);
 

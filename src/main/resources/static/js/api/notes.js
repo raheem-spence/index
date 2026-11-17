@@ -194,3 +194,29 @@ export async function fetchNoteById(noteId) {
     const notes = await allResponse.json();
     return notes.find(n => String(n.id) === String(noteId) || null);
 }
+
+export async function fetchReactionState(noteId) {
+    const response = await fetch(`/notes/${noteId}/reactions`, {
+        method: 'GET',
+        credentials: 'include'  
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to get reaction state: ${response.status}`);
+    }
+    
+    return await response.json();
+}
+
+export async function toggleReaction(noteId) {
+    const response = await fetch(`/notes/${noteId}/reactions`, {
+        method: 'POST',
+        credentials: 'include'
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to toggle reaction: ${response.status}`);
+    }
+
+    return await response.json();
+}

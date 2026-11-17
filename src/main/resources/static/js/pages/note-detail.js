@@ -1,5 +1,5 @@
 // imports (what helper functions or api calls we need?)
-import { deleteNote, fetchNoteById, updateNote } from "../api/notes.js";
+import { deleteNote, fetchNoteById, updateNote, fetchReactionState, toggleReaction } from "../api/notes.js";
 import { formatDate, showToast } from "../utilities.js"
 
 let currentNote = null;
@@ -58,7 +58,7 @@ function initializeNoteDetailPage() {
 
 
     renderNoteDetail(noteId);
-    initializeHelpfulButton();
+    initializeHelpfulButton(noteId);
     initializeCopyLinkButton();
     initializeEditActions();
     initializeDeleteActions();
@@ -259,10 +259,7 @@ function showError(mainMessage, helperMsg, type = 'no-note', retryFn = null) {
 }
 
 // helpful counter
-// default parameter feature: means expect a parameter called initialCount, if a value is passed use it, if nothing is passed (or undefined) fall back to zero
-// helpful later when i attach counts to notes and pass in the count from the backend
-// TODO: add helpful count to notes
-function initializeHelpfulButton(initialCount = 0) {
+async function initializeHelpfulButton(noteId) {
     // get DOM elements
     const helpfulBtnEl = document.getElementById('helpful-btn');
     const helpfulCountEl = document.getElementById('helpful-count');
@@ -270,27 +267,53 @@ function initializeHelpfulButton(initialCount = 0) {
     // if either element doesn't exist on the page, exit
     if (!helpfulBtnEl || !helpfulCountEl) return;
 
-    let count = initialCount;
-    let hasVoted = false;
+    // get reaction state to render initial state of button
+    try {
+        const reactionState = await fetchReactionState(noteId);
 
-    // initial rendering of the count
-    helpfulCountEl.textContent = count > 0 ? count : '';
-
-    helpfulBtnEl.addEventListener('click', () => {
-        if (!hasVoted) { 
-            count += 1
-            hasVoted = true;
+        if (reactionState.reacted) {
             helpfulBtnEl.classList.add('has-voted');
-
-        } else if (hasVoted && count > 0) {
-            count -= 1;
-            hasVoted = false;
+        } else {
             helpfulBtnEl.classList.remove('has-voted');
         }
 
-        helpfulCountEl.textContent = count > 0 ? count : '';
+        helpfulCountEl.textContent = reactionState.count;
+
+    } catch (error) {
+        console.error('Unable to get reaction state:', error);
+    }
+
+
+    let isPending = false;
+
+    helpfulBtnEl.addEventListener('click', async () => {
+
+        if (isPending) return;
+
+        try {
+            isPending = true;
+            helpfulBtnEl.disabled = true;
+            const toggleResponse = await toggleReaction(noteId);
+
+            
+            if (toggleResponse.reacted) {
+                helpfulBtnEl.classList.add('has-voted');
+            } else {
+                helpfulBtnEl.classList.remove('has-voted');
+            }
+
+            helpfulCountEl.textContent = toggleResponse.count;
+
+        } catch {
+            console.error('Unable to toggle reaction:', error);
+
+        } finally {
+            isPending = false;
+            helpfulBtnEl.disabled = false;
+        }
     })
 }
+
 // copy note button
 // copy link button
 function initializeCopyLinkButton() {

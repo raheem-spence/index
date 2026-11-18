@@ -1,6 +1,8 @@
 import { loadAllUserAccessibleNotes } from "../api/notes.js";
-import { loadCurrentUser } from "../script.js";
+import { loadCurrentUser, initializeSaveNoteButton } from "../script.js";
 import { formatRelativeTime } from "../utilities.js";
+
+const BOOKMARK = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2 2 0 0 1 2 2v15a1 1 0 0 1-1.496.868l-4.512-2.578a2 2 0 0 0-1.984 0l-4.512 2.578A1 1 0 0 1 5 20V5a2 2 0 0 1 2-2z"></path></svg>`;
 
 const noteList = document.getElementById('note-list');
 
@@ -220,6 +222,8 @@ function renderAllNotesView(notesToRender) {
 
 function addNote(newNoteData) {
     const noteLi = document.createElement('li');
+    noteLi.classList.add('note-list-element');
+
     const noteATag = document.createElement('a');
     noteATag.href = `/note-detail.html?id=${newNoteData.id}`;
 
@@ -228,6 +232,14 @@ function addNote(newNoteData) {
     const noteCourseDiv = document.createElement('div');
     const noteOwner = document.createElement('span');
     const noteCls = document.createElement('span');
+
+    const saveNoteBtn = document.createElement('button');
+    saveNoteBtn.type = 'button';
+    const bookmarkSvgContainer = document.createElement('div');
+    bookmarkSvgContainer.innerHTML = BOOKMARK;
+
+    saveNoteBtn.appendChild(bookmarkSvgContainer);
+    saveNoteBtn.classList.add('save-note-btn');
 
     const noteTime = document.createElement('span');
 
@@ -249,8 +261,10 @@ function addNote(newNoteData) {
     noteCourseDiv.append(noteCls, noteOwner)
     noteOwnerClsDiv.append(noteTitle, noteCourseDiv);
     noteATag.append(noteOwnerClsDiv, noteTime);
-    noteLi.append(noteATag);
+    noteLi.append(noteATag, saveNoteBtn);
 
+    initializeSaveNoteButton(saveNoteBtn, newNoteData.id)
+    
     return noteLi;
 }
 

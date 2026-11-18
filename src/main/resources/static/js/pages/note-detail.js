@@ -1,5 +1,6 @@
 // imports (what helper functions or api calls we need?)
 import { deleteNote, fetchNoteById, updateNote, fetchReactionState, toggleReaction } from "../api/notes.js";
+import { initializeSaveNoteButton } from "../script.js";
 import { formatDate, showToast } from "../utilities.js"
 
 let currentNote = null;
@@ -24,6 +25,8 @@ const noteTitle = document.getElementById('note-title');
 
 const noteBody = document.getElementById('note-body');
 const editTextArea = document.getElementById('edit-textarea');
+
+const saveNoteBtn = document.getElementById('save-note-btn');
 
 // event listener for when the DOMContentLoaded so when the HTML parser has finished loading the DOM tree except images, css styles
 // helps so we dont access an element that isn't on the page yet and get null
@@ -59,7 +62,7 @@ function initializeNoteDetailPage() {
 
     renderNoteDetail(noteId);
     initializeHelpfulButton(noteId);
-    initializeCopyLinkButton();
+    initializeSaveNoteButton(saveNoteBtn, noteId)
     initializeEditActions();
     initializeDeleteActions();
     
@@ -312,24 +315,6 @@ async function initializeHelpfulButton(noteId) {
             helpfulBtnEl.disabled = false;
         }
     })
-}
-
-// copy note button
-// copy link button
-function initializeCopyLinkButton() {
-    const copyLinkBtnEl = document.getElementById('copy-link-btn');
-
-    if (!copyLinkBtnEl) return;
-
-    copyLinkBtnEl.addEventListener('click', async () => {
-        try {
-            await navigator.clipboard.writeText(window.location.href);
-            showToast('Link copied to clipboard')
-        } catch (error) {
-            console.error('Failed to copy link:', error);
-            showToast('Failed to copy link', 'error');
-        }
-    });
 }
 
 function enterEditMode(currentNote) {

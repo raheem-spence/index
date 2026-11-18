@@ -2,6 +2,7 @@ import { fetchCurrentUser } from "./api/users.js";
 import { fetchCourses, joinCourse, createCourse } from "./api/courses.js";
 import { getCourseInitials, showToast } from "./utilities.js";
 import { logoutUser } from "./api/auth.js";
+import { fetchSavedNoteState, toggleSaveNote } from "./api/notes.js";
 
 // wait until the browser is done parsing all html elements before running scripts,
 // preventing 'null' errors when looking up DOM ids like buttons and inputs
@@ -756,4 +757,70 @@ function getCreateCourseError(courseRequest) {
     return null;
 }
 
+
+export async function initializeSaveNoteButton(buttonElement, noteId, initialSaved = null, onToggle = null) {
+    let isSaved = Boolean(initialSaved); // false is null or false, true if true
+    let isPending = false;
+
+    const textEl = buttonElement.querySelector('.save-btn-text');
+
+    function updateUI(saved) {
+        // update svg/classes
+        if (textEl) {
+            textEl.textContent = saved ? 'Saved' : 'Save';
+            textEl.classList.toggle('saved', saved);
+        }
+
+        buttonElement.classList.toggle('saved-note', saved);
+    }
+    
+
+    updateUI(isSaved);
+
+    // initial render
+    
+
+    if (initialSaved === null) {
+        try {
+            const data = await fetchSavedNoteState(noteId);
+            isSaved = data.saved;
+            updateUI(isSaved);
+        } catch (error) {
+            console.error('Unable to fetch saved note state:', error);
+        }
+    }
+
+    buttonElement.addEventListener('click', async (e) => {
+        console.log('clicked')
+        e.preventDefault();
+        e.stopPropagation(); // prevent bubbling up to opening the note card
+
+        // dont allow a request to get through again after initial request from button click
+        if (isPending) return;
+        
+        isPending = true;
+        buttonElement.disabled = true;
+
+        try {
+            const data = await toggleSaveNote(noteId);
+            isSaved = data.saved;
+            updateUI(isSaved);
+
+            if (isSaved) {
+                showToast('Note saved');
+            } else {
+                showToast('Removed from saved')
+            }
+
+            if (typeof onToggle === 'function') {
+                onToggle(noteId, isSaved);
+            }
+        } catch (error) {
+            console.error('Unable to save note:', error);
+        } finally {
+            isPending = false;
+            buttonElement.disabled = false;
+        }
+    });
+}
 

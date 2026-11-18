@@ -19,6 +19,8 @@ public interface SavedNoteRepository extends JpaRepository<SavedNote, SavedNoteI
             "JOIN FETCH n.course " +
             "JOIN FETCH n.owner " +
             "WHERE s.userId = :userId " +
+            "AND EXISTS (SELECT 1 FROM CourseMembership cm WHERE cm.course.id = n.course.id " +
+            "AND cm.user.id = :userId) "+
             " ORDER BY s.createdAt DESC")
     List<SavedNote> findByUserIdWithNotes(@Param("userId") Long userId);
 }

@@ -220,3 +220,42 @@ export async function toggleReaction(noteId) {
 
     return await response.json();
 }
+
+export async function fetchSavedNoteState(noteId) {
+    const response = await fetch(`/notes/${noteId}/save`, {
+        method: 'GET',
+        credentials: 'include'
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to get saved note state: ${response.status}`);
+    }
+
+    return await response.json();
+}
+
+export async function fetchSavedNotes() {
+    const response = await fetch('/notes/saved', {
+        method: 'GET',
+        credentials: 'include'
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to get saved notes: ${response.status}`);
+    }
+
+    return await response.json();
+}
+
+export async function toggleSaveNote(noteId) {
+    const response = await fetch(`/notes/${noteId}/save`, {
+        method: 'POST',
+        credentials: 'include'
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to toggle save note: ${response.status}`);
+    }
+
+    return await response.json();
+}

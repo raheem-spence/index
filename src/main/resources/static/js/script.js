@@ -7,6 +7,22 @@ import { fetchSavedNoteState, toggleSaveNote } from "./api/notes.js";
 // wait until the browser is done parsing all html elements before running scripts,
 // preventing 'null' errors when looking up DOM ids like buttons and inputs
 document.addEventListener('DOMContentLoaded', () => {
+    // // get current pathname
+    // const currentPath = window.location.pathname;
+
+    // const sidebarLinks = document.querySelectorAll('.nav-link');
+
+    // sidebarLinks.forEach((link) => {
+    //     // convert link.href into a URL object to reliably extract pathname
+    //     const linkPath = new URL(link.href).pathname;
+
+    //     if (linkPath === currentPath) {
+    //         link.classList.add('active');
+    //     } else {
+    //         link.classList.remove('active');
+    //     }
+    // })
+
     // check if a previous page left a toast
     const pendingToast = sessionStorage.getItem('pendingToast');
     if (pendingToast) {

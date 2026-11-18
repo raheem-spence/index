@@ -225,6 +225,11 @@ aside{
     color: var(--nav-active-text);
 }
 
+.nav-link.active:hover {
+    background-color: var(--nav-active-bg);
+    color: var(--nav-active-text);
+}
+
 .nav-link:hover {
     background-color: var(--bg-secondary);
     color: var(--text-primary);

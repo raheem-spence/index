@@ -13,4 +13,5 @@ public class NoteReactionId implements Serializable {
 
     private Long noteId;
     private Long userId;
+
 }

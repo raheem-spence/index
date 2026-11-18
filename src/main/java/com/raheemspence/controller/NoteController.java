@@ -2,10 +2,13 @@ package com.raheemspence.controller;
 
 import com.raheemspence.dto.request.NoteRequest;
 import com.raheemspence.dto.response.NoteResponse;
+import com.raheemspence.model.Note;
 import com.raheemspence.service.NoteService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 
 import java.util.List;
@@ -44,6 +47,17 @@ public class NoteController {
         }
 
         return noteService.getRecentNotes(userId);
+    }
+
+    @GetMapping("/notes/{noteId}")
+    public NoteResponse getNoteById(@PathVariable Long noteId, HttpSession httpSession) {
+        Long userId = (Long) httpSession.getAttribute("userId");
+
+        if (userId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is unauthorized");
+        }
+
+        return noteService.getNoteById(noteId);
     }
 
     @GetMapping("/{courseId}/notes")

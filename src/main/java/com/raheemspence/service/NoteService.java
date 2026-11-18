@@ -100,6 +100,26 @@ public class NoteService {
         return recentNotesResponse;
     }
 
+    public NoteResponse getNoteById(Long noteId) {
+        Note note = noteRepository.findById(noteId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note not found"));
+
+        NoteResponse noteResponse = new NoteResponse();
+
+        noteResponse.setTitle(note.getTitle());
+        noteResponse.setContent(note.getContent());
+        noteResponse.setId(note.getId());
+        noteResponse.setCourseId(note.getCourse().getId());
+        noteResponse.setCourseName(note.getCourse().getName());
+        noteResponse.setOwnerFirstName(note.getOwner().getFirstName());
+        noteResponse.setOwnerLastName(note.getOwner().getLastName());
+        noteResponse.setCreatedAt(note.getCreatedAt());
+        noteResponse.setUpdatedAt(note.getUpdatedAt());
+        noteResponse.setOwnerId(note.getOwner().getId());
+
+        return noteResponse;
+    }
+
     public List<NoteResponse> getNotesByCourseId(Long userId, Long courseId) {
         // Check if user is a member of the course
         if (!courseMembershipRepository.existsByUserIdAndCourseId(userId, courseId)) {

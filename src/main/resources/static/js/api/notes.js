@@ -170,29 +170,17 @@ export async function deleteNote(courseId, noteId) {
 }
 
 export async function fetchNoteById(noteId) {
-    
-    try {
-        const response = await fetch(`/notes/${noteId}`);
-        if (response.ok) {
-            return await response.json();
+
+        const response = await fetch(`/courses/notes/${noteId}`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch note: ${response.ok}`);
         }
-    } catch (error) {
-        console.info("Direct endpoint not available, falling back to note collection.");
-    }
 
-    // fallback: endpoint isnt deployed yet
-    // fetch all notes and find it (keeps testing going)
-    const allResponse = await fetch('/courses/notes/all', {
-        method: 'GET',
-        credentials: 'include'
-    });
-
-    if (!allResponse.ok) {
-        throw new Error(`Failed to fetch notes: ${allResponse.status}`);
-    }
-
-    const notes = await allResponse.json();
-    return notes.find(n => String(n.id) === String(noteId) || null);
+        return await response.json();   
 }
 
 export async function fetchReactionState(noteId) {

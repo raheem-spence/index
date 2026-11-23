@@ -15,8 +15,6 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     Optional<Course> findByJoinCode(String joinCode);
 
-    List<Course> findByCreatorId(Long creatorId);
-
     @Query("SELECT c FROM Course c JOIN CourseMembership cm on cm.course = c WHERE cm.user.id = :userId ORDER BY cm.joinedAt DESC")
     List<Course> findAccessibleCoursesByUserId(@Param("userId") Long userId, Pageable pageable);
 

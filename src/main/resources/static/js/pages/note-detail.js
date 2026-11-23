@@ -1,9 +1,25 @@
 // imports (what helper functions or api calls we need?)
 import { deleteNote, fetchNoteById, updateNote, fetchReactionState, toggleReaction } from "../api/notes.js";
 import { initializeSaveNoteButton } from "../script.js";
-import { formatDate, showToast } from "../utilities.js"
+import { formatDate, showToast, formatFileSize} from "../utilities.js"
+import { fetchAttachments, deleteAttachment, uploadAttachment } from "../api/noteAttachments.js";
+
+const MAX_FILES = 5;
+const MAX_FILE_SIZE_BTYES = 25 * 1024 * 1024;
+
+// MIME (Multipurpose Internet Mail Extension) types are the univeral internet standards for file types
+const ALLOWED_MIME_TYPES = [
+    'application/pdf',
+    'image/png',
+    'image/jpeg',
+    'image/webp'
+];
+
 
 let currentNote = null;
+let stagedFiles = [];
+const stagedDeletions = new Set();
+let currentAttachmentCount = 0;
 
 const viewActions = document.getElementById('view-actions');
 const editActions = document.getElementById('edit-actions');
@@ -25,6 +41,10 @@ const noteTitle = document.getElementById('note-title');
 
 const noteBody = document.getElementById('note-body');
 const editTextArea = document.getElementById('edit-textarea');
+
+const noteAttachmentsEl = document.getElementById('note-attachments');
+const attachmentsGridEl = document.getElementById('attachments-grid');
+
 
 const saveNoteBtn = document.getElementById('save-note-btn');
 
@@ -63,10 +83,13 @@ function initializeNoteDetailPage() {
 
 
     renderNoteDetail(noteId);
+    loadAndRenderAttachments(noteId);
     initializeHelpfulButton(noteId);
     initializeSaveNoteButton(saveNoteBtn, noteId)
     initializeEditActions();
     initializeDeleteActions();
+    initializeAttachmentsActions();
+    setUpAttachments();
     
 }
 
@@ -136,9 +159,6 @@ async function renderNoteDetail(noteId) {
         const modificationEl = document.getElementById('note-modification');
         const dateEl = document.getElementById('note-date');
         const noteCourseLinkEl = document.getElementById('note-course-link');
-
-        // attachments
-        const attachmentsGridEl = document.getElementById('note-attachments-grid');
        
 
         // .filter(Boolean) strips out empty string, undefined, null, 0 
@@ -321,6 +341,13 @@ async function initializeHelpfulButton(noteId) {
 }
 
 function enterEditMode(currentNote) {
+    // find all buttons and remove hidden class to show delete button
+    const deleteBtns = document.querySelectorAll('.attachment-delete-btn');
+
+    deleteBtns.forEach((button) => {
+        button.classList.remove('hidden');
+    })
+
     // swap the h1 to input (prefilled with current content)
     if (!editInput) return;
 
@@ -349,6 +376,14 @@ function enterEditMode(currentNote) {
 }
 
 function exitEditMode(editActions, viewActions, editInput, noteTitle, footer, dropzoneSection, currentNote) {
+    stagedDeletions.clear();
+    stagedFiles = [];
+
+    const listElement = document.getElementById('staged-files-list');
+    if (listElement) listElement.innerHTML = '';
+
+    loadAndRenderAttachments(currentNote.id);
+
     editActions.classList.add('hidden');
     viewActions.classList.remove('hidden');
 
@@ -378,7 +413,7 @@ async function handleSaveNote(currNote, editedTitle, editedContent, saveChangesB
     }
 
     // if changes are identical to original note
-    if (currNote.title === editedTitle && currNote.content === editedContent) {
+    if (currNote.title === editedTitle && currNote.content === editedContent && stagedDeletions.size === 0 && stagedFiles.length === 0) {
         console.log('no changes!');
         exitEditMode(editActions, viewActions, editInput, noteTitle, footer, dropzoneSection, currNote);
         return;
@@ -402,8 +437,23 @@ async function handleSaveNote(currNote, editedTitle, editedContent, saveChangesB
             return;
         }
 
+        if (stagedDeletions.size > 0) {
+            for (const attachmentId of stagedDeletions) {
+                await deleteAttachment(currNote.id, attachmentId);
+            }
+        }
+
+        for (const file of stagedFiles) {
+            await uploadAttachment(currNote.id, file);
+        }
+
+        stagedFiles = [];
+
+        stagedDeletions.clear();
+
         saveChangesBtn.disabled = false;
         saveChangesBtn.textContent = 'Save changes';
+
 
         setTimeout(() => {
             showToast('Note changes saved');
@@ -456,4 +506,328 @@ function getCurrentUser() {
     } catch {
         return null;
     }
+}
+
+async function loadAndRenderAttachments(noteId) {
+    
+    try {
+
+        const attachments = await fetchAttachments(noteId);
+        attachmentsGridEl.replaceChildren();
+
+        if (!attachments || attachments.length === 0) {
+            noteAttachmentsEl.classList.add('hidden');
+            return;
+        }
+        console.log(attachments);
+        noteAttachmentsEl.classList.remove('hidden');
+
+        attachments.forEach((attachment) => {
+            const attachmentLinkContainer = document.createElement('div');
+            attachmentLinkContainer.classList.add('attachment-link-container');
+
+            const isImage = attachment.contentType && attachment.contentType.startsWith('image/');
+            const isPDF = attachment.contentType && attachment.contentType === 'application/pdf';
+
+            if (isImage) {
+                const imgEl = document.createElement('img');
+                imgEl.classList.add('img-el');
+                imgEl.loading = 'lazy';
+                imgEl.src = `${attachment.downloadUrl}`;
+                attachmentLinkContainer.append(imgEl);
+            } else if (isPDF) {
+                const pdfDiv = document.createElement('div');
+                pdfDiv.classList.add('pdf-div');
+                pdfDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>`;
+                attachmentLinkContainer.append(pdfDiv);
+            } else {
+                const fileDiv = document.createElement('div');
+                fileDiv.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                        <polyline points="14 2 14 8 20 8" />
+                                    </svg>`;
+                attachmentLinkContainer.append(fileDiv);
+            }
+
+            const attachmentLink = document.createElement('a');
+            const attachmentName = document.createElement('span');
+            attachmentName.classList.add('attachment-link-name', 'truncate');
+
+            const attachmentMetaData = document.createElement('span');
+            attachmentMetaData.classList.add('attachment-link-meta-data');
+
+            const attachmentDeleteBtn = document.createElement('button');
+            attachmentDeleteBtn.type = 'button';
+            attachmentDeleteBtn.dataset.id = attachment.id;
+            attachmentDeleteBtn.classList.add('attachment-delete-btn', 'hidden');
+            attachmentDeleteBtn.setAttribute('aria-label', 'Remove attachment');
+            const trashSvgContainer = document.createElement('div');
+            trashSvgContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                                            fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                            </svg>`;
+            attachmentDeleteBtn.append(trashSvgContainer);
+
+            attachmentLink.href = `${attachment.downloadUrl}`;
+            attachmentLink.target ="_blank";
+            attachmentLink.rel = "noopener noreferrer";
+            attachmentName.textContent = attachment.fileName;
+            attachmentMetaData.textContent = (attachment.contentType.split('/')[1]?.toUpperCase() || 'FILE') + " · " + formatFileSize(attachment.fileSize);
+            
+            attachmentLink.append(attachmentName, attachmentMetaData);
+            attachmentLinkContainer.append(attachmentLink, attachmentDeleteBtn);
+            attachmentsGridEl.append(attachmentLinkContainer);
+        });
+
+        currentAttachmentCount = attachments.length;
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+function initializeAttachmentsActions() {
+    attachmentsGridEl.addEventListener('click', (e) => {
+        const deleteBtn = e.target.closest('.attachment-delete-btn');
+        if (!deleteBtn) return;
+
+        const attachmentCard = deleteBtn.closest('.attachment-link-container');
+
+        const attachmentId = Number(deleteBtn.dataset.id);
+
+        if (stagedDeletions.has(attachmentId)) {
+            stagedDeletions.delete(attachmentId);
+            attachmentCard.classList.remove('staged-for-delete');
+            // change icon back to trash
+            deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+            fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 11v6"/><path d="M14 11v6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>`;
+            deleteBtn.setAttribute('aria-label', 'Remove attachment');
+        } else {
+            stagedDeletions.add(attachmentId);
+            attachmentCard.classList.add('staged-for-delete');
+            // change icon to undo icon
+            deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-undo preview-icon"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>`;
+            deleteBtn.setAttribute('aria-label', 'Undo remove attachment');
+        }
+
+        console.log(stagedDeletions);
+    })
+}
+
+function setUpAttachments() {
+    const fileInput = document.getElementById('note-file-input');
+    const dropzone = document.getElementById('dropzone');
+
+    if (!fileInput || !dropzone) return;
+
+    // Native click / file picker
+    // note: a form control is any HTML element designed to collect user input inside a form:
+    // - <input> (text, checkbox, radio, file, number, date)
+    // - <textarea>
+    // - <select>
+    // each control has a value, here <input type="file"> value is a string representation of the
+    // selected file path (browsers mask it)
+    // change event fires when a form's control value has been modified and finalized by the user
+    // e.g. on text input when you type something then click outside
+    // e.g. on file input it fires when the OS file picker closes
+    fileInput.addEventListener('change', (e) => {
+        // remember e.target is the element that triggered the event so the input type="file" element
+        // file inputs have a special property called .files
+        // note: it does not give you the file path on the hard drive
+        // browsers block that for privacy and security so websites can't spy on user's folder names
+        // however it retunrs a browser data structure containing File objects where each gives you
+        // - file.name (e.g. "lecture-notes.pdf")
+        // - file.size (in bytes, e.g. 1048676 for 1 MB)
+        // - file.type (the MIME type, e.g. "application/pdf")
+        // - file.lastModified (timestamp of when it was saved)
+        if (e.target.files && e.target.files.length > 0) {
+            // e.target.files looks like an array but is not. Its a FileList which is "array-like"
+            // it has a .length and you can access items with brackets but it does not have array methods
+            // like .forEach(), .map(), .filter(), .some()
+            // Array.from() takes an array-like structure and converts it into a real, modern JS array
+            // where you can unlock standard array methods
+            handleFilesAdded(Array.from(e.target.files));
+        }
+
+        // reset input value so re-selecting a file with the same name triggers 'change' again 
+        fileInput.value = '';
+    });
+
+    // Drag and drop
+    // browsers natively open files on drop (e.g.  replacing the tab with a PDF)
+    // preventDefault() on both 'dragover' and 'drop' is mandatory to stop that behavior
+    // dragover fires continuously (every few ms) as long as the dragged file is hovering inside
+    // the dropzone boundaries
+    dropzone.addEventListener('dragover', (e) => {
+        // by default, browsers reject drops on almost all HTML elements so we need to tell the browser
+        // not to reject
+        e.preventDefault();
+        dropzone.classList.add('drag-over');
+    });
+
+    // dragleave fires once the cursor leaves the dropzone area without letting go of the mouse button
+    dropzone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('drag-over');
+    })
+
+    // drop fires the instant the user releases the mouse button while inside the dropzone
+    dropzone.addEventListener('drop', (e) => {
+        // this prevents the browsers default behavior of navigating away form the page 
+        // and opening the dropped image or PDF right in the browser tab, destroying whatever note
+        // the user was typing
+        e.preventDefault();
+        dropzone.classList.remove('drag-over');
+
+        // e.dataTranser.files contains the FileList dropped fomr the OS desktop/finder
+        // when you drag something in you OS, the OS creates and invisible "clipboard in flight" 
+        // called a DataTransfer object
+        // the browser exposes that object through e.dataTransfer through drap and drop events
+        // when you click the labl and use the OS file dialog: files live on the e.target.files
+        // when you drag a file from the desktop or Finder window: files live on the e.dataTransfer.files
+        if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
+            handleFilesAdded(Array.from(e.dataTransfer.files));
+        }
+    });
+
+    // keyboard accessibility for <label tabindex="0">
+    dropzone.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            fileInput.click();
+        }
+    });
+}
+
+function handleFilesAdded(incomingFiles) {
+    // .forEach(element, index, array) 
+    // the first element is the current item being processed in this loop iteration
+    // the second argument is the numeric position of that item in the array starting at 0
+    // the third argument is rarely need but is a reference to the entire original array itself
+    // JS closures???
+
+    incomingFiles.forEach(file => {
+
+        // validation 1: check max count limit
+        if (currentAttachmentCount - stagedDeletions.size + stagedFiles.length >= MAX_FILES) {
+            showToast('Maximum 5 files per note', 'info');
+            return;
+        }
+        // validation 2: size limit (25 MB)
+        if (file.size > MAX_FILE_SIZE_BTYES) {
+            showToast(`"${file.name}" exceeds the 25 MB limit.`, 'info');
+            return;
+        }
+
+        // validation 3: file type check
+        if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+            showToast(`"${file.name}" is not supported. Use PDF, PNG, or JPEG.`, 'info');
+            return;
+        }
+
+        // validation 4: duplicate check (matches name, byte size, and last modified timestamp)
+        // .some() is an array method that asks "does at least one item in this array meet this condition"
+        // it tests each item one by one and the second it finds one math that returns true, it stops checking
+        // and returns true.
+        // if all items have zero matches, it returns false
+        const isDuplicate = stagedFiles.some((existing) => 
+            existing.name === file.name &&
+            existing.size === file.size &&
+            existing.lastModified === file.lastModified
+        );
+
+        if (isDuplicate) {
+            showToast(`"${file.name}" is already attached`, 'info');
+            return;
+        }
+
+        // passed all validation checks, stage it
+        stagedFiles.push(file);
+    });
+
+    renderStagedFiles();
+}
+
+function renderStagedFiles() {
+
+    if (stagedFiles.length > 0) {
+        noteAttachmentsEl.classList.remove('hidden');
+    } else if (currentAttachmentCount === 0) {
+        noteAttachmentsEl.classList.add('hidden');
+    }
+
+    attachmentsGridEl.querySelectorAll('.staged-card').forEach(el => el.remove());
+    console.log(stagedFiles);
+    stagedFiles.forEach((file, index) => {
+
+        const attachmentLinkContainer = document.createElement('div');
+        attachmentLinkContainer.classList.add('attachment-link-container', 'staged-card');
+        
+
+        const isImage = file.type && file.type.startsWith('image/');
+        const isPDF = file.type && file.type === 'application/pdf';
+
+        if (isImage) {
+            const imgEl = document.createElement('img');
+            imgEl.classList.add('img-el');
+            imgEl.loading = 'lazy';
+            imgEl.src = URL.createObjectURL(file);
+            attachmentLinkContainer.append(imgEl);
+        } else if (isPDF) {
+            const pdfDiv = document.createElement('div');
+            pdfDiv.classList.add('pdf-div');
+            pdfDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>`;
+            attachmentLinkContainer.append(pdfDiv);
+        } else {
+            const fileDiv = document.createElement('div');
+            fileDiv.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                </svg>`;
+            attachmentLinkContainer.append(fileDiv);
+        }
+
+        const attachmentLink = document.createElement('a');
+        const attachmentName = document.createElement('span');
+        attachmentName.classList.add('attachment-link-name', 'truncate');
+
+        const attachmentMetaData = document.createElement('span');
+        attachmentMetaData.classList.add('attachment-link-meta-data');
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.classList.add('remove-file-btn');
+        removeBtn.setAttribute('aria-label', `Remove ${file.name}`);
+
+        const removeSvgContainer = document.createElement('div');
+        removeSvgContainer.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>`;
+        removeBtn.append(removeSvgContainer);
+
+        attachmentLink.href = URL.createObjectURL(file);
+        attachmentLink.target ="_blank";
+        attachmentLink.rel = "noopener noreferrer";
+        attachmentName.textContent = file.name;
+        attachmentMetaData.textContent = (file.type.split('/')[1]?.toUpperCase() || 'FILE') + " · " + formatFileSize(file.size);
+        
+        attachmentLink.append(attachmentName, attachmentMetaData);
+        attachmentLinkContainer.append(attachmentLink, removeBtn);
+        attachmentsGridEl.append(attachmentLinkContainer);
+
+        // scoped event listener 
+        // "scoped" means the listener is attached directly to the specific button created inside this
+        // particulr loop iteration for this specific file
+        // the whole document isnt searched because the li was created in memory
+        removeBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // prevent clicking row from doing anything else
+            // .splice(startIndex, deleteCount) modifies an array in-place by removing, replacing, or adding items
+            stagedFiles.splice(index, 1);
+            renderStagedFiles();
+        });
+
+    });
 }

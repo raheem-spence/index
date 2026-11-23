@@ -2788,6 +2788,12 @@ dialog.modal-dialog:focus-visible {
     border: none;
 }
 
+.attachments-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
 .attachments-section {
     margin-top: 32px;
     padding-top: 24px;
@@ -2926,7 +2932,7 @@ dialog.modal-dialog:focus-visible {
     flex-shrink: 0;
 }
 
-.remove-file-btn {
+.remove-file-btn, .attachment-delete-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -2943,10 +2949,6 @@ dialog.modal-dialog:focus-visible {
     transition: color 0.15s ease, background-color 0.15s ease;
 }
 
-.remove-file-btn:hover {
-    color: var(--text-primary);
-    background-color: var(--bg-secondary);
-}
 
 .remove-file-btn:focus-visible {
     outline: none;
@@ -3825,4 +3827,87 @@ dialog.modal-dialog:focus-visible {
 
 .font-semibold {
     font-weight: 600;
+}
+
+.attachment-link-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    gap: 8px;
+}
+
+.attachment-link-container:hover {
+    background-color: var(--bg-secondary);
+}
+
+.attachment-link-container a {
+    display: inline-flex;
+    flex-direction: column;
+    text-decoration: none;
+    width: 100%;
+    min-width: 0;
+}
+
+.attachment-link-name {
+    font-family: inherit;
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: .875rem;
+    line-height: calc(1.25 / 0.875);
+    cursor: pointer;
+}
+
+.attachment-link-meta-data {
+    font-family: inherit;
+    color: var(--muted-foreground);
+    font-size: .75rem;
+    line-height: calc(1 / 0.75);
+}
+
+.pdf-div {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    height: 40px;
+    width: 40px;
+    color: var(--muted-foreground);
+    background-color: var(--secondary);
+    flex-shrink: 0;
+}
+
+.img-el {
+    flex-shrink: 0;
+    object-fit: cover;
+    height: 40;
+    width: 40;
+    border-radius: 6px;
+}
+
+.attachment-delete-btn:hover, .remove-file-btn:hover {
+    background-color: oklch(.935 .004 220);
+    color: var(--text-primary);
+}
+
+.staged-for-delete a, .staged-for-delete img {
+    pointer-events: none;
+    opacity: 0.45;
+}
+
+.note-attachment-data {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+}
+
+.note-attachment-count {
+    font-size: .75rem;
+    color: var(--muted-foreground);
 }

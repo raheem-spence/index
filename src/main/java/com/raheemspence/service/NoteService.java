@@ -5,10 +5,7 @@ import com.raheemspence.dto.response.NoteResponse;
 import com.raheemspence.model.Course;
 import com.raheemspence.model.Note;
 import com.raheemspence.model.User;
-import com.raheemspence.repository.CourseMembershipRepository;
-import com.raheemspence.repository.CourseRepository;
-import com.raheemspence.repository.NoteRepository;
-import com.raheemspence.repository.UserRepository;
+import com.raheemspence.repository.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,8 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class NoteService {
@@ -26,19 +22,40 @@ public class NoteService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final CourseMembershipRepository courseMembershipRepository;
+    private final NoteAttachmentRepository noteAttachmentRepository;
 
     public NoteService(NoteRepository noteRepository,
                        UserRepository userRepository,
                        CourseRepository courseRepository,
-                       CourseMembershipRepository courseMembershipRepository) {
+                       CourseMembershipRepository courseMembershipRepository,
+                       NoteAttachmentRepository noteAttachmentRepository) {
         this.noteRepository = noteRepository;
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
         this.courseMembershipRepository = courseMembershipRepository;
+        this.noteAttachmentRepository = noteAttachmentRepository;
     }
 
     public List<NoteResponse> getAllNotes(Long userId) {
         List<Note> allNotes = noteRepository.findAllNotesAccessibleByUser(userId);
+
+        if (allNotes.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Long> noteIds = new ArrayList<>();
+        for (Note note : allNotes) {
+            noteIds.add(note.getId());
+        }
+
+        List<Object[]> results = noteAttachmentRepository.countAttachmentsByNoteIds(noteIds);
+
+        Map<Long, Long> attachmentCountMap = new HashMap<>();
+        for (Object[] row : results) {
+            Long noteId = (Long) row[0];
+            Long count = (Long) row[1];
+            attachmentCountMap.put(noteId, count);
+        }
 
         List<NoteResponse> allNotesResponse = new ArrayList<>();
 
@@ -55,6 +72,7 @@ public class NoteService {
             noteResponse.setOwnerLastName(note.getOwner().getLastName());
             noteResponse.setCourseName(note.getCourse().getName());
             noteResponse.setCourseId(note.getCourse().getId());
+            noteResponse.setAttachmentCount(attachmentCountMap.getOrDefault(note.getId(), 0L));
 
             allNotesResponse.add(noteResponse);
         }
@@ -68,6 +86,24 @@ public class NoteService {
 
         List<Note> recentNotes = noteRepository.findAccessibleNotesByUserIdLimit5(userId, pageable);
 
+        if (recentNotes.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Long> noteIds = new ArrayList<>();
+        for (Note note : recentNotes) {
+            noteIds.add(note.getId());
+        }
+
+        List<Object[]> results = noteAttachmentRepository.countAttachmentsByNoteIds(noteIds);
+
+        Map<Long, Long> attachmentCountMap = new HashMap<>();
+        for (Object[] row : results) {
+            Long noteId = (Long) row[0];
+            Long count = (Long) row[1];
+            attachmentCountMap.put(noteId, count);
+        }
+
         List<NoteResponse> recentNotesResponse = new ArrayList<>();
 
         for (Note note: recentNotes) {
@@ -79,6 +115,7 @@ public class NoteService {
             Long ownerId = note.getOwner().getId();
             String firstName = note.getOwner().getFirstName();
             String lastName = note.getOwner().getLastName();
+            Long count = attachmentCountMap.getOrDefault(note.getId(), 0L);
 
             NoteResponse noteResponse = new NoteResponse();
 
@@ -92,6 +129,7 @@ public class NoteService {
             noteResponse.setOwnerLastName(lastName);
             noteResponse.setCourseId(note.getCourse().getId());
             noteResponse.setCourseName(note.getCourse().getName());
+            noteResponse.setAttachmentCount(count);
 
             recentNotesResponse.add(noteResponse);
 
@@ -139,6 +177,25 @@ public class NoteService {
         // Get notes as a list
         List<Note> notes = noteRepository.findByCourseIdOrderByUpdatedAtDesc(courseId);
 
+
+        if (notes.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Long> noteIds = new ArrayList<>();
+        for (Note note : notes) {
+            noteIds.add(note.getId());
+        }
+
+        List<Object[]> results = noteAttachmentRepository.countAttachmentsByNoteIds(noteIds);
+
+        Map<Long, Long> attachmentCountMap = new HashMap<>();
+        for (Object[] row : results) {
+            Long noteId = (Long) row[0];
+            Long count = (Long) row[1];
+            attachmentCountMap.put(noteId, count);
+        }
+
         // Create new list to store NoteResponse dto's
         List<NoteResponse> noteResponseList = new ArrayList<>();
 
@@ -167,6 +224,7 @@ public class NoteService {
             noteResponse.setOwnerLastName(lastName);
             noteResponse.setCourseId(course.getId());
             noteResponse.setCourseName(course.getName());
+            noteResponse.setAttachmentCount(attachmentCountMap.getOrDefault(note.getId(), 0L));
 
             // Add dto to list
             noteResponseList.add(noteResponse);

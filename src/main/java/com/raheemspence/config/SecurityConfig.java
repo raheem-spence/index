@@ -136,7 +136,10 @@ public class SecurityConfig {
                                 "/dashboard.html",
                                 "/courses.html",
                                 "/notes.html",
-                                "/create-note.html"
+                                "/create-note.html",
+                                "/note-detail.html",
+                                "/course-detail.html",
+                                "/saved-notes.html"
                         ).authenticated()
 
                         // any other request

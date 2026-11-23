@@ -154,4 +154,17 @@ export async function copyToClipboard(copySvgContainer, copySvgString, joinCode)
     } catch (error) {
         console.error('Failed to copy:', error);
     }
+
+}
+
+// converts bytes to human-readable strings (1024 -> 1 KB)
+export function formatFileSize(bytes) {
+    // .toFixed(digits) formats ta number using fixed-point notation (rounding it to a specific number of decimal places)
+    // and converts it to a string
+    // computers dont count in clean decimals so dividing bytes can get messy
+    // .toFixed(1) rounds te 1 decimal place "1.4 MB"
+    // .toFixed(0) rounds to 0 decimal places (whole number) "450 KB"
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }

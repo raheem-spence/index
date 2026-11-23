@@ -1,6 +1,7 @@
 import { fetchCourses } from "../api/courses.js";
 import { createNote } from "../api/notes.js";
-import { showToast } from "../utilities.js";
+import { showToast, formatFileSize } from "../utilities.js";
+import { uploadAttachment } from "../api/noteAttachments.js";
 
 // tracks whether the user is intentionally navigating away after a successful publish
 let isSubmitting = false;
@@ -259,7 +260,7 @@ function setUpFormSubmit() {
     const form = document.getElementById('create-note-form');
     const submitBtn = document.getElementById('publish-note-btn');
     const hiddenCourseInput = document.getElementById('selected-course-id');
-    const titleInput = document.getElementById('note-title');
+    const titleInput = document.getElementById('note-title-input');
     const contentTextarea = document.getElementById('note-content');
 
     if (!form || !submitBtn) return;
@@ -298,8 +299,10 @@ function setUpFormSubmit() {
         const originalBtnText = submitBtn.textContent;
         submitBtn.textContent = 'Publishing...';
 
+        let newNote;
+
         try {
-            const newNote = await createNote(courseId, {title, content});
+            newNote = await createNote(courseId, {title, content});
 
             if (!newNote) {
                 alert('Could not publish note. Please try again.');
@@ -309,19 +312,46 @@ function setUpFormSubmit() {
             }
 
             isSubmitting = true;
-            
-            // store pending toast for the destination page
-            sessionStorage.setItem('pendingToast', 'Note created');
-
-            // navitigae to all notes page or maybe note detail (later) on success
-            window.location.href = 'notes.html';
-
         } catch (error) {
             console.error('Unexpected error publishing note:', error);
             alert('An unexpected error occurred. Please try agian.');
             submitBtn.disabled = false;
             submitBtn.textContent = originalBtnText;
+            return;
         }
+
+        try {
+            if (stagedFiles.length > 0) {
+                submitBtn.textContent = 'Uploading attachments...';
+                for (const file of stagedFiles) {
+                    const newAttachment = await uploadAttachment(newNote.id, file);
+            
+                    if (!newAttachment) {
+                        alert('Unexpected error occurred. Please try again.');
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalBtnText;
+                        sessionStorage.setItem('pendingToast', 'Note created, but not all attachments uploaded.' )
+                        // window.location.href = `note-detail.html?id=${newNote.id}`;
+                        return;
+                    }
+
+                    isSubmitting = true;
+                }
+            }
+        } catch (error) {
+            console.error('Unexpected error uploading attachment:', error);
+            alert('Unexpected error occurred. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
+            sessionStorage.setItem('pendingToast', 'Note created, but some attachments failed to upload');
+            // window.location.href = `note-detail.html?id=${newNote.id}`;
+            return;
+        }
+
+        // navitigae to all notes page or maybe note detail (later) on success
+        sessionStorage.setItem('pendingToast', stagedFiles.length > 0 ? 'Note and attachments published' : 'Note published')
+        window.location.href = `note-detail.html?id=${newNote.id}`;
+
     });
 
     document.addEventListener('keydown', (e) => {
@@ -476,7 +506,7 @@ function handleFilesAdded(incomingFiles) {
         );
 
         if (isDuplicate) {
-            showToast(`"${file.name}" is already attached`, info);
+            showToast(`"${file.name}" is already attached`, 'info');
             return;
         }
 
@@ -527,14 +557,3 @@ function renderStagedFiles() {
     });
 }
 
-// converts bytes to human-readable strings (1024 -> 1 KB)
-function formatFileSize(bytes) {
-    // .toFixed(digits) formats ta number using fixed-point notation (rounding it to a specific number of decimal places)
-    // and converts it to a string
-    // computers dont count in clean decimals so dividing bytes can get messy
-    // .toFixed(1) rounds te 1 decimal place "1.4 MB"
-    // .toFixed(0) rounds to 0 decimal places (whole number) "450 KB"
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}

@@ -65,6 +65,7 @@ async function initializeDashboard() {
         return;
     }
     recentNotes = recentNotesResult.data;
+    console.log(recentNotes);
 
     const dashboardCoursesResult = await fetchDashboardCourses();
     if (!dashboardCoursesResult.success) {
@@ -273,6 +274,23 @@ function renderDashboardNotes(notesSection) {
         const noteCourseDiv = document.createElement('div');
         const noteOwner = document.createElement('span');
         const noteCls = document.createElement('span');
+        noteCourseDiv.append(noteCls, noteOwner);
+
+        if (note.attachmentCount > 0) {
+            const noteAttachmentData = document.createElement('span');
+            noteAttachmentData.classList.add('note-attachment-data');
+            
+            const noteAttachmentCount = document.createElement('span');
+            noteAttachmentCount.textContent = note.attachmentCount > 1 ? note.attachmentCount : '';
+            noteAttachmentCount.classList.add('note-attachment-count');
+            
+            const linkSvgContainer = document.createElement('div');
+            linkSvgContainer.innerHTML = `<svg class="attachments-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                            <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                                        </svg>`;
+            noteAttachmentData.append(linkSvgContainer, noteAttachmentCount);
+            noteCourseDiv.append(noteAttachmentData);
+        }
 
         noteATag.classList.add('note-a-tag');
         noteTitle.classList.add('note-title', 'truncate');
@@ -288,7 +306,6 @@ function renderDashboardNotes(notesSection) {
         noteCls.textContent = `${note.courseName}`;
         noteTime.textContent =  formatRelativeTime(note.updatedAt);
 
-        noteCourseDiv.append(noteCls, noteOwner);
         noteOwnerClsDiv.append(noteTitle, noteCourseDiv);
         noteATag.append(noteOwnerClsDiv, noteTime);
         noteItem.append(noteATag, saveNoteBtn);

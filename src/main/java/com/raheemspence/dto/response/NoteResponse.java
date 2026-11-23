@@ -19,4 +19,5 @@ public class NoteResponse {
     private String ownerLastName;
     private String courseName;
     private Long courseId;
+    private Long attachmentCount;
 }

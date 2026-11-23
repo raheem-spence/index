@@ -4,6 +4,7 @@ package com.raheemspence.service;
 import com.raheemspence.model.Note;
 import com.raheemspence.model.SavedNote;
 import com.raheemspence.model.SavedNoteId;
+import com.raheemspence.repository.NoteAttachmentRepository;
 import com.raheemspence.repository.NoteRepository;
 import com.raheemspence.repository.SavedNoteRepository;
 import org.springframework.http.HttpStatus;
@@ -13,17 +14,20 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 import java.time.Instant;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class SavedNoteService {
 
     private final SavedNoteRepository savedNoteRepository;
     private final NoteRepository noteRepository;
+    private final NoteAttachmentRepository noteAttachmentRepository;
 
-    public SavedNoteService(SavedNoteRepository savedNoteRepository, NoteRepository noteRepository) {
+    public SavedNoteService(SavedNoteRepository savedNoteRepository, NoteRepository noteRepository,
+                            NoteAttachmentRepository noteAttachmentRepository) {
         this.savedNoteRepository = savedNoteRepository;
         this.noteRepository = noteRepository;
+        this.noteAttachmentRepository = noteAttachmentRepository;
     }
 
     public record SavedNoteSummaryDTO(Long noteId,
@@ -32,7 +36,8 @@ public class SavedNoteService {
                                       String ownerFirstName,
                                       String ownerLastName,
                                       Instant createdAt,
-                                      Instant updatedAt) {}
+                                      Instant updatedAt,
+                                      Long attachmentCount) {}
 
     public record SaveStatusResponse(boolean saved) {}
 
@@ -40,6 +45,24 @@ public class SavedNoteService {
     public List<SavedNoteSummaryDTO> getSavedNotes(Long userId) {
 
         List<SavedNote> savedNotes =  savedNoteRepository.findByUserIdWithNotes(userId);
+
+        if (savedNotes.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Long> noteIds = new ArrayList<>();
+        for (SavedNote savedNote : savedNotes) {
+            noteIds.add(savedNote.getNote().getId());
+        }
+
+        List<Object[]> results = noteAttachmentRepository.countAttachmentsByNoteIds(noteIds);
+
+        Map<Long, Long> attachmentCountMap = new HashMap<>();
+        for (Object[] row : results) {
+            Long noteId = (Long) row[0];
+            Long count = (Long) row[1];
+            attachmentCountMap.put(noteId, count);
+        }
 
         return savedNotes.stream()
                 .map(savedNote -> {
@@ -51,7 +74,9 @@ public class SavedNoteService {
                             note.getOwner().getFirstName(),
                             note.getOwner().getLastName(),
                             note.getCreatedAt(),
-                            note.getUpdatedAt()
+                            note.getUpdatedAt(),
+                            attachmentCountMap.getOrDefault(note.getId(), 0L)
+
                     );
                 }).
                 toList();

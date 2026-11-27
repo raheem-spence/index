@@ -20,4 +20,5 @@ public class NoteResponse {
     private String courseName;
     private Long courseId;
     private Long attachmentCount;
+    private Boolean isPublic;
 }

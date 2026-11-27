@@ -247,3 +247,35 @@ export async function toggleSaveNote(noteId) {
 
     return await response.json();
 }
+
+export async function togglePublicNote(noteId, isPublic) {
+    const response = await fetch(`/courses/notes/${noteId}/share`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify({isPublic})
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to toggle save note: ${response.status}`);
+    }
+
+    return await response.json();
+}
+
+export async function getPublicNote(noteId) {
+    const response = await fetch(`/courses/public/notes/${noteId}`, {
+        method: 'GET',
+        credentials: 'include'
+    });
+
+    if (!response.ok) {
+        const error = new Error(`Failed to get public note: ${response.status}`);
+        error.status = response.status;
+        throw error;
+    }
+
+    return await response.json();
+}

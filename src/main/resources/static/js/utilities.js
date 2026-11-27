@@ -125,10 +125,10 @@ export function formatJoinCode(rawCode) {
     return rawCode ? `${rawCode.slice(0, 3)}-${rawCode.slice(3)}` : "";
 }
 
-export async function copyToClipboard(copySvgContainer, copySvgString, joinCode) {
+export async function copyToClipboard(copySvgContainer, copySvgString, stringToCopy) {
     try {
         // copy code to clipboard
-        await navigator.clipboard.writeText(joinCode);
+        await navigator.clipboard.writeText(stringToCopy);
 
         // change the icon
         const checkMarkString = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" 

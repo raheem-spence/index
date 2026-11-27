@@ -2,7 +2,9 @@ package com.raheemspence.controller;
 
 import com.raheemspence.dto.request.NoteRequest;
 import com.raheemspence.dto.response.NoteResponse;
-import com.raheemspence.model.Note;
+import com.raheemspence.dto.response.PublicNoteResponse;
+import com.raheemspence.service.NoteService.NoteShareResponse;
+import com.raheemspence.service.NoteService.UpdateShareStatusRequest;
 import com.raheemspence.service.NoteService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -106,5 +108,25 @@ public class NoteController {
         Long userId = (Long) httpSession.getAttribute("userId");
 
         return noteService.updateNote(userId, noteId, courseId, noteRequest);
+    }
+
+    // Update public viewing access
+    @PatchMapping("/notes/{noteId}/share")
+    public NoteShareResponse updatePublicAccess(@PathVariable Long noteId,
+                                                @Valid @RequestBody UpdateShareStatusRequest request,
+                                                            HttpSession httpSession) {
+        // Get user id from session
+        Long userId = (Long) httpSession.getAttribute("userId");
+
+        if (userId == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User is unauthorized");
+        }
+
+        return noteService.togglePublicAccess(noteId, userId, request);
+    }
+
+    @GetMapping("/public/notes/{noteId}")
+    public PublicNoteResponse getPublicNote(@PathVariable Long noteId) {
+        return noteService.getPublicNote(noteId);
     }
 }

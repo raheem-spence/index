@@ -54,6 +54,9 @@ public class Note {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
+    @Column(nullable = false)
+    private boolean isPublic = false;
+
     private Instant updatedAt;
     private Instant deletedAt;
 

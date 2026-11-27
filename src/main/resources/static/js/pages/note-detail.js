@@ -1,7 +1,7 @@
 // imports (what helper functions or api calls we need?)
-import { deleteNote, fetchNoteById, updateNote, fetchReactionState, toggleReaction } from "../api/notes.js";
+import { deleteNote, fetchNoteById, updateNote, fetchReactionState, toggleReaction, togglePublicNote } from "../api/notes.js";
 import { initializeSaveNoteButton } from "../script.js";
-import { formatDate, showToast, formatFileSize} from "../utilities.js"
+import { formatDate, showToast, formatFileSize, copyToClipboard} from "../utilities.js"
 import { fetchAttachments, deleteAttachment, uploadAttachment } from "../api/noteAttachments.js";
 
 const MAX_FILES = 5;
@@ -15,11 +15,18 @@ const ALLOWED_MIME_TYPES = [
     'image/webp'
 ];
 
+const copyIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" 
+                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" 
+                class="lucide lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2">
+                </rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+                </svg>`;
+
 
 let currentNote = null;
 let stagedFiles = [];
 const stagedDeletions = new Set();
 let currentAttachmentCount = 0;
+
 
 const viewActions = document.getElementById('view-actions');
 const editActions = document.getElementById('edit-actions');
@@ -35,6 +42,42 @@ const deleteText = document.getElementById('delete-text');
 const yesDeleteBtn = document.getElementById('yes-delete-btn');
 const noDeleteBtn = document.getElementById('no-delete-btn');
 const deleteConfirmGroup = document.getElementById('delete-confirm-group');
+
+// share popup trigger button
+const shareNoteBtn = document.getElementById('share-note-btn');
+
+// share popup trigger button icon
+const shareNoteBtnIcon = document.getElementById('share-btn-icon');
+
+// icon inside the share popover
+const shareIcon = document.getElementById('access-icon');
+
+// share popup div
+const sharePopover = document.getElementById('share-popover');
+
+// share options button within popover
+const shareOptionsBtn = document.getElementById('access-btn');
+
+const shareOptionsBtnText = document.getElementById('access-text');
+
+// share choice container
+const shareChoiceContainer = document.getElementById('access-choice-container');
+
+const accessHelperText = document.getElementById('access-helper-text');
+
+const footerText = document.getElementById('footer-text');
+const footerUpdateIcon = document.getElementById('footer-update-icon');
+
+const copyShareLinkBtn = document.getElementById('copy-share-link');
+
+const courseMembersOptionBtn = document.getElementById('course-members-option-btn');
+
+const publicOptionBtn = document.getElementById('public-option-btn');
+
+const privateCheckmarkIcon = document.getElementById('private-checkmark');
+const publicCheckmarkIcon = document.getElementById('public-checkmark');
+
+const copyIconDiv = document.getElementById('copy-icon-div');
 
 const editInput = document.getElementById('edit-input');
 const noteTitle = document.getElementById('note-title');
@@ -88,6 +131,7 @@ function initializeNoteDetailPage() {
     initializeSaveNoteButton(saveNoteBtn, noteId)
     initializeEditActions();
     initializeDeleteActions();
+    initializeShareActions(noteId);
     initializeAttachmentsActions();
     setUpAttachments();
     
@@ -138,6 +182,8 @@ async function renderNoteDetail(noteId) {
         }
 
         currentNote = noteData;
+
+        updateShareUI(currentNote.isPublic);
 
         const user = getCurrentUser();
 
@@ -830,4 +876,165 @@ function renderStagedFiles() {
         });
 
     });
+}
+
+function initializeShareActions(noteId) {
+    if (!shareNoteBtn || !sharePopover) return;
+
+    shareNoteBtn.addEventListener('click', () => {
+        sharePopover.classList.remove('hidden');
+        shareNoteBtn.setAttribute('aria-expanded', 'true');
+    });
+
+    // close popover on click outside
+    document.addEventListener('click', (e) => {
+        if (!shareNoteBtn.contains(e.target) && !sharePopover.contains(e.target)) {
+            sharePopover.classList.add('hidden');
+            shareNoteBtn.setAttribute('aria-expanded', 'false');
+
+            shareChoiceContainer.classList.add('hidden');
+            shareChoiceContainer.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // close popover on escape button
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !sharePopover.classList.contains('hidden')) {
+            sharePopover.classList.add('hidden');
+            shareNoteBtn.setAttribute('aria-expanded', 'false');
+            shareNoteBtn.focus(); // return focuse to share button for screen readers
+
+            shareChoiceContainer.classList.add('hidden');
+            shareChoiceContainer.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+
+    // share access options button
+    shareOptionsBtn.addEventListener('click', () => {
+
+        if (shareChoiceContainer.classList.contains('hidden')) {
+            shareChoiceContainer.classList.remove('hidden');
+            shareOptionsBtn.setAttribute('aria-expanded', 'true');
+        } else {
+            shareChoiceContainer.classList.add('hidden');
+            shareOptionsBtn.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+
+    // user clicked outside the choices buttons but on the share popover
+    sharePopover.addEventListener('click', (e) => {
+        e.stopPropagation();
+
+        if (sharePopover.contains(e.target) && 
+        !shareChoiceContainer.contains(e.target) && 
+        !shareChoiceContainer.classList.contains('hidden') && 
+        !shareOptionsBtn.contains(e.target)) {
+            shareChoiceContainer.classList.add('hidden');
+            shareOptionsBtn.focus();
+        }
+    });
+
+    courseMembersOptionBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+
+        try {
+            const result = await togglePublicNote(noteId, false);
+
+            currentNote.isPublic = result.isPublic;
+
+            updateShareUI(currentNote.isPublic);
+
+        } catch (error) {
+            console.error('Failed to toggle public note view:', error);
+            showToast('Unable to update share access', 'error');
+        }
+
+        shareChoiceContainer.classList.add('hidden');
+        footerUpdateIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" 
+                                    fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" 
+                                    aria-hidden="true" data-tsd-source="/src/components/NoteShare.tsx:74:207">
+                                    <path d="M20 6 9 17l-5-5"></path>
+                                    </svg>`;
+        footerText.textContent = 'Access updated';
+    });
+
+    publicOptionBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+
+        try {
+            const result = await togglePublicNote(noteId, true);
+
+            currentNote.isPublic = result.isPublic;
+
+            updateShareUI(currentNote.isPublic);
+
+        } catch (error) {
+            console.error('Failed to toggle public note view:', error);
+            showToast('Unable to update share access', 'error');
+        }
+
+        shareChoiceContainer.classList.add('hidden');
+        footerUpdateIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" 
+                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" 
+                                aria-hidden="true" data-tsd-source="/src/components/NoteShare.tsx:74:207">
+                                <path d="M20 6 9 17l-5-5"></path>
+                                </svg>`;
+        footerText.textContent = 'Access updated';
+    });
+
+
+    // user copys link
+    copyShareLinkBtn.addEventListener('click', () => {
+        // wire up the URL
+        const publicUrl = window.location.origin + '/public-note.html?id=' + noteId;
+       
+        copyToClipboard(copyIconDiv, copyIconSvg, publicUrl);
+
+        if (!currentNote.isPublic) {
+            showToast(`Visitor's won't be able to view note unless access is public`, 'info');
+        }
+    })
+
+
+}
+
+function updateShareUI(isPublic) {
+    if (isPublic) {
+        privateCheckmarkIcon.classList.add('hidden');
+        publicCheckmarkIcon.classList.remove('hidden');
+        shareOptionsBtnText.textContent = 'Anyone with the link';
+
+        // icon within popover
+        shareIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" 
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20">
+                            </path><path d="M2 12h20"></path>
+                            </svg>`;
+        
+        // icon on share trigger button
+        shareNoteBtnIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" 
+                                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20">
+                                    </path><path d="M2 12h20"></path>
+                                    </svg>`;
+
+        accessHelperText.textContent =  'Anyone with this link can read the note. No account needed.';
+    } else {
+        publicCheckmarkIcon.classList.add('hidden');
+        privateCheckmarkIcon.classList.remove('hidden');
+        shareOptionsBtnText.textContent = 'Course members only';
+        shareIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" 
+                                stroke-linejoin="round" aria-hidden="true">
+                                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>`;
+
+         shareNoteBtnIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" 
+                                stroke-linejoin="round" aria-hidden="true">
+                                <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>`;
+
+        accessHelperText.textContent = 'Only signed-in members of this course can open the note.';
+    }
 }

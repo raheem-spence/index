@@ -1,0 +1,82 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style2.css">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <title>Index</title>
+</head>
+<body>
+    <header class="public-note-header">
+        <div class="logo-div">
+            <a href="/index.html">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24" aria-hidden="true">
+                <!-- The teal rounded tile  -->
+                <rect width="64" height="64" rx="15" fill="#006363" />
+                
+                <!-- The white lowercase "i" -->
+                <path
+                  d="M72 92H281V442H82V534H389V92H568V0H72ZM275 713H387V607H275Z"
+                  transform="translate(14.05 52.00) scale(0.056101 -0.056101)"
+                  fill="#ffffff"
+                />
+              </svg>       
+              </a>       
+        </div>
+        <a href="/signup.html" class="sign-in-btn">Sign in</a>
+    </header>
+    <main class="public-note-main">
+        <div id="public-note-container">
+            <article class="note-document" id="note-document">
+                <!-- header: title, course badge, author, timestamp -->
+                <header class="note-header">
+                    <h1 class="note-detail-title" id="note-title"></h1>
+                    <dl class="note-meta-grid">
+                        <div class="list-group note-detail-course">
+                            <!-- book icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open h-4 w-4 text-muted-foreground" aria-hidden="true"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>
+                            <dt class="list-description">Course</dt>
+                            <dd class="list-item" id="note-course">
+                                    <span id="note-course-name"></span>
+                            </dd>
+                        </div>
+                        <div class="list-group">
+                            <!-- clock icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock h-4 w-4 text-muted-foreground" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                            <dt class="list-description" id="note-modification"></dt>
+                            <dd class="list-item" id="note-date">
+                            </dd>
+                        </div>
+                        <div class="list-group">
+                            <!-- person icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user h-4 w-4 text-muted-foreground" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            <dt class="list-description">Author</dt>
+                            <dd class="list-item" id="note-author"></dd>
+                        </div>
+                    </dl>
+                </header>
+
+                <!-- body -->
+                <div class="note-body" id="note-body"></div>
+
+                <!-- attachments section (if they exist) -->
+                <section class="note-attachments hidden" id="note-attachments" aria-labelledby="attachments-heading">
+                    <h2 id="attachments-heading" class="attachments-title">
+                        <!-- paperclip icon -->
+                        <svg class="attachments-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                        </svg>
+                        <span>Attachments</span>
+                    </h2>
+                    <div class="attachments-grid" id="attachments-grid"></div>
+                </section>
+                <footer class="public-note-footer" id="note-footer">
+                    <p><span>Shared from Index.</span> Study groups post notes and attach the files, so nothing gets lost in the group chat.</p>
+                    <a href="/signup.html" class="join-btn">Sign in</a>
+                </footer>
+            </article>
+        </div>
+    </main>
+</body>
+<script type="module" src="/js/pages/public-note.js" defer></script>
+</html>

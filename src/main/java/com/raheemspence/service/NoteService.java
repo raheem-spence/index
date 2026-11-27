@@ -2,6 +2,8 @@ package com.raheemspence.service;
 
 import com.raheemspence.dto.request.NoteRequest;
 import com.raheemspence.dto.response.NoteResponse;
+import com.raheemspence.dto.response.PublicNoteResponse;
+import com.raheemspence.mapper.PublicNoteMapper;
 import com.raheemspence.model.Course;
 import com.raheemspence.model.Note;
 import com.raheemspence.model.User;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -23,17 +26,20 @@ public class NoteService {
     private final CourseRepository courseRepository;
     private final CourseMembershipRepository courseMembershipRepository;
     private final NoteAttachmentRepository noteAttachmentRepository;
+    private final PublicNoteMapper publicNoteMapper;
 
     public NoteService(NoteRepository noteRepository,
                        UserRepository userRepository,
                        CourseRepository courseRepository,
                        CourseMembershipRepository courseMembershipRepository,
-                       NoteAttachmentRepository noteAttachmentRepository) {
+                       NoteAttachmentRepository noteAttachmentRepository,
+                       PublicNoteMapper publicNoteMapper) {
         this.noteRepository = noteRepository;
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
         this.courseMembershipRepository = courseMembershipRepository;
         this.noteAttachmentRepository = noteAttachmentRepository;
+        this.publicNoteMapper = publicNoteMapper;
     }
 
     public List<NoteResponse> getAllNotes(Long userId) {
@@ -154,6 +160,7 @@ public class NoteService {
         noteResponse.setCreatedAt(note.getCreatedAt());
         noteResponse.setUpdatedAt(note.getUpdatedAt());
         noteResponse.setOwnerId(note.getOwner().getId());
+        noteResponse.setIsPublic(note.isPublic());
 
         return noteResponse;
     }
@@ -358,6 +365,44 @@ public class NoteService {
         noteResponse.setUpdatedAt(savedNote.getUpdatedAt());
 
         return noteResponse;
+    }
+
+    public record UpdateShareStatusRequest( boolean isPublic ) {}
+
+    public record NoteShareResponse(
+            Long noteId,
+            boolean isPublic
+    ){}
+
+    @Transactional
+    public NoteShareResponse togglePublicAccess(Long noteId, Long userId, UpdateShareStatusRequest request) {
+        // find note, if not return 404
+        Note note = noteRepository.findById(noteId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note not found"));
+
+        // verity user is owner and can change the public access field
+        if (!note.getOwner().getId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to alter this note");
+        }
+
+        // change the public access field and return NoteShareResponse dto
+        note.setPublic(request.isPublic());
+        return new NoteShareResponse(note.getId(), note.isPublic());
+    }
+
+    @Transactional(readOnly = true)
+    public PublicNoteResponse getPublicNote(Long noteId) {
+        // find note, if not found return 404
+        Note note = noteRepository.findById(noteId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Note not found"));
+
+        // if public access is false, return 404
+        if (!note.isPublic()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Note not public");
+        }
+
+        // return public note response
+        return publicNoteMapper.mapToPublicNoteResponse(note);
     }
 }
 

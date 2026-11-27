@@ -124,6 +124,7 @@ public class SecurityConfig {
                                 "/login.html",
                                 "/signup.html",
                                 "/join.html",
+                                "/public/**",
                                 "/auth/**", // login, register endpoints
                                 "/css/**", // styles
                                 "/js/**", // scripts need for login

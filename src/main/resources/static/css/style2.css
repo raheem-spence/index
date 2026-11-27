@@ -264,9 +264,6 @@ aside{
     background-color: var(--bg-secondary);
 }
 
-.nav-row .nav-link:hover {
-    background-color: transparent;
-}
 
 .nav-row:hover .nav-link {
     color: var(--text-primary);

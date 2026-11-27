@@ -19,4 +19,5 @@ public interface NoteAttachmentRepository extends JpaRepository<NoteAttachment, 
     @Query("SELECT a.note.id, COUNT(a) FROM NoteAttachment a WHERE a.note.id IN :noteIds GROUP BY a.note.id")
     List<Object[]> countAttachmentsByNoteIds(@Param("noteIds") List<Long> noteIds);
 
+    long countByNoteId(Long noteId);
 }

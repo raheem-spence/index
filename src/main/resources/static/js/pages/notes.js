@@ -221,7 +221,6 @@ function renderAllNotesView(notesToRender) {
 }
 
 function addNote(newNoteData) {
-    console.log(newNoteData);
     const noteLi = document.createElement('li');
     noteLi.classList.add('note-list-element');
 

@@ -65,7 +65,6 @@ async function initializeDashboard() {
         return;
     }
     recentNotes = recentNotesResult.data;
-    console.log(recentNotes);
 
     const dashboardCoursesResult = await fetchDashboardCourses();
     if (!dashboardCoursesResult.success) {

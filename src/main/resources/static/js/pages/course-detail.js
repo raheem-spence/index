@@ -157,7 +157,6 @@ async function renderCourseDetail(courseId) {
             showError('Course not found', `This course may have been deleted, or the link is incorrect.`, 'no-course');
         }
         courseData = courseDetails.data;
-        console.log(courseData);
        
         if (!notes.data) return;
          

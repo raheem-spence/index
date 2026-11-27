@@ -72,7 +72,6 @@ function renderSavedNotes(notesToRender) {
 
     // loop through saved notes and render them
     for (const note of notesToRender) {
-        console.log(note);
         const noteItem = document.createElement('li');
         noteItem.dataset.id = note.noteId;
         noteItem.classList.add('note-list-element');

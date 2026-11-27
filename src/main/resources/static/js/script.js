@@ -7,21 +7,25 @@ import { fetchSavedNoteState, toggleSaveNote } from "./api/notes.js";
 // wait until the browser is done parsing all html elements before running scripts,
 // preventing 'null' errors when looking up DOM ids like buttons and inputs
 document.addEventListener('DOMContentLoaded', () => {
-    // // get current pathname
-    // const currentPath = window.location.pathname;
+    // get current pathname
+    const currentPath = window.location.pathname;
 
-    // const sidebarLinks = document.querySelectorAll('.nav-link');
+    const sidebarLinks = document.querySelectorAll('.nav-link');
 
-    // sidebarLinks.forEach((link) => {
-    //     // convert link.href into a URL object to reliably extract pathname
-    //     const linkPath = new URL(link.href).pathname;
+    sidebarLinks.forEach((link) => {
+        // convert link.href into a URL object to reliably extract pathname
+        const linkPath = new URL(link.href).pathname;
 
-    //     if (linkPath === currentPath) {
-    //         link.classList.add('active');
-    //     } else {
-    //         link.classList.remove('active');
-    //     }
-    // })
+        if (linkPath === currentPath) {
+            link.classList.add('active');
+            link.setAttribute('aria-current', 'page');
+        } else if ((currentPath.includes('note-detail') || currentPath.includes('create-note')) && !linkPath.includes('saved') && linkPath.includes('note')) {
+            link.classList.add('active');
+            link.setAttribute('aria-current', 'page');
+        } else {
+            link.classList.remove('active');
+        }
+    })
 
     // check if a previous page left a toast
     const pendingToast = sessionStorage.getItem('pendingToast');

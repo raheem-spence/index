@@ -161,6 +161,7 @@ public class NoteService {
         noteResponse.setUpdatedAt(note.getUpdatedAt());
         noteResponse.setOwnerId(note.getOwner().getId());
         noteResponse.setIsPublic(note.isPublic());
+        noteResponse.setAttachmentCount(noteAttachmentRepository.countByNoteId(note.getId()));
 
         return noteResponse;
     }

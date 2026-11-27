@@ -104,8 +104,6 @@ function initializeNoteDetailPage() {
     const noteId = urlParams.get('id');
     const from = urlParams.get('from');
 
-    console.log(noteId);
-
     const backATag = document.getElementById('back-link');
     const backDestination = document.getElementById('back-destination');
     
@@ -174,7 +172,6 @@ async function renderNoteDetail(noteId) {
     try {
     // get the note data
         const noteData = await fetchNoteById(noteId);
-        console.log(noteData);
         
         if (!noteData) {
             showError('Note not found', `This note may have been deleted, or the link is incorrect.`, 'no-note');
@@ -565,7 +562,7 @@ async function loadAndRenderAttachments(noteId) {
             noteAttachmentsEl.classList.add('hidden');
             return;
         }
-        console.log(attachments);
+        
         noteAttachmentsEl.classList.remove('hidden');
 
         attachments.forEach((attachment) => {
